@@ -468,10 +468,23 @@ void Player::InitMusic(void)
    //
    // reset the music 
    //
-   client->ps.current_music_mood = mood_normal;
-   client->ps.fallback_music_mood = mood_normal;
-   ChangeMusic("normal", "normal", false);
-   music_forced = false;
+   if(level.default_current_mood == NULL)
+   {
+      level.default_current_mood = 1;
+   }
+   else if(level.default_current_mood == 2)
+   {
+      action_level = 80;
+   }
+   if(level.default_fallback_mood == NULL)
+   {
+      level.default_fallback_mood = 1;
+   }
+   music_current_mood = level.default_current_mood;
+   music_fallback_mood = level.default_fallback_mood;
+   client->ps.current_music_mood = level.default_current_mood;
+   client->ps.fallback_music_mood = level.default_fallback_mood;
+   music_forced = level.default_music_forced;
 }
 
 void Player::InitClient(void)
@@ -1941,7 +1954,19 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
       // raise the action level
       //
       if(currentWeapon)
-         action_level += currentWeapon->ActionLevelIncrement();
+	  {
+         Vector dir, src, end;
+         trace_t trace;
+
+         currentWeapon->GetMuzzlePosition(&src, &dir);
+
+         end = src + dir * 8192;
+         trace = G_FullTrace(src, vec_zero, vec_zero, end, 256, this, MASK_SHOT, "Player::SetCameraEntity");
+         if(trace.intersect.valid)
+         {
+            action_level += currentWeapon->ActionLevelIncrement();
+         }
+      }
 
       firedown = true;
       firedowntime = level.time;
@@ -4945,18 +4970,18 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
    else if(action_level > 30)
    {
       music_current_mood = mood_normal;
-      music_fallback_mood = mood_normal;
+      //music_fallback_mood = mood_normal;
       client->ps.current_music_mood = mood_action;
-      client->ps.fallback_music_mood = mood_normal;
+      client->ps.fallback_music_mood = mood_action;
    }
-   else if((action_level < 15) && (client->ps.current_music_mood == mood_action))
+   else if((action_level < 15) && (client->ps.current_music_mood == mood_action) && (music_current_mood == mood_normal))
    {
       music_current_mood = mood_normal;
-      music_fallback_mood = mood_normal;
+      //music_fallback_mood = mood_normal;
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
    }
-   else if(client->ps.current_music_mood != mood_action)
+   else if(!((client->ps.current_music_mood == mood_action) && (music_current_mood == mood_normal)))
    {
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
@@ -4977,7 +5002,11 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
    //
    if(s_debugmusic->value)
    {
-      warning("DebugMusic", "%s's action_level = %4.2f\n", client->pers.netname, action_level);
+      warning("DebugMusic", "%s's action_level = %4.2f\n %i %i %i %i", client->pers.netname, action_level, music_current_mood, client->ps.current_music_mood, music_fallback_mood, client->ps.fallback_music_mood);
+      if(music_forced)
+      {
+         warning("DebugMusic", "FORCED");
+      }
    }
 }
 
@@ -5704,6 +5733,10 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
    music_forced = force;
    if(str(current) == str("normal"))
    {
+      if(music_forced)
+      {
+         action_level = 0;
+      }
       music_forced = false;
    }
 
@@ -5716,6 +5749,14 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
       }
       else
       {
+         if(str(current) == str("action"))
+         {
+            action_level = 80;
+         }
+         else if(str(current) != str("normal"))
+         {
+            action_level = 0;
+         }
          music_current_mood = current_mood_num;
       }
    }
@@ -5800,14 +5841,17 @@ void Player::Human(Event *ev)
 {
    int playernum;
 
+   if(!((flags & FL_SP_MUTANT) && (health <= 0)))
+   {
+      setModel(savemodel.c_str());
+      SetAnim("idle");
+
+      strcpy(client->pers.model, savemodel.c_str());
+      strcpy(client->pers.skin, saveskin.c_str());
+   }
+
    flags &= ~FL_SP_MUTANT;
    flags &= ~FL_MUTANT;
-
-   setModel(savemodel.c_str());
-   SetAnim("idle");
-
-   strcpy(client->pers.model, savemodel.c_str());
-   strcpy(client->pers.skin, saveskin.c_str());
 
    playernum = edict - g_edicts - 1;
 
@@ -5823,13 +5867,16 @@ void Player::Mutate(Event *ev)
    int      playernum;
    Weapon   *mutanthands;
 
+   if(!(flags & (FL_MUTANT | FL_SP_MUTANT)))
+   {
+      savemodel = client->pers.model;
+      saveskin = client->pers.skin;
+   }
+
    flags |= FL_SP_MUTANT;
 
    setModel("manumit_pl.def");
    SetAnim("idle");
-
-   savemodel = client->pers.model;
-   saveskin = client->pers.skin;
 
    strcpy(client->pers.model, "manumit_pl.def");
 

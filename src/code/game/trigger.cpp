@@ -1846,7 +1846,10 @@ void TriggerExit::DisplayExitSign(Event *ev)
       //
       // change music
       //
-      client->ChangeMusic("success", "normal", false);
+      if(level.exitmusic)
+      {
+         client->ChangeMusic("success", "normal", false);
+      }
       client->client->ps.stats[STAT_EXITSIGN] = 11;
    }
 }

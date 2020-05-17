@@ -2388,6 +2388,10 @@ level_locals_t::level_locals_t() : Class()
 
    cinematic = false;
    no_jc = false;
+   exitmusic = false;
+   default_current_mood = NULL;
+   default_fallback_mood = NULL;
+   default_music_forced = false;
 
    water_color = vec_zero;
    lightvolume_color = vec_zero;
@@ -2425,6 +2429,10 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
 
    arc.WriteBoolean(cinematic);
    arc.WriteBoolean(no_jc);
+   arc.WriteBoolean(exitmusic);
+   arc.WriteInteger(default_current_mood);
+   arc.WriteInteger(default_fallback_mood);
+   arc.WriteBoolean(default_music_forced);
 
    arc.WriteVector(water_color);
    arc.WriteVector(lightvolume_color);
@@ -2471,6 +2479,10 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
 
    arc.ReadBoolean(&cinematic);
    arc.ReadBoolean(&no_jc);
+   arc.ReadBoolean(&exitmusic);
+   arc.ReadInteger(&default_current_mood);
+   arc.ReadInteger(&default_fallback_mood);
+   arc.ReadBoolean(&default_music_forced);
    arc.ReadVector(&water_color);
    arc.ReadVector(&lightvolume_color);
    arc.ReadVector(&lava_color);
