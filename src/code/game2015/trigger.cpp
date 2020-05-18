@@ -2116,7 +2116,10 @@ void TriggerExit::DisplayExitSign(Event *ev)
       //
       // change music
       //
-      client->ChangeMusic("success", "normal", false);
+      if(level.exitmusic)
+      {
+         client->ChangeMusic("success", "normal", false);
+      }
       if(!ctf->value) //### not in CTF
          client->client->ps.stats[STAT_EXITSIGN] = 11;
    }

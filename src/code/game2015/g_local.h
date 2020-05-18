@@ -289,6 +289,11 @@ public:
 
    qboolean    no_jc;
 
+   qboolean    exitmusic;
+   int         default_current_mood;
+   int         default_fallback_mood;
+   qboolean    default_music_forced;
+
    // Blending color for water, light volumes,lava
    Vector      water_color;
    Vector      lightvolume_color;
