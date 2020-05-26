@@ -199,6 +199,7 @@ protected:
 
    float             last_damage_time;
    qboolean          music_forced;
+   float             music_cancel;
 
    // CTF
    HookPtr           hook;
@@ -515,6 +516,7 @@ inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
 
    arc.WriteFloat(last_damage_time);
    arc.WriteBoolean(music_forced);
+   arc.WriteFloat(music_cancel);
 
    arc.WriteBoolean(trappedInQuantum);
 }
@@ -647,6 +649,7 @@ inline EXPORT_FROM_DLL void Player::Unarchive(Archiver &arc)
 
    arc.ReadFloat(&last_damage_time);
    arc.ReadBoolean(&music_forced);
+   arc.ReadFloat(&music_cancel);
 
    arc.ReadBoolean(&trappedInQuantum);
 }
