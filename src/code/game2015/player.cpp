@@ -6539,37 +6539,41 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
    }
-   else if((action_level > 30) && ((music_fallback_mood == mood_action) || ((client->ps.fallback_music_mood == mood_action) && (client->ps.current_music_mood != mood_action))))
+   else if(action_level > 30 && (music_fallback_mood == mood_action || (client->ps.fallback_music_mood == mood_action && client->ps.current_music_mood != mood_action)) && music_current_mood != mood_normal)
    {
       music_fallback_mood = mood_normal;
-      if(music_current_mood != mood_normal)
+      if(music_current_mood != mood_special)
       {
          client->ps.current_music_mood = music_current_mood;
       }
       client->ps.fallback_music_mood = mood_action;
-      music_current_mood = mood_normal;
+      music_current_mood = mood_special;
    }
    else if(action_level > 30)
    {
       music_current_mood = mood_normal;
-      //music_fallback_mood = mood_normal;
+      music_fallback_mood = mood_normal;
       client->ps.current_music_mood = mood_action;
       client->ps.fallback_music_mood = mood_action;
    }
-   else if((action_level < 15) && ((client->ps.current_music_mood == mood_action) || (client->ps.fallback_music_mood == mood_action)) && (music_current_mood == mood_normal))
+   else if(action_level < 15 && (client->ps.current_music_mood == mood_action || client->ps.fallback_music_mood == mood_action) && (music_current_mood == mood_normal || music_current_mood == mood_special))
    {
       music_current_mood = mood_normal;
-      //music_fallback_mood = mood_normal;
+      music_fallback_mood = mood_normal;
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
    }
-   else if(music_cancel < level.time && ((client->ps.current_music_mood == mood_success) || (client->ps.current_music_mood == mood_failure)))
+   else if(music_cancel < level.time && (client->ps.current_music_mood == mood_success || client->ps.current_music_mood == mood_failure))
    {
       music_current_mood = music_fallback_mood;
       client->ps.current_music_mood = client->ps.fallback_music_mood;
    }
-   else if(!(((client->ps.current_music_mood == mood_action) || (client->ps.fallback_music_mood == mood_action)) && (music_current_mood == mood_normal)))
+   else if(!((client->ps.current_music_mood == mood_action || client->ps.fallback_music_mood == mood_action) && (music_current_mood == mood_normal || music_current_mood == mood_special)))
    {
+      if(music_fallback_mood == mood_action || music_current_mood == mood_normal)
+      {
+         music_fallback_mood = mood_normal;
+      }
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
    }
@@ -7333,7 +7337,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
       action_level = 0;
       music_forced = false;
    }
-   else if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || ((str(current) == str("failure") && client->ps.current_music_mood != mood_failure)))
+   else if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || (str(current) == str("failure") && client->ps.current_music_mood != mood_failure))
    {
       music_cancel = level.time + 20;
    }
