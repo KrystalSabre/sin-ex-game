@@ -4970,7 +4970,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
    }
    else if(action_level > 30 && (music_fallback_mood == mood_action || (client->ps.fallback_music_mood == mood_action && client->ps.current_music_mood != mood_action)) && music_current_mood != mood_normal)
    {
-      if(music_fallback_mood == mood_action))
+      if(music_fallback_mood == mood_action)
       {
          client->ps.current_music_mood = music_current_mood;
       }
