@@ -4974,18 +4974,18 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       {
          client->ps.current_music_mood = music_current_mood;
       }
-      client->ps.fallback_music_mood = mood_action;
-      music_current_mood = mood_special;
+      music_current_mood = mood_action;
       music_fallback_mood = mood_normal;
+      client->ps.fallback_music_mood = mood_action;
    }
    else if(action_level > 30)
    {
-      music_current_mood = mood_normal;
+      music_current_mood = mood_action;
       music_fallback_mood = mood_normal;
       client->ps.current_music_mood = mood_action;
       client->ps.fallback_music_mood = mood_action;
    }
-   else if(action_level < 15 && (client->ps.current_music_mood == mood_action || client->ps.fallback_music_mood == mood_action) && (music_current_mood == mood_normal || music_current_mood == mood_special))
+   else if(action_level < 15 && client->ps.fallback_music_mood == mood_action && music_current_mood == mood_action)
    {
       music_current_mood = mood_normal;
       music_fallback_mood = mood_normal;
@@ -4997,7 +4997,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       music_current_mood = music_fallback_mood;
       client->ps.current_music_mood = client->ps.fallback_music_mood;
    }
-   else if(!((client->ps.current_music_mood == mood_action || client->ps.fallback_music_mood == mood_action) && (music_current_mood == mood_normal || music_current_mood == mood_special)))
+   else if(!(client->ps.fallback_music_mood == mood_action && music_current_mood == mood_action))
    {
       if(music_fallback_mood == mood_action || music_current_mood == mood_normal)
       {
