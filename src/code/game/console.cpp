@@ -612,7 +612,7 @@ void ConsoleManager::ConsoleLayout(Event *ev)
          else if(strstr(token, "---"))
          {
             strcat(newlayout, " ");
-            strcat(newlayout, "\"\"");
+            strcat(newlayout, "\"\"\"");
             // Skip over extraneous lines of characters
          }
          else
@@ -678,7 +678,7 @@ void ConsoleManager::ConsoleAppLayout(Event *ev)
          }
          else if(strstr(token, "---"))
          {
-            strcat(newlayout, "\"\"");
+            strcat(newlayout, "\"\"\"");
             // Skip over extraneous lines of characters
          }
          else

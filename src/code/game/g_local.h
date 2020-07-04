@@ -245,8 +245,8 @@ public:
    qboolean    no_jc;
 
    qboolean    exitmusic;
-   int         default_current_mood;
-   int         default_fallback_mood;
+   str         default_current_mood;
+   str         default_fallback_mood;
    qboolean    default_music_forced;
 
    // Blending color for water, light volumes,lava
@@ -258,6 +258,8 @@ public:
    float       lava_alpha;
    qboolean    airclamp;
    qboolean    training;
+
+   Entity      *defaultcamera;
 
    level_locals_t();
    virtual void   Archive(Archiver &arc)   override;

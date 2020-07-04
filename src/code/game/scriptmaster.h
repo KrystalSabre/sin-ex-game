@@ -181,8 +181,6 @@ protected:
    void                 ForceMusicEvent(Event *ev);
    void                 SoundtrackEvent(Event *ev);
    void                 ExitMusicEvent(Event *ev);
-   void                 DefaultMusicEvent(Event *ev);
-   void                 ForceDefaultMusicEvent(Event *ev);
    void                 ScriptError(const char *fmt, ...);
    void                 SetCinematic(Event *ev);
    void                 SetNonCinematic(Event *ev);

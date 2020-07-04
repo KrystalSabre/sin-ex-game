@@ -131,6 +131,8 @@ int		sv_numtraces;
 
 usercmd_t *current_ucmd;
 
+cvar_t   *patched;
+
 void     G_AllocDebugLines( void );
 void		G_ClientDrawBoundingBoxes( void );
 void		( *ServerError )( const char *fmt, ... );
@@ -325,6 +327,8 @@ void G_InitGame(void)
    }
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
+
+   patched           = gi.cvar("patched", "917745", CVAR_NOSET);
 
    CTF_Init();
 
@@ -2389,8 +2393,8 @@ level_locals_t::level_locals_t() : Class()
    cinematic = false;
    no_jc = false;
    exitmusic = false;
-   default_current_mood = NULL;
-   default_fallback_mood = NULL;
+   default_current_mood = "";
+   default_fallback_mood = "";
    default_music_forced = false;
 
    water_color = vec_zero;
@@ -2402,6 +2406,8 @@ level_locals_t::level_locals_t() : Class()
 
    missionfailed = false;
    missionfailedtime = 0;
+
+   defaultcamera = NULL;
 }
 
 EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
@@ -2430,8 +2436,8 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
    arc.WriteBoolean(cinematic);
    arc.WriteBoolean(no_jc);
    arc.WriteBoolean(exitmusic);
-   arc.WriteInteger(default_current_mood);
-   arc.WriteInteger(default_fallback_mood);
+   arc.WriteString(default_current_mood);
+   arc.WriteString(default_fallback_mood);
    arc.WriteBoolean(default_music_forced);
 
    arc.WriteVector(water_color);
@@ -2480,8 +2486,8 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
    arc.ReadBoolean(&cinematic);
    arc.ReadBoolean(&no_jc);
    arc.ReadBoolean(&exitmusic);
-   arc.ReadInteger(&default_current_mood);
-   arc.ReadInteger(&default_fallback_mood);
+   arc.ReadString(&default_current_mood);
+   arc.ReadString(&default_fallback_mood);
    arc.ReadBoolean(&default_music_forced);
    arc.ReadVector(&water_color);
    arc.ReadVector(&lightvolume_color);

@@ -33,6 +33,11 @@ ResponseDef BlueCard::Responses[] =
 BlueCard::BlueCard() : InventoryItem()
 {
    setModel("card_blu.def");
+   if(coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 class EXPORT_FROM_DLL OrangeCard : public InventoryItem
@@ -52,6 +57,11 @@ ResponseDef OrangeCard::Responses[] =
 OrangeCard::OrangeCard() : InventoryItem()
 {
    setModel("card_orng.def");
+   if (coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 class EXPORT_FROM_DLL YellowCard : public InventoryItem
@@ -71,6 +81,11 @@ ResponseDef YellowCard::Responses[] =
 YellowCard::YellowCard() : InventoryItem()
 {
    setModel("card_yel.def");
+   if(coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 class EXPORT_FROM_DLL GreenCard : public InventoryItem
@@ -90,6 +105,11 @@ ResponseDef GreenCard::Responses[] =
 GreenCard::GreenCard() : InventoryItem()
 {
    setModel("card_grn.def");
+   if (coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 class EXPORT_FROM_DLL IdentCard : public InventoryItem
@@ -109,6 +129,11 @@ ResponseDef IdentCard::Responses[] =
 IdentCard::IdentCard() : InventoryItem()
 {
    setModel("identcard.def");
+   if (coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 class EXPORT_FROM_DLL Cookies : public InventoryItem
@@ -204,6 +229,11 @@ ResponseDef KeyRing::Responses[] =
 KeyRing::KeyRing() : InventoryItem()
 {
    setModel("keys.def");
+   if (coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 class EXPORT_FROM_DLL MoneyBag : public InventoryItem
@@ -585,6 +615,11 @@ ResponseDef Hand::Responses[] =
 Hand::Hand() : InventoryItem()
 {
    setModel("hand.def");
+   if (coop->value)
+   {
+      setRespawnTime(3);
+      setRespawn(true);
+   }
 }
 
 /*SINED inventory_genericpulsepart (.3 1 .3) (-8 -8 0) (8 8 16) NOT_SOLID NOT_DAMAGABLE
