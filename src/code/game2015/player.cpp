@@ -3107,7 +3107,7 @@ void Player::EventUseItem(Event *ev)
    if(flags & (FL_MUTANT | FL_SP_MUTANT))
       return;
 
-   if(currentWeapon && !currentWeapon->ChangingWeapons())
+   if(currentWeapon && Q_strcasecmp(name,"QuantumDestabilizer") && !currentWeapon->ChangingWeapons())
    {
       if(!Q_stricmp(name, currentWeapon->getClassname()))
       {

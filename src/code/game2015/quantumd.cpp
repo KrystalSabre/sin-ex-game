@@ -849,11 +849,11 @@ qboolean QuantumDestabilizer::Drop()
 }
 
 //###
-void QuantumDestabilizer::SecondaryUse(Event *ev)
-{
-   // switch to the stinger pack
-   owner->useWeapon("StingerPack");
-}
+//void QuantumDestabilizer::SecondaryUse(Event *ev)
+//{
+//   // switch to the stinger pack
+//   owner->useWeapon("StingerPack");
+//}
 //###
 
 // EOF

@@ -47,7 +47,7 @@ public:
                                  int kick,
                                  int dflags);
    virtual qboolean  Drop()                    override;
-   virtual void      SecondaryUse(Event *ev)   override; //###
+   //virtual void      SecondaryUse(Event *ev)   override; //###
    virtual void      Archive(Archiver &arc)    override;
    virtual void      Unarchive(Archiver &arc)  override;
 };
