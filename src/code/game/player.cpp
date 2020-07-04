@@ -2490,7 +2490,7 @@ EXPORT_FROM_DLL void Player::ClientThink(Event *ev)
             (buttons & BUTTON_USE) ||
             (current_ucmd->upmove > 0))
          {
-            if(world->skipthread.length() > 1 && !coop-> value)
+            if(world->skipthread.length() > 1 && !coop->value)
             {
                ExecuteThread(world->skipthread);
             }
