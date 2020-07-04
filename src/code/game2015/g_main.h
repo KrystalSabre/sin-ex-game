@@ -113,6 +113,8 @@ extern   float     reset_timeofs;
 
 extern   usercmd_t *current_ucmd;
 
+extern   cvar_t   *patched;
+
 #define DM_FLAG( flag ) ( deathmatch->value && ( ( int )dmflags->value & ( flag ) ) )
 
 void     G_BeginIntermission(const char *map);

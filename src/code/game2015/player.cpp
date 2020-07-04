@@ -527,24 +527,15 @@ void Player::InitMusic(void)
    //
    // reset the music 
    //
-   if(level.default_current_mood == NULL)
+   if(level.default_current_mood == "")
    {
-      level.default_current_mood = 1;
+      level.default_current_mood = "normal";
    }
-   else if(level.default_current_mood == 2 || level.default_fallback_mood == 2)
+   if(level.default_fallback_mood == "")
    {
-      action_level = 80;
+      level.default_fallback_mood = "normal";
    }
-   if(level.default_fallback_mood == NULL)
-   {
-      level.default_fallback_mood = 1;
-   }
-   music_current_mood = level.default_current_mood;
-   music_fallback_mood = level.default_fallback_mood;
-   client->ps.current_music_mood = level.default_current_mood;
-   client->ps.fallback_music_mood = level.default_fallback_mood;
-   music_forced = level.default_music_forced;
-   music_cancel = level.time + 20;
+   ChangeMusic(level.default_current_mood.c_str(), level.default_fallback_mood.c_str(), level.default_music_forced);
 }
 
 void Player::InitClient(void)
@@ -712,6 +703,15 @@ void Player::InitInventory(void)
       giveWeapon("SpiderMine");
    }
 #endif
+
+   if(coop->value)
+   {
+      int playernum;
+
+      playernum = edict - g_edicts;
+      levelVars.SetVariable("playernum", playernum);
+      ExecuteThread("playerspawn", true);
+   }
 }
 
 void Player::InitView(void)
@@ -1921,7 +1921,10 @@ void Player::Killed(Event *ev)
    //
    // change music
    //
-   ChangeMusic("failure", "normal", true);
+   if(!deathmatch->value)
+   {
+      ChangeMusic("failure", "none", true);
+   }
 
    //### death from flames
    if(inflictor->isSubclassOf<ThrowerFlame>())
@@ -1938,7 +1941,7 @@ void Player::Killed(Event *ev)
    edict->s.effects &= ~EF_WARM;
    //###
 
-   if(!deathmatch->value && !level.training && !level.no_jc)
+   if(!deathmatch->value && !coop->value && !level.training && !level.no_jc)
    {
       char name[128];
       int num;
@@ -2425,7 +2428,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
 
          end = src + dir * 8192;
          trace = G_FullTrace(src, vec_zero, vec_zero, end, 256, this, MASK_SHOT, "Player::SetCameraEntity");
-         if(trace.intersect.valid)
+         if(trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag)
          {
             action_level += currentWeapon->ActionLevelIncrement();
          }
@@ -3036,7 +3039,7 @@ EXPORT_FROM_DLL void Player::ClientThink(Event *ev)
             (buttons & BUTTON_USE) ||
             (current_ucmd->upmove > 0))
          {
-            if(world->skipthread.length() > 1)
+            if(world->skipthread.length() > 1 && !coop->value)
             {
                ExecuteThread(world->skipthread);
             }
@@ -6625,6 +6628,16 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       edict->s.effects &= ~EF_CROUCH;
    }
 
+   if(coop->value && level.defaultcamera)
+   {
+      CinematicCamera = level.defaultcamera;
+      hidestats = true;
+   }
+   else if(coop->value && !watchCamera)
+   {
+      hidestats = false;
+   }
+
    if(movieCamera != CinematicCamera)
    {
       if(movieCamera && movieCamera->isSubclassOf<SecurityCamera>())
@@ -7331,15 +7344,16 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
    int current_mood_num;
    int fallback_mood_num;
 
+   if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || (str(current) == str("failure") && client->ps.current_music_mood != mood_failure) || (!force) && (music_forced))
+   {
+      music_cancel = level.time + 20;
+   }
+
    music_forced = force;
    if(str(current) == str("normal") && music_forced)
    {
       action_level = 0;
       music_forced = false;
-   }
-   else if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || (str(current) == str("failure") && client->ps.current_music_mood != mood_failure))
-   {
-      music_cancel = level.time + 20;
    }
 
    if(current)

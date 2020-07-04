@@ -293,6 +293,7 @@ void Ion::Explode(Event *ev)
    Entity      *owner;
    int         damg;
    Vector      v;
+   int         i;
 
    other = ev->GetEntity(1);
    assert(other);
@@ -349,7 +350,7 @@ void Ion::Explode(Event *ev)
    // Process the explode animation, then remove this thing
    RandomAnimate("explode", EV_Remove);
 
-#if 0
+//#if 0
    // Fire off some gib bursts
    for(i = 0; i < 3; i++)
    {
@@ -358,7 +359,7 @@ void Ion::Explode(Event *ev)
       burst = new IonBurst();
       burst->Setup(owner, v, power);
    }
-#endif
+//#endif
 
    FlashPlayers(v, 1, 1, 1, 0.5, 500);
 }
@@ -447,11 +448,11 @@ QuantumDestabilizer::QuantumDestabilizer() : BulletWeapon()
    gi.soundindex("weapons/quantum/burst.wav");
 
    SetAmmo("BulletPulse", 20, 100);
-   //SetSecondaryAmmo( "BulletPulse", 5, 100);
+   SetSecondaryAmmo( "BulletPulse", 5, 100);
    SetRank(90, 90);
    SetType(WEAPON_2HANDED_LO);
    trapped_sent = nullptr;
-   //dualmode = true;
+   dualmode = true;
 }
 
 void QuantumDestabilizer::EatAmmo(Event *ev)
@@ -770,6 +771,9 @@ void QuantumDestabilizer::Shoot(Event *ev)
 {
    Vector pos, dir;
    auto   ion = new Ion();
+   trace_t  trace;
+   int      length;
+   int      damg;
 
    assert(owner);
    if(!owner)
@@ -778,10 +782,10 @@ void QuantumDestabilizer::Shoot(Event *ev)
    }
 
    GetMuzzlePosition(&pos, &dir);
-   ion->Setup(owner, pos, dir, power);
-   NextAttack(1);
+   //ion->Setup(owner, pos, dir, power);
+   //NextAttack(1);
 
-#if 0
+//#if 0
    if(weaponmode == PRIMARY)
    {
       Ion *ion = new Ion();
@@ -805,7 +809,7 @@ void QuantumDestabilizer::Shoot(Event *ev)
       TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, 0);
       NextAttack(0);
    }
-#endif
+//#endif
 
 #if 0
    // DESTABILIZE MODE

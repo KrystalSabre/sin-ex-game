@@ -130,8 +130,6 @@ Event EV_ScriptThread_MusicEvent("music");
 Event EV_ScriptThread_ForceMusicEvent("forcemusic");
 Event EV_ScriptThread_SoundtrackEvent("soundtrack");
 Event EV_ScriptThread_ExitMusicEvent("exitmusic");
-Event EV_ScriptThread_DefaultMusicEvent("defaultmusic");
-Event EV_ScriptThread_ForceDefaultMusicEvent("forcedefaultmusic");
 
 // Precache specific
 Event EV_ScriptThread_JC_Hearable("jc_hearable");
@@ -722,8 +720,6 @@ ResponseDef ScriptThread::Responses[] =
    { &EV_ScriptThread_ForceMusicEvent,       (Response)&ScriptThread::ForceMusicEvent },
    { &EV_ScriptThread_SoundtrackEvent,       (Response)&ScriptThread::SoundtrackEvent },
    { &EV_ScriptThread_ExitMusicEvent,  (Response)&ScriptThread::ExitMusicEvent },
-   { &EV_ScriptThread_DefaultMusicEvent, (Response)&ScriptThread::DefaultMusicEvent },
-   { &EV_ScriptThread_ForceDefaultMusicEvent, (Response)&ScriptThread::ForceDefaultMusicEvent },
    { &EV_ScriptThread_LoadOverlay,           (Response)&ScriptThread::LoadOverlay },
    { &EV_ScriptThread_LoadIntermission,      (Response)&ScriptThread::LoadIntermission },
    { &EV_ScriptThread_IntermissionLayout,    (Response)&ScriptThread::IntermissionLayout },
@@ -2097,6 +2093,7 @@ void ScriptThread::CueCamera(Event *ev)
    if(ent)
    {
       SetCamera(ent);
+      level.defaultcamera = ent;
    }
    else
    {
@@ -2107,6 +2104,7 @@ void ScriptThread::CueCamera(Event *ev)
 void ScriptThread::CuePlayer(Event *ev)
 {
    SetCamera(NULL);
+   level.defaultcamera = NULL;
 }
 
 void ScriptThread::FreezePlayer(Event *ev)
@@ -2579,6 +2577,7 @@ void ScriptThread::MusicEvent(Event *ev)
 {
    const char *current;
    const char *fallback;
+   qboolean   default = false;
 
    current = nullptr;
    fallback = nullptr;
@@ -2586,6 +2585,22 @@ void ScriptThread::MusicEvent(Event *ev)
 
    if(ev->NumArgs() > 1)
       fallback = ev->GetString(2);
+
+   if(ev->NumArgs() > 2)
+      default = ev->GetInteger(3);
+
+   if(default)
+   {
+      level.default_current_mood = current;
+      level.default_fallback_mood = fallback;
+      level.default_music_forced = false;
+   }
+   else
+   {
+      level.default_current_mood = "normal";
+      level.default_fallback_mood = "normal";
+      level.default_music_forced = false;
+   }
 
    ChangeMusic(current, fallback, false);
 }
@@ -2594,6 +2609,7 @@ void ScriptThread::ForceMusicEvent(Event *ev)
 {
    const char *current;
    const char *fallback;
+   qboolean   default = false;
 
    current = nullptr;
    fallback = nullptr;
@@ -2601,6 +2617,22 @@ void ScriptThread::ForceMusicEvent(Event *ev)
 
    if(ev->NumArgs() > 1)
       fallback = ev->GetString(2);
+
+   if(ev->NumArgs() > 2)
+      default = ev->GetInteger(3);
+
+   if(default)
+   {
+      level.default_current_mood = current;
+      level.default_fallback_mood = fallback;
+      level.default_music_forced = true;
+   }
+   else
+   {
+      level.default_current_mood = "normal";
+      level.default_fallback_mood = "normal";
+      level.default_music_forced = false;
+   }
 
    ChangeMusic(current, fallback, true);
 }
@@ -2613,92 +2645,6 @@ void ScriptThread::SoundtrackEvent(Event *ev)
 void ScriptThread::ExitMusicEvent(Event *ev)
 {
    level.exitmusic = true;
-}
-
-void ScriptThread::DefaultMusicEvent(Event *ev)
-{
-   const char *current;
-   const char *fallback;
-   int current_mood_num;
-   int fallback_mood_num;
-
-   current = NULL;
-   fallback = NULL;
-   current = ev->GetString(1);
-
-   if(ev->NumArgs() > 1)
-      fallback = ev->GetString(2);
-
-   if(current)
-   {
-      current_mood_num = MusicMood_NameToNum(current);
-      if(current_mood_num < 0)
-      {
-         gi.dprintf("current music mood %s not found", current);
-      }
-      else
-      {
-         level.default_current_mood = current_mood_num;
-      }
-   }
-   if(fallback)
-   {
-      fallback_mood_num = MusicMood_NameToNum(fallback);
-      if(fallback_mood_num < 0)
-      {
-         gi.dprintf("fallback music mood %s not found", fallback);
-         fallback = NULL;
-      }
-      else
-      {
-         level.default_fallback_mood = fallback_mood_num;
-      }
-   }
-
-   level.default_music_forced = false;
-}
-
-void ScriptThread::ForceDefaultMusicEvent(Event *ev)
-{
-   const char *current;
-   const char *fallback;
-   int current_mood_num;
-   int fallback_mood_num;
-
-   current = NULL;
-   fallback = NULL;
-   current = ev->GetString(1);
-
-   if(ev->NumArgs() > 1)
-      fallback = ev->GetString(2);
-
-   if(current)
-   {
-      current_mood_num = MusicMood_NameToNum(current);
-      if(current_mood_num < 0)
-      {
-         gi.dprintf("current music mood %s not found", current);
-      }
-      else
-      {
-         level.default_current_mood = current_mood_num;
-      }
-   }
-   if(fallback)
-   {
-      fallback_mood_num = MusicMood_NameToNum(fallback);
-      if(fallback_mood_num < 0)
-      {
-         gi.dprintf("fallback music mood %s not found", fallback);
-         fallback = NULL;
-      }
-      else
-      {
-         level.default_fallback_mood = fallback_mood_num;
-      }
-   }
-
-   level.default_music_forced = true;
 }
 
 void ScriptThread::MenuEvent(Event *ev)
@@ -2763,7 +2709,7 @@ void ScriptThread::MissionFailed(Event *ev)
 {
    int i;
 
-   ChangeMusic("failure", "normal", true);
+   ChangeMusic("failure", "none", true);
 
    for(i = 1; i <= game.maxclients; i++)
    {
