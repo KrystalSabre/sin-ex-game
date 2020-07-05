@@ -449,7 +449,7 @@ QuantumDestabilizer::QuantumDestabilizer() : BulletWeapon()
    PostEvent(EV_Remove, 0);
    return;
 #endif
-   SetModels("quantum.def", "view_quantum.def");
+   SetModels("quantum.def", "view_quantum2.def");
    modelIndex("qp_burst.def");
    modelIndex("sprites/qp_exhaust.spr");
    modelIndex("sprites/qp_sphere.spr");
