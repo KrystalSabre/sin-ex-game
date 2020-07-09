@@ -145,8 +145,6 @@ int		sv_numtraces;
 
 usercmd_t *current_ucmd;
 
-cvar_t   *patched;
-
 void     G_AllocDebugLines( void );
 void		G_ClientDrawBoundingBoxes( void );
 void		( *ServerError )( const char *fmt, ... );
@@ -350,8 +348,6 @@ void G_InitGame(void)
    }
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
-
-   patched           = gi.cvar("patched", "917745", CVAR_NOSET);
 
    //###
    informermodel     = gi.cvar("informermodel", MFD_INFORMERMODEL, CVAR_SERVERINFO | CVAR_ARCHIVE);
