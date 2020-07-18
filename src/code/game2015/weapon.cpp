@@ -480,7 +480,7 @@ void Weapon::SetOwner(Sentient *ent)
 
    setModel(viewmodel);
 
-   if(ent->isClient() && ammotype.length() && startammo && !G_GetSpawnArg("savegame"))
+   if(ent->isClient() && ammotype.length() && startammo && !G_GetSpawnArg("savegame") && !(coop->value && !sv_cheats->value && Q_strcasecmp(getClassname(), "Magnum")))
    {
       ent->giveItem(ammotype.c_str(), startammo);
    }

@@ -1073,7 +1073,7 @@ EXPORT_FROM_DLL inline qboolean Listener::CheckEventFlags(Event *event)
       }
 
       // don't allow console cheats during deathmatch unless the server says it's ok.
-      if((event->info.flags & EV_CHEAT) && deathmatch->value && !sv_cheats->value)
+      if((event->info.flags & EV_CHEAT) && (deathmatch->value || coop->value) && !sv_cheats->value)
       {
          if(isSubclassOf<Entity>())
          {
