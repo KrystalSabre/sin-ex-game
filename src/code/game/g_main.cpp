@@ -1218,7 +1218,7 @@ void G_RunFrame(void)
    PathManager.ShowNodes();
 
    // don't show entnums during deathmatch
-   showentnums = (sv_showentnums->value && (!deathmatch->value || sv_cheats->value));
+   showentnums = (sv_showentnums->value && (!deathmatch->value || !coop->value || sv_cheats->value));
 
    // Process most of the events before the physics are run
    // so that we can affect the physics immediately
@@ -2210,7 +2210,7 @@ void G_ClientDrawBoundingBoxes(void)
    Vector	eye;
 
    // don't show bboxes during deathmatch
-   if(!sv_showbboxes->value || (deathmatch->value && !sv_cheats->value))
+   if(!sv_showbboxes->value || ((deathmatch->value || coop->value) && !sv_cheats->value))
    {
       return;
    }
