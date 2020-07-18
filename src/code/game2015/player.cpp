@@ -675,6 +675,15 @@ void Player::InitWeapons(void)
    firedowntime = 0;
    usedown      = false;
    gunoffset    = Vector(0, 0, STAND_HEIGHT);
+
+   if(coop->value)
+   {
+      int playernum;
+
+      playernum = edict - g_edicts;
+      levelVars.SetVariable("playernum", playernum);
+      ExecuteThread("playerspawn", true);
+   }
 }
 
 void Player::InitInventory(void)
@@ -703,15 +712,6 @@ void Player::InitInventory(void)
       giveWeapon("SpiderMine");
    }
 #endif
-
-   if(coop->value)
-   {
-      int playernum;
-
-      playernum = edict - g_edicts;
-      levelVars.SetVariable("playernum", playernum);
-      ExecuteThread("playerspawn", true);
-   }
 }
 
 void Player::InitView(void)
