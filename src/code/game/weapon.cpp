@@ -886,7 +886,7 @@ void Weapon::Fire(void)
 
    if(dualmode)
    {
-      if(weaponmode == PRIMARY || (!Q_strcasecmp(getClassname(), "RocketLauncher") && !ctf->value))
+      if(weaponmode == PRIMARY)
       {
          RandomAnimate("primaryfire", EV_Weapon_DoneFiring);
       }
