@@ -886,7 +886,7 @@ void Weapon::Fire(void)
 
    if(dualmode)
    {
-      if(weaponmode == PRIMARY)
+      if(weaponmode == PRIMARY || (!Q_strcasecmp(getClassname(), "RocketLauncher") && !ctf->value))
       {
          RandomAnimate("primaryfire", EV_Weapon_DoneFiring);
       }
@@ -899,6 +899,8 @@ void Weapon::Fire(void)
    {
       if((owner) && (owner->flags & FL_SILENCER) && (silenced))
          RandomAnimate("silfire", EV_Weapon_DoneFiring);
+      else if(!Q_strcasecmp(getClassname(), "RocketLauncher"))
+         RandomAnimate("primaryfire", EV_Weapon_DoneFiring);
       else
          RandomAnimate("fire", EV_Weapon_DoneFiring);
    }
