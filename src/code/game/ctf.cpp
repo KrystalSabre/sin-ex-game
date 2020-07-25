@@ -83,6 +83,18 @@ void CTF_InitFlags(void)
    if(num = G_FindClass(0, "CTF_Flag_Sintek"))
       sintek_flag = (CTF_Flag_Sintek *)G_GetEntity(num);
 
+   //### if can't find either flag, then we're probably not in a CTF game
+   // exec dm.cfg and restart the map.
+   if(!hardcorps_flag && !sintek_flag)
+   {
+      gi.AddCommandString("exec dm.cfg\n");
+      gi.cvar_forceset("ctf", "0");
+      gi.cvar_forceset("deathmatch", "1");
+      gi.AddCommandString(va("map %s\n", level.mapname.c_str()));
+      return;
+   }
+   //###
+
    // Check for errors
    if(!hardcorps_flag)
       gi.error("CTF: Hardcorps flag not found!\n");
@@ -999,6 +1011,17 @@ CTF_Flag::CTF_Flag() : InventoryItem()
 {
    modelIndex("ctf_flag_sintek_w.def");
    modelIndex("ctf_flag_hardcorps_w.def");
+
+   //### if in a CTF map but not in CTF game mode,
+   // exec sinctf.cfg and restart the map.
+   if(deathmatch->value && !ctf->value)
+   {
+      gi.AddCommandString("exec sinctf.cfg\n");
+      gi.cvar_forceset("ctf", "1");
+      gi.cvar_forceset("deathmatch", "1");
+      gi.AddCommandString(va("map %s\n", level.mapname.c_str()));
+   }
+   //###
 }
 
 void CTF_Flag::ResetFlag(Event *ev)
