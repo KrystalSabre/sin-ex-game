@@ -5898,6 +5898,9 @@ void Player::Human(Event *ev)
    gi.configstring(CS_PLAYERSKINS + playernum, 
                    va("%s\\%s\\%s", client->pers.netname, client->pers.model, client->pers.skin));
 
+   strcpy(client->pers.model, savemodel.c_str());
+   strcpy(client->pers.skin, saveskin.c_str());
+
    takeWeapon("MutantHands");
 }
 
