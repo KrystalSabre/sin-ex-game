@@ -1594,7 +1594,10 @@ void Player::Pain(Event *ev)
    }
 
    // increase action level of game
-   action_level += damage;
+   if(attacker->isSubclassOf<Sentient>() && attacker != this)
+   {
+      action_level += damage;
+   }
 
    // add to the damage inflicted on a player this frame
    // the total will be turned into screen blends and view angle kicks
@@ -5763,7 +5766,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
    int current_mood_num;
    int fallback_mood_num;
 
-   if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || (str(current) == str("failure") && client->ps.current_music_mood != mood_failure) || (!force) && (music_forced))
+   if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || (str(current) == str("failure") && client->ps.current_music_mood != mood_failure) || (!force && music_forced))
    {
       music_cancel = level.time + 20;
    }
