@@ -182,7 +182,17 @@ World::World() : Entity()
          }
       }
 
-      mapname += ".scr";
+      str mapnamedm;
+      mapnamedm = mapname;
+      mapnamedm += "_dm.scr";
+      if(deathmatch->value && gi.LoadFile(mapnamedm.c_str(), NULL, 0) != -1)
+      {
+         mapname = mapnamedm;
+      }
+      else
+      {
+         mapname += ".scr";
+      }
 
       text = &mapname[5];
 
