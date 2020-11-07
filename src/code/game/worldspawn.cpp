@@ -184,7 +184,7 @@ World::World() : Entity()
 
       str mapnamedm;
       mapnamedm = mapname;
-      mapnamedm += "_dm.scr";
+      mapnamedm += ".dm";
       if(deathmatch->value && gi.LoadFile(mapnamedm.c_str(), NULL, 0) != -1)
       {
          mapname = mapnamedm;
