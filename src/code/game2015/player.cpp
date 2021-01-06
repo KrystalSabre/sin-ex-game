@@ -7367,11 +7367,6 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
    }
 
    music_forced = force;
-   if(str(current) == str("normal") && music_forced)
-   {
-      action_level = 0;
-      music_forced = false;
-   }
 
    if(current)
    {
@@ -7386,7 +7381,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
          {
             action_level = 80;
          }
-         else if(str(current) != str("normal"))
+         else
          {
             action_level = 0;
          }
