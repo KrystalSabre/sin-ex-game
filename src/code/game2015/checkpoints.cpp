@@ -540,11 +540,9 @@ void CheckPoint::TriggerStuff(Event *ev)
          {
             if(!ExecuteThread(dialog))
                warning("TriggerStuff", "Null game script");
+            ExecuteThread(dialog, true);
          }
-         else
-         {
-            gi.centerprintf(other->edict, "jcx yv 20 string \"You need this item:\" jcx yv -20 icon %d", item->GetIconIndex());
-         }
+         gi.centerprintf(other->edict, "jcx yv 20 string \"You need this item:\" jcx yv -20 icon %d", item->GetIconIndex());
 
          delete item;
          return;

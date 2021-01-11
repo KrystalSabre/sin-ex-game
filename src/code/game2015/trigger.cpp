@@ -224,11 +224,9 @@ void Trigger::TriggerStuff(Event *ev)
             {
                warning("TriggerStuff", "Null game script");
             }
+            ExecuteThread(dialog, true);
          }
-         else
-         {
-            gi.centerprintf(other->edict, "jcx yv 20 string \"You need this item:\" jcx yv -20 icon %d", item->GetIconIndex());
-         }
+         gi.centerprintf(other->edict, "jcx yv 20 string \"You need this item:\" jcx yv -20 icon %d", item->GetIconIndex());
          delete item;
          return;
       }
@@ -1036,7 +1034,7 @@ TriggerPlaySound::TriggerPlaySound() : Trigger()
    if(spawnflags & 33)
    {
       ambient = true;
-      attenuation = G_GetFloatArg("attenuation", ATTN_IDLE);
+      attenuation = G_GetFloatArg("attenuation", ATTN_STATIC);
       if(spawnflags & 1)
       {
          ToggleSound(NULL);
