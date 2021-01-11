@@ -998,6 +998,7 @@ void ScriptSlave::UseFunc(Event *ev)
       {
          Item           *item;
          const ClassDef *cls;
+         str             dialog;
 
          cls = getClass(key.c_str());
          if(!cls)
@@ -1009,6 +1010,15 @@ void ScriptSlave::UseFunc(Event *ev)
          item->CancelEventsOfType(EV_Item_DropToFloor);
          item->CancelEventsOfType(EV_Remove);
          item->ProcessPendingEvents();
+         dialog = item->GetDialogNeeded();
+         if(dialog.length() > 1)
+         {
+            if(!ExecuteThread(dialog))
+            {
+               warning("TriggerStuff", "Null game script");
+            }
+            ExecuteThread(dialog, true);
+         }
          gi.centerprintf(other->edict, "jcx yv 20 string \"You need this item:\" jcx yv -20 icon %d", item->GetIconIndex());
          delete item;
          return;
