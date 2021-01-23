@@ -1126,7 +1126,7 @@ EXPORT_FROM_DLL void ScriptThread::ProcessCommand(int argc, const char **argv)
       {
          if(name[1] == '*')
          {
-            if(coop->value)
+            if(maxclients->value > 1)
             {
                ent = G_GetEntity(atoi(&name[2]) + (maxclients->value + 3));
             }
