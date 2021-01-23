@@ -1122,13 +1122,28 @@ EXPORT_FROM_DLL void ScriptThread::ProcessCommand(int argc, const char **argv)
    // Check for entnum commands
    if(name[0] == '*')
    {
-      if(!IsNumeric(&name[1]))
+      if(!IsNumeric(&name[1]) && name[1] != '*')
       {
          ScriptError("Expecting numeric value for * command, but found '%s'\n", &name[1]);
       }
       else if(FindEvent(command.c_str()))
       {
-         ent = G_GetEntity(atoi(&name[1]));
+         if(name[1] == '*')
+         {
+            if(coop->value)
+            {
+               ent = G_GetEntity(atoi(&name[2]) + (maxclients->value + 3));
+            }
+            else
+            {
+               ent = G_GetEntity(atoi(&name[2]));
+            }
+         }
+         else
+         {
+            ent = G_GetEntity(atoi(&name[1]));
+         }
+
          if(ent)
          {
             event = new Event(command);
