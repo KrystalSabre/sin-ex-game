@@ -327,7 +327,7 @@ public:
    TriggerSpeaker();
 };
 
-class EXPORT_FROM_DLL RandomSpeaker : public TriggerSpeaker
+class EXPORT_FROM_DLL RandomSpeaker : public TriggerPlaySound
 {
 protected:
    float mindelay;
@@ -345,14 +345,14 @@ public:
 
 inline EXPORT_FROM_DLL void RandomSpeaker::Archive(Archiver &arc)
 {
-   TriggerSpeaker::Archive(arc);
+   TriggerPlaySound::Archive(arc);
    arc.WriteFloat(mindelay);
    arc.WriteFloat(maxdelay);
 }
 
 inline EXPORT_FROM_DLL void RandomSpeaker::Unarchive(Archiver &arc)
 {
-   TriggerSpeaker::Unarchive(arc);
+   TriggerPlaySound::Unarchive(arc);
    arc.ReadFloat(&mindelay);
    arc.ReadFloat(&maxdelay);
 }

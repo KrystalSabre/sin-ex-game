@@ -890,7 +890,7 @@ ResponseDef TriggerPlaySound::Responses[] =
 
 void TriggerPlaySound::ToggleSound(Event *ev)
 {
-   if(!state)
+   if(!state || state == 2)
    {
       // noise should already be initialized
       assert(Noise().length());
@@ -962,7 +962,7 @@ TriggerPlaySound::TriggerPlaySound() : Trigger()
    if(spawnflags & 33)
    {
       ambient = true;
-      attenuation = G_GetFloatArg("attenuation", ATTN_STATIC);
+      attenuation = G_GetFloatArg("attenuation", ATTN_IDLE);
       if(spawnflags & 1)
       {
          ToggleSound(NULL);
@@ -1027,6 +1027,13 @@ TriggerSpeaker::TriggerSpeaker() : TriggerPlaySound()
    pitch    = G_GetFloatArg("pitch", 1.0);
    fadetime = G_GetFloatArg("fadetime", 0);
    timeofs  = G_GetFloatArg("timeofs", 0);
+   if(!(spawnflags & 1) && !targetname.length())
+   {
+      ambient = true;
+      attenuation = G_GetFloatArg("attenuation", ATTN_IDLE);
+      ToggleSound(NULL);
+      gi.dprintf("%d: I have no spawnflags and I must %s\n", entnum, Noise().c_str());
+   }
 }
 
 /*****************************************************************************/
@@ -1060,7 +1067,7 @@ If PROJECTILES is set, the trigger will respond to projectiles (rockets, grenade
 
 /*****************************************************************************/
 
-CLASS_DECLARATION(TriggerSpeaker, RandomSpeaker, "trigger_randomspeaker");
+CLASS_DECLARATION(TriggerPlaySound, RandomSpeaker, "trigger_randomspeaker");
 
 Event EV_TriggerRandomSpeaker_TriggerSound("triggersound");
 
@@ -1073,21 +1080,35 @@ ResponseDef RandomSpeaker::Responses[] =
 
 void RandomSpeaker::TriggerSound(Event *ev)
 {
+   if(state)
+      TriggerPlaySound::ToggleSound(ev);
    ScheduleSound();
-   TriggerPlaySound::ToggleSound(ev);
 }
 
 void RandomSpeaker::ScheduleSound(void)
 {
+   state = 2;
    CancelEventsOfType(EV_Trigger_Effect);
    PostEvent(EV_Trigger_Effect, mindelay + G_Random(maxdelay - mindelay));
 }
 
-RandomSpeaker::RandomSpeaker() : TriggerSpeaker()
+RandomSpeaker::RandomSpeaker() : TriggerPlaySound()
 {
+   if(attenuation == -1)
+      attenuation = 0;
+   pitch    = G_GetFloatArg("pitch", 1.0);
+   fadetime = G_GetFloatArg("fadetime", 0);
+   timeofs  = G_GetFloatArg("timeofs", 0);
    mindelay = G_GetFloatArg("mindelay", 3);
    maxdelay = G_GetFloatArg("maxdelay", 10);
-   ScheduleSound();
+   if(!targetname.length())
+   {
+      ScheduleSound();
+   }
+   else
+   {
+      gi.dprintf("%d: I need to be triggered before I can %s\n", entnum, Noise().c_str());
+   }
 }
 
 /*****************************************************************************/
