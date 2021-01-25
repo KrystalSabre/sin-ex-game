@@ -3921,12 +3921,12 @@ void Player::ToggleZoomMode(Event *ev)
          fov = 160;
       }
 
-      RandomGlobalSound("scope_zoomout", 1, CHAN_VOICE, ATTN_NORM);
+      RandomGlobalSound("scope_zoomout", 1, CHAN_WEAPONIDLE, ATTN_NORM);
       ProcessEvent(EV_MovementSound);
    }
    else
    {
-      RandomGlobalSound("scope_zoomin", 1, CHAN_VOICE, ATTN_NORM);
+      RandomGlobalSound("scope_zoomin", 1, CHAN_WEAPONIDLE, ATTN_NORM);
       ProcessEvent(EV_MovementSound);
       zoom_mode = ZOOMED_IN;
       fov = 20;
