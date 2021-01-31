@@ -476,7 +476,7 @@ void Player::InitMusic(void)
    {
       level.default_fallback_mood = "normal";
    }
-   ChangeMusic(level.default_current_mood.c_str(), level.default_fallback_mood.c_str(), level.default_music_forced);
+   ChangeMusic(level.default_current_mood.c_str(), level.default_fallback_mood.c_str(), level.default_music_forced, 0);
 }
 
 void Player::InitClient(void)
@@ -1544,7 +1544,7 @@ void Player::Killed(Event *ev)
    //
    if(!deathmatch->value)
    {
-      ChangeMusic("failure", "none", true);
+      ChangeMusic("failure", "none", true, 0);
    }
 
    if(!deathmatch->value && !coop->value && !level.training && !level.no_jc)
@@ -1981,7 +1981,10 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
 
          currentWeapon->GetMuzzlePosition(&src, &dir);
 
-         end = src + dir * 8192;
+         if(!Q_strcasecmp(currentWeapon->getClassname(), "Fists"))
+            end = src + dir * 128;
+         else
+            end = src + dir * 8192;
          trace = G_FullTrace(src, vec_zero, vec_zero, end, 256, this, MASK_SHOT, "Player::SetCameraEntity");
          if(trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag)
          {
@@ -4983,20 +4986,17 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
 
 EXPORT_FROM_DLL void Player::UpdateMusic(void)
 {
-   if(music_forced)
+   if(music_cancel_time > 0 && music_cancel_time < level.time)
+   {
+      if(music_forced && music_fallback_mood != (mood_normal || mood_action))
+         ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), true, 0);
+      else
+         ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), false, 0);
+   }
+   else if(music_forced)
    {
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
-   }
-   else if(action_level > 30 && (music_fallback_mood == mood_action || (client->ps.fallback_music_mood == mood_action && client->ps.current_music_mood != mood_action)) && music_current_mood != mood_normal)
-   {
-      if(music_fallback_mood == mood_action)
-      {
-         client->ps.current_music_mood = music_current_mood;
-      }
-      music_current_mood = mood_action;
-      music_fallback_mood = mood_normal;
-      client->ps.fallback_music_mood = mood_action;
    }
    else if(action_level > 30)
    {
@@ -5004,25 +5004,18 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       music_fallback_mood = mood_normal;
       client->ps.current_music_mood = mood_action;
       client->ps.fallback_music_mood = mood_action;
+      music_cancel_time = 0;
    }
-   else if(action_level < 15 && client->ps.fallback_music_mood == mood_action && music_current_mood == mood_action)
+   else if(action_level < 15 && client->ps.current_music_mood == mood_action && music_current_mood == mood_action)
    {
       music_current_mood = mood_normal;
       music_fallback_mood = mood_normal;
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
+      music_cancel_time = 0;
    }
-   else if(music_cancel < level.time && (client->ps.current_music_mood == mood_success || client->ps.current_music_mood == mood_failure))
+   else if(!(client->ps.current_music_mood == mood_action && music_current_mood == mood_action))
    {
-      music_current_mood = music_fallback_mood;
-      client->ps.current_music_mood = client->ps.fallback_music_mood;
-   }
-   else if(!(client->ps.fallback_music_mood == mood_action && music_current_mood == mood_action))
-   {
-      if(music_fallback_mood == mood_action || music_current_mood == mood_normal)
-      {
-         music_fallback_mood = mood_normal;
-      }
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
    }
@@ -5775,14 +5768,18 @@ void Player::HideStats(Event *ev)
    hidestats = true;
 }
 
-void Player::ChangeMusic(const char * current, const char * fallback, qboolean force)
+void Player::ChangeMusic(const char * current, const char * fallback, qboolean force, float cancel)
 {
    int current_mood_num;
    int fallback_mood_num;
 
-   if((str(current) == str("success") && client->ps.current_music_mood != mood_success) || (str(current) == str("failure") && client->ps.current_music_mood != mood_failure) || (!force && music_forced))
+   if((client->ps.current_music_mood != MusicMood_NameToNum(current)) && cancel > 0)
    {
-      music_cancel = level.time + 20;
+      music_cancel_time = level.time + cancel;
+   }
+   else
+   {
+      music_cancel_time = 0;
    }
 
    music_forced = force;
@@ -5817,10 +5814,6 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
       }
       else
       {
-         if(str(fallback) == str("action"))
-         {
-            action_level = 80;
-         }
          music_fallback_mood = fallback_mood_num;
       }
    }

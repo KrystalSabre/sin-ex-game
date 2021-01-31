@@ -2558,10 +2558,12 @@ void ScriptThread::MusicEvent(Event *ev)
 {
    const char *current;
    const char *fallback;
+   float      cancel;
    qboolean   default = false;
 
    current = NULL;
    fallback = NULL;
+   cancel = 0;
    current = ev->GetString(1);
 
    if(ev->NumArgs() > 1)
@@ -2570,9 +2572,15 @@ void ScriptThread::MusicEvent(Event *ev)
    if(ev->NumArgs() > 2)
       default = ev->GetInteger(3);
 
+   if(ev->NumArgs() > 3)
+      cancel = ev->GetFloat(4);
+
    if(default)
    {
-      level.default_current_mood = current;
+      if(cancel > 0)
+         level.default_current_mood = fallback;
+      else
+         level.default_current_mood = current;
       level.default_fallback_mood = fallback;
       level.default_music_forced = false;
    }
@@ -2583,17 +2591,19 @@ void ScriptThread::MusicEvent(Event *ev)
       level.default_music_forced = false;
    }
 
-   ChangeMusic(current, fallback, false);
+   ChangeMusic(current, fallback, false, cancel);
 }
 
 void ScriptThread::ForceMusicEvent(Event *ev)
 {
    const char *current;
    const char *fallback;
+   float      cancel;
    qboolean   default = false;
 
    current = NULL;
    fallback = NULL;
+   cancel = 0;
    current = ev->GetString(1);
 
    if(ev->NumArgs() > 1)
@@ -2602,11 +2612,20 @@ void ScriptThread::ForceMusicEvent(Event *ev)
    if(ev->NumArgs() > 2)
       default = ev->GetInteger(3);
 
+   if(ev->NumArgs() > 3)
+      cancel = ev->GetFloat(4);
+
    if(default)
    {
-      level.default_current_mood = current;
+      if(cancel > 0)
+         level.default_current_mood = fallback;
+      else
+         level.default_current_mood = current;
       level.default_fallback_mood = fallback;
-      level.default_music_forced = true;
+      if(cancel > 0 && !strcmp(fallback, "normal") && !strcmp(fallback, "action"))
+         level.default_music_forced = false;
+      else
+         level.default_music_forced = true;
    }
    else
    {
@@ -2615,7 +2634,7 @@ void ScriptThread::ForceMusicEvent(Event *ev)
       level.default_music_forced = false;
    }
 
-   ChangeMusic(current, fallback, true);
+   ChangeMusic(current, fallback, true, cancel);
 }
 
 void ScriptThread::SoundtrackEvent(Event *ev)
@@ -2690,7 +2709,7 @@ void ScriptThread::MissionFailed(Event *ev)
 {
    int i;
 
-   ChangeMusic("failure", "none", true);
+   ChangeMusic("failure", "none", true, 0);
 
    for(i = 1; i <= game.maxclients; i++)
    {
