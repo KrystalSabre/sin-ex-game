@@ -42,7 +42,7 @@ void TempModel(Entity * parent, Vector origin, Vector angles, const char *modeln
 void TesselateModel(Entity * ent, int min_size, int max_size, Vector dir, float power, float percentage,
                     int thickness, Vector origin, int type=TESS_DEFAULT_TYPE, int lightstyle=TESS_DEFAULT_LIGHTSTYLE);
 
-void ChangeMusic(const char *current, const char *fallback, qboolean force);
+void ChangeMusic(const char *current, const char *fallback, qboolean force, float cancel);
 
 void ChangeSoundtrack(const char * soundtrack);
 
