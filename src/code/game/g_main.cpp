@@ -321,7 +321,7 @@ void G_InitGame(void)
    }
    else
    {
-      sv_fatrockets = gi.cvar("sv_fatrockets", "1", CVAR_SERVERINFO);
+      sv_fatrockets = gi.cvar("sv_fatrockets", "0", CVAR_SERVERINFO);
    }
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
