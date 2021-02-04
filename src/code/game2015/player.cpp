@@ -1013,7 +1013,7 @@ void Player::Obituary(Entity *attacker, Entity *inflictor, str location, int mea
    qboolean mfd_game    = false;
    //###
 
-   if(!deathmatch->value)
+   if(!(deathmatch->value || coop->value))
       return;
 
    //###
@@ -6559,8 +6559,10 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
 {
    if(music_cancel_time > 0 && music_cancel_time < level.time)
    {
-      if(music_forced && music_fallback_mood != (mood_normal || mood_action))
+      if(music_forced && music_fallback_mood != mood_normal && music_fallback_mood != mood_action && music_fallback_mood != music_current_mood)
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), true, 0);
+      else if(!music_forced && music_fallback_mood == music_current_mood)
+         ChangeMusic("normal", "normal", false, 0);
       else
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), false, 0);
    }
