@@ -920,7 +920,7 @@ void Player::Obituary(Entity *attacker, Entity *inflictor, str location, int mea
    const char *message1 = NULL;
    const char *message2 = "";
    int num;
-   if(!deathmatch->value)
+   if(!(deathmatch->value || coop->value))
       return;
 
    // Client killed themself
@@ -4988,8 +4988,10 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
 {
    if(music_cancel_time > 0 && music_cancel_time < level.time)
    {
-      if(music_forced && music_fallback_mood != (mood_normal || mood_action))
+      if(music_forced && music_fallback_mood != mood_normal && music_fallback_mood != mood_action && music_fallback_mood != music_current_mood)
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), true, 0);
+      else if(!music_forced && music_fallback_mood == music_current_mood)
+         ChangeMusic("normal", "normal", false, 0);
       else
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), false, 0);
    }
