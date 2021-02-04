@@ -2575,7 +2575,7 @@ void ScriptThread::MusicEvent(Event *ev)
    if(ev->NumArgs() > 3)
       cancel = ev->GetFloat(4);
 
-   if(default)
+   if(default && !(cancel > 0 && !strcmp(fallback, current)))
    {
       if(cancel > 0)
          level.default_current_mood = fallback;
@@ -2622,7 +2622,7 @@ void ScriptThread::ForceMusicEvent(Event *ev)
       else
          level.default_current_mood = current;
       level.default_fallback_mood = fallback;
-      if(cancel > 0 && !strcmp(fallback, "normal") && !strcmp(fallback, "action"))
+      if(cancel > 0 && (!strcmp(fallback, "normal") || !strcmp(fallback, "action") || !strcmp(fallback, current)))
          level.default_music_forced = false;
       else
          level.default_music_forced = true;
