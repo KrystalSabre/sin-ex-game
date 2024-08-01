@@ -171,9 +171,6 @@ PLAYER
 
 cvar_t * s_debugmusic;
 cvar_t * whereami;
-cvar_t * vid_ref;
-cvar_t * sw_mode;
-cvar_t * gl_mode;
 
 CLASS_DECLARATION(Sentient, Player, "player");
 
@@ -321,9 +318,6 @@ Player::Player() : Sentient()
 
    s_debugmusic = gi.cvar("s_debugmusic", "0", 0);
    whereami = gi.cvar("whereami", "0", 0);
-   vid_ref = gi.cvar("vid_ref", "", CVAR_USERINFO|CVAR_ARCHIVE);
-   sw_mode = gi.cvar("sw_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
-   gl_mode = gi.cvar("gl_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
 
    // Remove him from the world until we spawn him
    unlink();

@@ -127,6 +127,10 @@ cvar_t	*csys_draw;
 
 cvar_t   *parentmode;
 
+cvar_t   *vid_ref;
+cvar_t   *sw_mode;
+cvar_t   *gl_mode;
+
 int		sv_numtraces;
 
 usercmd_t *current_ucmd;
@@ -325,6 +329,10 @@ void G_InitGame(void)
    }
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
+
+   vid_ref           = gi.cvar("vid_ref", "", CVAR_USERINFO|CVAR_ARCHIVE);
+   sw_mode           = gi.cvar("sw_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
+   gl_mode           = gi.cvar("gl_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
 
    CTF_Init();
 
