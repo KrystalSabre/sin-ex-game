@@ -128,6 +128,7 @@ Event EV_Player_DropFlag("dropflag", EV_CONSOLE);
 #define CROUCH_SPEED			110.0f
 #define ACCELERATION			10.0f
 #define TAUNT_TIME			1.0f
+#define FOV_ADJUST(fov,videomode) (atan((videomode >= 11 ? 16 : 64) / ((videomode >= 11 ? 9 : 37) / tan((atan(3 / (4 / tan(fov / 360 * M_PI))) * 360 / M_PI) / 360 * M_PI))) * 360 / M_PI)
 
 /*
 ==============================================================================
@@ -140,6 +141,9 @@ PLAYER
 
 cvar_t * s_debugmusic;
 cvar_t * whereami;
+cvar_t * vid_ref;
+cvar_t * sw_mode;
+cvar_t * gl_mode;
 
 CLASS_DECLARATION(Sentient, Player, "player");
 
@@ -267,6 +271,13 @@ Player::Player() : Sentient()
 
    s_debugmusic = gi.cvar("s_debugmusic", "0", 0);
    whereami = gi.cvar("whereami", "0", 0);
+   vid_ref = gi.cvar("vid_ref", "", CVAR_USERINFO|CVAR_ARCHIVE);
+   sw_mode = gi.cvar("sw_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
+   gl_mode = gi.cvar("gl_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
+
+   int videomode = (!stricmp(vid_ref->string, "soft") ? sw_mode->value : gl_mode->value);
+   if(videomode >= 8)
+      fov = FOV_ADJUST(fov, videomode);
 
    // Remove him from the world until we spawn him
    unlink();
@@ -3032,6 +3043,10 @@ void Player::Fov(Event *ev)
       fov = 90;
    else if(fov > 160)
       fov = 160;
+
+   int videomode = (!stricmp(vid_ref->string, "soft") ? sw_mode->value : gl_mode->value);
+   if(videomode >= 8)
+      fov = FOV_ADJUST(fov, videomode);
 }
 
 void Player::SaveFov(Event *ev)
@@ -3106,6 +3121,10 @@ void Player::ToggleZoomMode(Event *ev)
          fov = 160;
       }
 
+      int videomode = (!stricmp(vid_ref->string, "soft") ? sw_mode->value : gl_mode->value);
+      if(videomode >= 8)
+         fov = FOV_ADJUST(fov, videomode);
+
       RandomGlobalSound("scope_zoomout", 1, CHAN_WEAPONIDLE, ATTN_NORM);
       ProcessEvent(EV_MovementSound);
    }
@@ -3114,7 +3133,7 @@ void Player::ToggleZoomMode(Event *ev)
       RandomGlobalSound("scope_zoomin", 1, CHAN_WEAPONIDLE, ATTN_NORM);
       ProcessEvent(EV_MovementSound);
       zoom_mode = ZOOMED_IN;
-      fov = 20;
+      fov = max(atan(20 / (90 / tan(fov / 360 * M_PI))) * 360 / M_PI, 1);
    }
 }
 
@@ -3132,6 +3151,10 @@ void Player::ZoomOut(Event *ev)
       {
          fov = 160;
       }
+
+      int videomode = (!stricmp(vid_ref->string, "soft") ? sw_mode->value : gl_mode->value);
+      if(videomode >= 8)
+         fov = FOV_ADJUST(fov, videomode);
    }
 }
 
@@ -4208,6 +4231,8 @@ void Player::SetCameraEntity(Entity *cameraEnt)
       {
          pos = ((Sentient *)cameraEnt)->EyePosition() - cameraEnt->worldorigin;
       }
+
+      camerafov = max(atan(camerafov / (90 / tan(fov / 360 * M_PI))) * 360 / M_PI, 1);
 
       SetCameraValues(cameraEnt->worldorigin, pos, cameraEnt->worldangles, vec_zero,
                       cameraEnt->velocity, noblend, camerafov);
