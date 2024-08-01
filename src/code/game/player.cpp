@@ -128,7 +128,7 @@ Event EV_Player_DropFlag("dropflag", EV_CONSOLE);
 #define CROUCH_SPEED			110.0f
 #define ACCELERATION			10.0f
 #define TAUNT_TIME			1.0f
-#define FOV_ADJUST(fov,videomode) (atan(16 / ((videomode >= 11 ? 9 : 10) / tan((atan((videomode >= 11 ? 3 : 4) / ((videomode >= 11 ? 4 : 5) / tan(fov / 360 * M_PI))) * 360 / M_PI) / 360 * M_PI))) * 360 / M_PI)
+#define FOV_ADJUST(fov,videomode) (atan(16 / ((videomode >= 11 ? 9 : 10) / tan((atan((videomode >= 11 ? 3 : 4) / ((videomode >= 11 ? 4 : 5) / tan((float)fov / 360 * M_PI))) * 360 / M_PI) / 360 * M_PI))) * 360 / M_PI)
 
 /*
 ==============================================================================
@@ -4215,7 +4215,12 @@ void Player::SetCameraEntity(Entity *cameraEnt)
          pos = ((Sentient *)cameraEnt)->EyePosition() - cameraEnt->worldorigin;
       }
 
-      camerafov = max(atan(camerafov / (90 / tan(realfov / 360 * M_PI))) * 360 / M_PI, 1);
+      if(!(viewmode >= CAMERA_VIEW && videomode < 8))
+      {
+         if(viewmode >= CAMERA_VIEW && videomode >= 8)
+            realfov = FOV_ADJUST(90, videomode);
+         camerafov = max(atan(camerafov / (90 / tan(realfov / 360 * M_PI))) * 360 / M_PI, 1);
+      }
 
       SetCameraValues(cameraEnt->worldorigin, pos, cameraEnt->worldangles, vec_zero,
                       cameraEnt->velocity, noblend, camerafov);
