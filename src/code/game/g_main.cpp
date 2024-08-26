@@ -318,15 +318,7 @@ void G_InitGame(void)
    sv_waterspeed		= gi.cvar("sv_waterspeed", "400", CVAR_SERVERINFO);
    sv_maplist        = gi.cvar("sv_maplist", "", CVAR_SERVERINFO|CVAR_ARCHIVE);
    sv_footsteps      = gi.cvar("sv_footsteps", "1", CVAR_SERVERINFO|CVAR_ARCHIVE);
-
-   if(deathmatch->value)
-   {
-      sv_fatrockets = gi.cvar_set("sv_fatrockets", "1");
-   }
-   else
-   {
-      sv_fatrockets = gi.cvar_set("sv_fatrockets", "0");
-   }
+   sv_fatrockets     = gi.cvar("sv_fatrockets", "1", CVAR_SERVERINFO);
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
 
@@ -2396,7 +2388,7 @@ level_locals_t::level_locals_t() : Class()
 
    cinematic = false;
    no_jc = false;
-   exitmusic = false;
+   exitmusic = 0;
    default_current_mood = "";
    default_fallback_mood = "";
    default_music_forced = false;
@@ -2439,7 +2431,7 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
 
    arc.WriteBoolean(cinematic);
    arc.WriteBoolean(no_jc);
-   arc.WriteBoolean(exitmusic);
+   arc.WriteFloat(exitmusic);
    arc.WriteString(default_current_mood);
    arc.WriteString(default_fallback_mood);
    arc.WriteBoolean(default_music_forced);
@@ -2489,7 +2481,7 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
 
    arc.ReadBoolean(&cinematic);
    arc.ReadBoolean(&no_jc);
-   arc.ReadBoolean(&exitmusic);
+   arc.ReadFloat(&exitmusic);
    arc.ReadString(&default_current_mood);
    arc.ReadString(&default_fallback_mood);
    arc.ReadBoolean(&default_music_forced);

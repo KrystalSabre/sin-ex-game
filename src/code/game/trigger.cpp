@@ -890,11 +890,11 @@ ResponseDef TriggerPlaySound::Responses[] =
 
 void TriggerPlaySound::ToggleSound(Event *ev)
 {
-   if(!state || state == 2)
+   if(state != 1)
    {
       // noise should already be initialized
       assert(Noise().length());
-      if(ambient || spawnflags & 128)
+      if(ambient || !state && (spawnflags & 128))
          state = 1;
 
       if(ambient)
@@ -1027,7 +1027,7 @@ TriggerSpeaker::TriggerSpeaker() : TriggerPlaySound()
    pitch    = G_GetFloatArg("pitch", 1.0);
    fadetime = G_GetFloatArg("fadetime", 0);
    timeofs  = G_GetFloatArg("timeofs", 0);
-   if(!(spawnflags & 1) && !targetname.length())
+   if(developer->value && !(spawnflags & 1) && !targetname.length())
    {
       ambient = true;
       attenuation = G_GetFloatArg("attenuation", ATTN_IDLE);
@@ -1867,7 +1867,7 @@ void TriggerExit::DisplayExitSign(Event *ev)
       //
       if(level.exitmusic)
       {
-         client->ChangeMusic("success", "normal", false, 20);
+         client->ChangeMusic("success", "normal", false, level.exitmusic);
          level.default_current_mood = "normal";
          level.default_fallback_mood = "normal";
          level.default_music_forced = false;

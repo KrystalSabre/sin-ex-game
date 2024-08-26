@@ -199,7 +199,7 @@ protected:
 
    float             last_damage_time;
    qboolean          music_forced;
-   float             music_cancel_time;
+   float             music_duration;
 
    // CTF
    HookPtr           hook;
@@ -356,7 +356,7 @@ public:
    virtual void      HideOverlay(Event *ev);
    virtual void      HideStats(Event *ev);
    virtual void      DrawStats(Event *ev);
-   virtual void      ChangeMusic(const char * current, const char * fallback, qboolean force, float cancel);
+   virtual void      ChangeMusic(const char * current, const char * fallback, qboolean force, float duration);
    virtual void      GravityNodes();
    virtual void      Archive(Archiver &arc)   override;
    virtual void      Unarchive(Archiver &arc) override;
@@ -516,7 +516,7 @@ inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
 
    arc.WriteFloat(last_damage_time);
    arc.WriteBoolean(music_forced);
-   arc.WriteFloat(music_cancel_time);
+   arc.WriteFloat(music_duration);
 
    arc.WriteBoolean(trappedInQuantum);
 }
@@ -649,7 +649,7 @@ inline EXPORT_FROM_DLL void Player::Unarchive(Archiver &arc)
 
    arc.ReadFloat(&last_damage_time);
    arc.ReadBoolean(&music_forced);
-   arc.ReadFloat(&music_cancel_time);
+   arc.ReadFloat(&music_duration);
 
    arc.ReadBoolean(&trappedInQuantum);
 }

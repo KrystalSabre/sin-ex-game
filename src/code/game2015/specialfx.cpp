@@ -978,7 +978,7 @@ Sprite::Sprite() : Trigger()
    }
 }
 
-void ChangeMusic(const char *current, const char *fallback, qboolean force, float cancel)
+void ChangeMusic(const char *current, const char *fallback, qboolean force, float duration)
 {
    int      j;
    edict_t	*other;
@@ -992,7 +992,7 @@ void ChangeMusic(const char *current, const char *fallback, qboolean force, floa
          {
             Player *client;
             client = (Player *)other->entity;
-            client->ChangeMusic(current, fallback, force, cancel);
+            client->ChangeMusic(current, fallback, force, duration);
          }
       }
    }

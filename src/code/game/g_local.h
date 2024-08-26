@@ -244,7 +244,7 @@ public:
 
    qboolean    no_jc;
 
-   qboolean    exitmusic;
+   float       exitmusic;
    str         default_current_mood;
    str         default_fallback_mood;
    qboolean    default_music_forced;

@@ -4984,7 +4984,7 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
 
 EXPORT_FROM_DLL void Player::UpdateMusic(void)
 {
-   if(music_cancel_time > 0 && music_cancel_time < level.time)
+   if(music_duration > 0 && music_duration < level.time)
    {
       if(music_forced && music_fallback_mood != mood_normal && music_fallback_mood != mood_action && music_fallback_mood != music_current_mood)
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), true, 0);
@@ -5004,7 +5004,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       music_fallback_mood = mood_normal;
       client->ps.current_music_mood = mood_action;
       client->ps.fallback_music_mood = mood_action;
-      music_cancel_time = 0;
+      music_duration = 0;
    }
    else if(action_level < 15 && client->ps.current_music_mood == mood_action && music_current_mood == mood_action)
    {
@@ -5012,7 +5012,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       music_fallback_mood = mood_normal;
       client->ps.current_music_mood = music_current_mood;
       client->ps.fallback_music_mood = music_fallback_mood;
-      music_cancel_time = 0;
+      music_duration = 0;
    }
    else if(!(client->ps.current_music_mood == mood_action && music_current_mood == mood_action))
    {
@@ -5768,18 +5768,18 @@ void Player::HideStats(Event *ev)
    hidestats = true;
 }
 
-void Player::ChangeMusic(const char * current, const char * fallback, qboolean force, float cancel)
+void Player::ChangeMusic(const char * current, const char * fallback, qboolean force, float duration)
 {
    int current_mood_num;
    int fallback_mood_num;
 
-   if((client->ps.current_music_mood != MusicMood_NameToNum(current)) && cancel > 0)
+   if((client->ps.current_music_mood != MusicMood_NameToNum(current)) && duration > 0)
    {
-      music_cancel_time = level.time + cancel;
+      music_duration = level.time + duration;
    }
    else
    {
-      music_cancel_time = 0;
+      music_duration = 0;
    }
 
    music_forced = force;

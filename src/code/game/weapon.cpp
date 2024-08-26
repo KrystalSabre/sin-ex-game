@@ -471,7 +471,7 @@ void Weapon::SetOwner(Sentient *ent)
 
    setModel(viewmodel);
 
-   if(ent->isClient() && ammotype.length() && startammo && !G_GetSpawnArg("savegame") && !(coop->value && !sv_cheats->value && Q_strcasecmp(getClassname(), "Magnum")))
+   if(ent->isClient() && ammotype.length() && startammo && !G_GetSpawnArg("savegame"))
    {
       ent->giveItem(ammotype.c_str(), startammo);
    }
@@ -899,8 +899,6 @@ void Weapon::Fire(void)
    {
       if((owner) && (owner->flags & FL_SILENCER) && (silenced))
          RandomAnimate("silfire", EV_Weapon_DoneFiring);
-      else if(!Q_strcasecmp(getClassname(), "RocketLauncher"))
-         RandomAnimate("primaryfire", EV_Weapon_DoneFiring);
       else
          RandomAnimate("fire", EV_Weapon_DoneFiring);
    }

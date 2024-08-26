@@ -2558,26 +2558,36 @@ void ScriptThread::MusicEvent(Event *ev)
 {
    const char *current;
    const char *fallback;
-   float      cancel;
-   qboolean   default = false;
+   float      duration;
+   qboolean   isdefault = false;
+   int i;
 
    current = NULL;
    fallback = NULL;
-   cancel = 0;
+   duration = 0;
    current = ev->GetString(1);
 
-   if(ev->NumArgs() > 1)
-      fallback = ev->GetString(2);
-
-   if(ev->NumArgs() > 2)
-      default = ev->GetInteger(3);
-
-   if(ev->NumArgs() > 3)
-      cancel = ev->GetFloat(4);
-
-   if(default && !(cancel > 0 && !strcmp(fallback, current)))
+   for(i = 2; i <= ev->NumArgs(); i++)
    {
-      if(cancel > 0)
+      switch(i - 2)
+      {
+      case 0:
+         fallback = ev->GetString(2);
+         break;
+      case 1:
+         isdefault = ev->GetInteger(3);
+         break;
+      case 2:
+         duration = ev->GetFloat(4);
+         break;
+      default:
+         break;
+      }
+   }
+
+   if(isdefault && !(duration > 0 && !strcmp(fallback, current)))
+   {
+      if(duration > 0)
          level.default_current_mood = fallback;
       else
          level.default_current_mood = current;
@@ -2591,38 +2601,48 @@ void ScriptThread::MusicEvent(Event *ev)
       level.default_music_forced = false;
    }
 
-   ChangeMusic(current, fallback, false, cancel);
+   ChangeMusic(current, fallback, false, duration);
 }
 
 void ScriptThread::ForceMusicEvent(Event *ev)
 {
    const char *current;
    const char *fallback;
-   float      cancel;
-   qboolean   default = false;
+   float      duration;
+   qboolean   isdefault = false;
+   int i;
 
    current = NULL;
    fallback = NULL;
-   cancel = 0;
+   duration = 0;
    current = ev->GetString(1);
 
-   if(ev->NumArgs() > 1)
-      fallback = ev->GetString(2);
-
-   if(ev->NumArgs() > 2)
-      default = ev->GetInteger(3);
-
-   if(ev->NumArgs() > 3)
-      cancel = ev->GetFloat(4);
-
-   if(default)
+   for(i = 2; i <= ev->NumArgs(); i++)
    {
-      if(cancel > 0)
+      switch(i - 2)
+      {
+      case 0:
+         fallback = ev->GetString(2);
+         break;
+      case 1:
+         isdefault = ev->GetInteger(3);
+         break;
+      case 2:
+         duration = ev->GetFloat(4);
+         break;
+      default:
+         break;
+      }
+   }
+
+   if(isdefault)
+   {
+      if(duration > 0)
          level.default_current_mood = fallback;
       else
          level.default_current_mood = current;
       level.default_fallback_mood = fallback;
-      if(cancel > 0 && (!strcmp(fallback, "normal") || !strcmp(fallback, "action") || !strcmp(fallback, current)))
+      if(duration > 0 && (!strcmp(fallback, "normal") || !strcmp(fallback, "action") || !strcmp(fallback, current)))
          level.default_music_forced = false;
       else
          level.default_music_forced = true;
@@ -2634,7 +2654,7 @@ void ScriptThread::ForceMusicEvent(Event *ev)
       level.default_music_forced = false;
    }
 
-   ChangeMusic(current, fallback, true, cancel);
+   ChangeMusic(current, fallback, true, duration);
 }
 
 void ScriptThread::SoundtrackEvent(Event *ev)
@@ -2644,7 +2664,10 @@ void ScriptThread::SoundtrackEvent(Event *ev)
 
 void ScriptThread::ExitMusicEvent(Event *ev)
 {
-   level.exitmusic = true;
+   if(ev->NumArgs() > 0)
+      level.exitmusic = ev->GetFloat(1);
+   else
+      level.exitmusic = 20;
 }
 
 void ScriptThread::MenuEvent(Event *ev)
