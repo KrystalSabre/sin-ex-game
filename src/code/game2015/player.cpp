@@ -3915,16 +3915,6 @@ void Player::ToggleZoomMode(Event *ev)
    {
       zoom_mode = ZOOMED_OUT;
 
-      fov = atof(Info_ValueForKey(client->pers.userinfo, "fov"));
-      if(fov < 1)
-      {
-         fov = 90;
-      }
-      else if(fov > 160)
-      {
-         fov = 160;
-      }
-
       RandomGlobalSound("scope_zoomout", 1, CHAN_WEAPONIDLE, ATTN_NORM);
       ProcessEvent(EV_MovementSound);
    }
@@ -3933,7 +3923,6 @@ void Player::ToggleZoomMode(Event *ev)
       RandomGlobalSound("scope_zoomin", 1, CHAN_WEAPONIDLE, ATTN_NORM);
       ProcessEvent(EV_MovementSound);
       zoom_mode = ZOOMED_IN;
-      fov = bound(atan(20 / (90 / tan(fov / 360 * M_PI))) * 360 / M_PI, 1, 20);
    }
 }
 
@@ -3942,15 +3931,6 @@ void Player::ZoomOut(Event *ev)
    if(zoom_mode == ZOOMED_IN)
    {
       zoom_mode = ZOOMED_OUT;
-      fov = atof(Info_ValueForKey(client->pers.userinfo, "fov"));
-      if(fov < 1)
-      {
-         fov = 90;
-      }
-      else if(fov > 160)
-      {
-         fov = 160;
-      }
    }
 }
 
@@ -5368,8 +5348,12 @@ void Player::SetCameraEntity(Entity *cameraEnt)
 
    int videomode = (!stricmp(Info_ValueForKey(client->pers.userinfo, "vid_ref"), "soft") ? atof(Info_ValueForKey(client->pers.userinfo, "sw_mode")) : atof(Info_ValueForKey(client->pers.userinfo, "gl_mode")));
    float realfov = fov;
-   if(videomode >= 8)
-      realfov = FOV_ADJUST(fov, videomode);
+
+   if(zoom_mode == ZOOMED_IN && fov > 20)
+      realfov = 20;
+
+   if(videomode >= 8 && viewmode <= THIRD_PERSON)
+      realfov = FOV_ADJUST(realfov, videomode);
 
    // In release, we should never be without a camera
    if(!cameraEnt)
@@ -5403,7 +5387,10 @@ void Player::SetCameraEntity(Entity *cameraEnt)
       }
       if(!ctf->value && vehicle && vehicle->IsDrivable())
       {
-         SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, realfov*1.25);
+         if(fov < 112.5)
+            SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, (videomode >= 8 ? FOV_ADJUST(112.5, videomode) : 112.5));
+         else
+            SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, realfov);
       }
       //###
       else if(hoverbike)
@@ -5641,12 +5628,10 @@ void Player::SetCameraEntity(Entity *cameraEnt)
          pos.z += (c_jitter_offset * crandom() + c_jitter_offset) * 0.5;
       }
 
-      if(!(viewmode >= CAMERA_VIEW && videomode < 8))
-      {
-         if(viewmode >= CAMERA_VIEW && videomode >= 8)
-            realfov = FOV_ADJUST(90, videomode);
-         camerafov = max(atan(camerafov / (90 / tan(realfov / 360 * M_PI))) * 360 / M_PI, 1);
-      }
+      if(viewmode <= THIRD_PERSON)
+         camerafov = realfov;
+      else if(videomode >= 8)
+         camerafov = FOV_ADJUST(camerafov, videomode);
 
       SetCameraValues(cameraEnt->worldorigin, pos, cameraEnt->worldangles, jitterang, cameraEnt->velocity, noblend, camerafov);
       //###
