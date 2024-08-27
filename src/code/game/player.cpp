@@ -1599,7 +1599,7 @@ void Player::Pain(Event *ev)
    if(attacker->isSubclassOf<Sentient>() && attacker != this)
    {
       action_level += damage;
-      action_level_decrement /= 2;
+      action_level_decrement = 0;
    }
 
    // add to the damage inflicted on a player this frame
@@ -1961,7 +1961,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
             if(trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag)
             {
                action_level += currentWeapon->ActionLevelIncrement();
-               action_level_decrement /= 2;
+               action_level_decrement = 0;
             }
          }
          Event *event;
@@ -1993,7 +1993,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
          if(trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag)
          {
             action_level += currentWeapon->ActionLevelIncrement();
-            action_level_decrement /= 2;
+            action_level_decrement = 0;
          }
       }
 
@@ -5026,7 +5026,9 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
 
    if(action_level > 0)
    {
-      action_level_decrement += 0.005f;
+      action_level_decrement += 0.008f;
+      if(action_level_decrement > 1.0)
+         action_level_decrement = 1.0f;
       action_level -= action_level_decrement;
       if(action_level > 80)
          action_level = 80;
@@ -5043,7 +5045,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
    //
    if(s_debugmusic->value)
    {
-      warning("DebugMusic", "%s's action_level = %4.2f, %4.4f\n %i %i %i %i", client->pers.netname, action_level, action_level_decrement, music_current_mood, client->ps.current_music_mood, music_fallback_mood, client->ps.fallback_music_mood);
+      warning("DebugMusic", "%s's action_level = %4.2f, %4.3f\n %i %i %i %i", client->pers.netname, action_level, action_level_decrement, music_current_mood, client->ps.current_music_mood, music_fallback_mood, client->ps.fallback_music_mood);
       if(music_forced)
       {
          warning("DebugMusic", "FORCED");
@@ -5809,6 +5811,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
          {
             action_level = 0;
          }
+         action_level_decrement = 0;
          music_current_mood = current_mood_num;
       }
    }
