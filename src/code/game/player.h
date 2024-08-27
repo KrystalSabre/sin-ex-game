@@ -173,6 +173,7 @@ protected:
 
    // music mood stuff
    float             action_level;
+   float             action_level_decrement;
    int               music_current_mood;
    int               music_fallback_mood;
 
@@ -489,6 +490,7 @@ inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
    arc.WriteBoolean(drawoverlay);
 
    arc.WriteFloat(action_level);
+   arc.WriteFloat(action_level_decrement);
    arc.WriteInteger(music_current_mood);
    arc.WriteInteger(music_fallback_mood);
 
@@ -623,6 +625,7 @@ inline EXPORT_FROM_DLL void Player::Unarchive(Archiver &arc)
    arc.ReadBoolean(&drawoverlay);
 
    arc.ReadFloat(&action_level);
+   arc.ReadFloat(&action_level_decrement);
    arc.ReadInteger(&music_current_mood);
    arc.ReadInteger(&music_fallback_mood);
 
