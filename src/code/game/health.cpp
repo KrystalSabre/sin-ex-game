@@ -75,14 +75,14 @@ void Health::PickupHealth(Event *ev)
    sen->health += amount;
    if(ctf->value && sen->HasItem("CTF_Tech_Regeneration"))
    {
-      if(sen->health > CTF_TECH_REGENERATION_HEALTH)
+      if(sen->health > sen->max_health + CTF_TECH_REGENERATION_HEALTH)
       {
-         sen->health = CTF_TECH_REGENERATION_HEALTH;
+         sen->health = sen->max_health + CTF_TECH_REGENERATION_HEALTH;
       }
    }
-   else if(sen->health > 200)
+   else if(sen->health > sen->max_health + 100)
    {
-      sen->health = 200;
+      sen->health = sen->max_health + 100;
    }
 
    //

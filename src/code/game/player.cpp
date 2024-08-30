@@ -4545,6 +4545,8 @@ EXPORT_FROM_DLL void Player::FinishMove(void)
    CalcBob();
 
    // check if we're over the limit health-wise
+   if(!FindItem("CTF_Tech_Regeneration") && health > max_health + 100)
+      health = max_health + 100;
    if(((int)health > (int)max_health) && ((float)((int)level.time) == level.time))
    {
       // CTF: Regeneration Tech doesn't drain health over 100
@@ -5026,7 +5028,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
 
    if(action_level > 0)
    {
-      action_level_decrement += 0.008f;
+      action_level_decrement += 0.005f;
       if(action_level_decrement > 1.0)
          action_level_decrement = 1.0f;
       action_level -= action_level_decrement;

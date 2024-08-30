@@ -1448,13 +1448,13 @@ void CTF_Tech_Regeneration::Regenerate(Event *ev)
    // Regenerate the owner
    if(owner)
    {
-      if(owner->health < CTF_TECH_REGENERATION_HEALTH)
+      if(owner->health < owner->max_health + CTF_TECH_REGENERATION_HEALTH)
       {
          owner->health += 2;
 
-         if(owner->health > CTF_TECH_REGENERATION_HEALTH)
+         if(owner->health > owner->max_health + CTF_TECH_REGENERATION_HEALTH)
          {
-            owner->health = CTF_TECH_REGENERATION_HEALTH;
+            owner->health = owner->max_health + CTF_TECH_REGENERATION_HEALTH;
          }
       }
 

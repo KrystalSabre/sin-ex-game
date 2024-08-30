@@ -128,27 +128,27 @@ void Health::PickupHealth(Event *ev)
    {
       if(sen->HasItem("CTF_Tech_Regeneration"))
       {
-         if(sen->health > CTF_TECH_REGENERATION_HEALTH)
+         if(sen->health > sen->max_health + CTF_TECH_REGENERATION_HEALTH)
          {
-            sen->health = CTF_TECH_REGENERATION_HEALTH;
+            sen->health = sen->max_health + CTF_TECH_REGENERATION_HEALTH;
          }
       }
       else if(sen->HasItem("CTF_Tech_Vampire"))
       {
-         if(sen->health > CTF_TECH_VAMPIRE_HEALTH)
+         if(sen->health > sen->max_health + CTF_TECH_VAMPIRE_HEALTH)
          {
-            sen->health = CTF_TECH_VAMPIRE_HEALTH;
+            sen->health = sen->max_health + CTF_TECH_VAMPIRE_HEALTH;
          }
       }
-      else if(sen->health > 200) // don't forget to check to regular health limit :p
+      else if(sen->health > sen->max_health + 100) // don't forget to check to regular health limit :p
       {
-         sen->health = 200;
+         sen->health = sen->max_health + 100;
       }
    }
    //###
-   else if(sen->health > 200)
+   else if(sen->health > sen->max_health + 100)
    {
-      sen->health = 200;
+      sen->health = sen->max_health + 100;
    }
 
    //

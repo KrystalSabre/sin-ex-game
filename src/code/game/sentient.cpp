@@ -1079,6 +1079,16 @@ void Sentient::EventGiveItem(Event *ev)
    type = ev->GetString(1);
    amount = ev->GetInteger(2);
 
+   if(!Q_strcasecmp(type, "health"))
+   {
+      if(amount >= 80)
+         type = "megahealth";
+      else if(amount >= 40)
+         type = "largehealth";
+      else if(amount < 15)
+         type = "smallhealth";
+   }
+
    giveItem(type, amount);
 }
 

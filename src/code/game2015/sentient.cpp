@@ -1114,6 +1114,16 @@ void Sentient::EventGiveItem(Event *ev)
 
    type   = ev->GetString(1);
    amount = ev->GetInteger(2);
+   
+   if(!Q_strcasecmp(type, "health"))
+   {
+      if(amount >= 80)
+         type = "megahealth";
+      else if(amount >= 40)
+         type = "largehealth";
+      else if(amount < 15)
+         type = "smallhealth";
+   }
 
    giveItem(type, amount);
 }
@@ -1591,9 +1601,9 @@ void Sentient::ArmorDamage(Event *ev)
 
                // attacker has vampire rune, so give him some health
                pl_attacker->health += damage * 0.75; // ##! for testing our less powerful runes
-               if(pl_attacker->health > CTF_TECH_VAMPIRE_HEALTH)
+               if(pl_attacker->health > pl_attacker->max_health + CTF_TECH_VAMPIRE_HEALTH)
                {
-                  pl_attacker->health = CTF_TECH_VAMPIRE_HEALTH;
+                  pl_attacker->health = pl_attacker->max_health + CTF_TECH_VAMPIRE_HEALTH;
                }
                ctfev = new Event(EV_Player_CTF_SoundEvent);
                ctfev->AddInteger(HEAL);

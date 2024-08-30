@@ -115,15 +115,15 @@ extern cvar_t *ctf_forcejoin;
 #define CTF_TECH_TIMEOUT                     60   // seconds before techs spawn again
 #define CTF_GRAPPLE_SPEED                    1200 //### speed of grapple in flight
 #define CTF_GRAPPLE_PULL_SPEED               750  //### speed player is pulled at
-#define CTF_TECH_REGENERATION_HEALTH         250  //### max health with regeneration
+#define CTF_TECH_REGENERATION_HEALTH         150  //### max health with regeneration
 #define CTF_TECH_REGENERATION_TIME           0.8  //### time between regenerations
 
 //### new defines
 #define CTF_GRAPPLE_RUNE_SPEED               2000 // speed of grapple in flight
 #define CTF_GRAPPLE_PULL_RUNE_SPEED          900  // speed player is pulled at
 
-#define CTF_TECH_VAMPIRE_DECAY_HEALTH        200  // max health till health decay sets in
-#define CTF_TECH_VAMPIRE_HEALTH              300  // ##! for testing our less powerfull runes
+#define CTF_TECH_VAMPIRE_DECAY_HEALTH        100  // max health till health decay sets in
+#define CTF_TECH_VAMPIRE_HEALTH              200  // ##! for testing our less powerfull runes
 #define CTF_TECH_VAMPIRE_DECAY_RATE          3    // ##! for testing our less powerfull runes
 
 #define CTF_TECH_SPLASH_SHIELD_REDUCTION     0.25 // ##! for testing our less powerfull runes

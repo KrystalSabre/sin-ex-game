@@ -113,7 +113,7 @@ extern cvar_t *ctf_forcejoin;
 #define CTF_TECH_TIMEOUT                     60   // seconds before techs spawn again
 #define CTF_GRAPPLE_SPEED                    1000 // speed of grapple in flight
 #define CTF_GRAPPLE_PULL_SPEED               700  // speed player is pulled at
-#define CTF_TECH_REGENERATION_HEALTH         300  // max health with regeneration
+#define CTF_TECH_REGENERATION_HEALTH         200  // max health with regeneration
 #define CTF_TECH_REGENERATION_TIME           0.7  // time between regenerations
 
 // FLAGS
