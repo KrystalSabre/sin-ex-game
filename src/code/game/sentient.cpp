@@ -940,7 +940,11 @@ Weapon *Sentient::giveWeapon(const char *weaponname)
       return NULL;
    }
 
+   if(FindItem(weaponname))
+      return NULL;
+
    weapon = (Weapon *)giveItem(weaponname, 1);
+   weapon->GiveAmmo(this);
 
    if(!currentWeapon || (weapon->Rank() > currentWeapon->Rank()))
    {

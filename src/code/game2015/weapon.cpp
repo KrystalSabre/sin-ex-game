@@ -213,6 +213,7 @@ void Weapon::SetSecondaryAmmo(const char *type, int amount, int startamount)
    }
 
    secondary_ammorequired = amount;
+   secondary_startammo = startamount;
 }
 
 void Weapon::SetAmmoAmount(int amount)
@@ -479,10 +480,25 @@ void Weapon::SetOwner(Sentient *ent)
    }
 
    setModel(viewmodel);
+}
 
-   if(ent->isClient() && ammotype.length() && startammo && !G_GetSpawnArg("savegame"))
+void Weapon::GiveAmmo(Sentient *ent)
+{
+   Ammo *ammo;
+
+   assert(ent);
+   if(!ent)
    {
-      ent->giveItem(ammotype.c_str(), startammo);
+      // return to avoid any buggy behaviour
+      return;
+   }
+
+   if(ent->isClient() && !G_GetSpawnArg("savegame"))
+   {
+      if(primary_ammo_type.length() && startammo)
+         ent->giveItem(primary_ammo_type.c_str(), startammo);
+      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
+         ent->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
    }
 }
 
@@ -1079,7 +1095,7 @@ void Weapon::PickupWeapon(Event *ev)
    }
 
    hasweapon = sen->HasItem(getClassname());
-   giveammo = (sen->isClient() && ammotype.length() && startammo);
+   giveammo = (sen->isClient() && primary_ammo_type.length() && startammo);
 
    // if he already has the weapon, don't pick it up if he doesn't need the ammo
    if(hasweapon)
@@ -1117,8 +1133,20 @@ void Weapon::PickupWeapon(Event *ev)
          return;
 
       // check if he needs the ammo
-      ammo = static_cast<Ammo *>(sen->FindItem(ammotype.c_str()));
+      ammo = static_cast<Ammo *>(sen->FindItem(primary_ammo_type.c_str()));
       if(ammo && (ammo->Amount() >= ammo->MaxAmount()))
+      {
+         giveammo = 0;
+      }
+      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type)
+      {
+         ammo = static_cast<Ammo *>(sen->FindItem(secondary_ammo_type.c_str()));
+         if(ammo && (ammo->Amount() < ammo->MaxAmount()))
+         {
+            giveammo |= 2;
+         }
+      }
+      if(!giveammo)
       {
          // doesn't need the ammo or the weapon, so return.
          return;
@@ -1182,7 +1210,12 @@ void Weapon::PickupWeapon(Event *ev)
 
    // check if we should give him ammo
    if(giveammo)
-      sen->giveItem(ammotype.c_str(), startammo);
+   {
+      if(giveammo & 1)
+         sen->giveItem(primary_ammo_type.c_str(), startammo);
+      if((giveammo & 2) && secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
+         sen->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
+   }
 }
 
 void Weapon::ForceIdle()

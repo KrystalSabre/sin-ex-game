@@ -91,6 +91,7 @@ protected:
    int                  ammorequired            = 0;
    int                  secondary_ammorequired  = 0;
    int                  startammo               = 0;
+   int                  secondary_startammo     = 0;
    int                  rank                    = 0;
    int                  order;
    int                  ammo_clip_size          = 0;
@@ -164,7 +165,8 @@ public:
    virtual void         SetModels(const char *world, const char *view);
 
    virtual void         SetOwner(Sentient *ent) override;
-
+   
+   virtual void         GiveAmmo(Sentient *ent);
    virtual int          AmmoAvailable();
    virtual qboolean     UnlimitedAmmo();
    virtual qboolean     HasAmmo();
