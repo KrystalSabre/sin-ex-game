@@ -583,12 +583,32 @@ qboolean Weapon::HasAmmo(void)
       {
          return true;
       }
+      else if(dualmode)
+      {
+         ammotype = secondary_ammo_type;
+         if((ammo_clip_size && ammo_in_clip >= secondary_ammorequired) || AmmoAvailable() >= secondary_ammorequired)
+         {
+            ammotype = primary_ammo_type;
+            return true;
+         }
+         ammotype = primary_ammo_type;
+      }
    }
    else
    {
       if((ammo_clip_size && ammo_in_clip >= secondary_ammorequired) || AmmoAvailable() >= secondary_ammorequired)
       {
          return true;
+      }
+      else
+      {
+         ammotype = primary_ammo_type;
+         if((ammo_clip_size && ammo_in_clip >= ammorequired) || AmmoAvailable() >= ammorequired)
+         {
+            ammotype = secondary_ammo_type;
+            return true;
+         }
+         ammotype = secondary_ammo_type;
       }
    }
 
@@ -707,6 +727,14 @@ void Weapon::ReadyWeapon(void)
    }
 
    weaponstate = WEAPON_RAISING;
+
+   if(dualmode)
+   {
+      if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
+         SetSecondaryMode();
+      else if(weaponmode == SECONDARY && AmmoAvailable() < secondary_ammorequired)
+         SetPrimaryMode();
+   }
 
    AttachGun();
 
@@ -864,6 +892,24 @@ void Weapon::Fire(void)
    {
       CheckReload();
       return;
+   }
+
+   if(dualmode && HasAmmo())
+   {
+      if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
+      {
+         weaponstate = WEAPON_CHANGING;
+         RandomAnimate("primary2secondary", EV_Weapon_SecondaryMode);
+         weaponmode = SECONDARY;
+         return;
+      }
+      else if(weaponmode == SECONDARY && AmmoAvailable() < secondary_ammorequired)
+      {
+         weaponstate = WEAPON_CHANGING;
+         RandomAnimate("secondary2primary", EV_Weapon_PrimaryMode);
+         weaponmode = PRIMARY;
+         return;
+      }
    }
 
    if(weaponmode == PRIMARY)
@@ -1473,6 +1519,28 @@ int Weapon::ClipAmmo(void)
 {
    if(ammo_clip_size)
       return ammo_in_clip;
+   else if(dualmode && secondary_ammo_type != primary_ammo_type)
+   {
+      Ammo *ammo;
+      str altammo;
+
+      if(owner)
+      {
+         if(ammotype == primary_ammo_type)
+            altammo = secondary_ammo_type;
+         else if(ammotype == secondary_ammo_type)
+            altammo = primary_ammo_type;
+
+         if(altammo.length())
+         {
+            ammo = (Ammo *)owner->FindItem(altammo.c_str());
+            if(ammo)
+            {
+               return ammo->Amount();
+            }
+         }
+      }
+   }
    else
       return -1;
 }

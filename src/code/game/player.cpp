@@ -4805,7 +4805,7 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    }
 
    // not used, so don't set to save net bandwidth
-#if 0
+//#if 0
    // All ammo types
    for(i = 0; i < NUM_AMMO_TYPES; i++)
    {
@@ -4815,14 +4815,14 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
       ammo = (Ammo *)FindItem(ammo_types[i]);
       if(ammo)
       {
-         client->ps.stats[STAT_AMMO_BASE + i] = ammo->Amount();
+         client->ps.stats[STAT_AMMO_BASE + i] = ((float)ammo->Amount() / ammo->MaxAmount()) * 1000;
       }
       else
       {
          client->ps.stats[STAT_AMMO_BASE + i] = 0;
       }
 }
-#endif
+//#endif
 
    //
    // Armor
