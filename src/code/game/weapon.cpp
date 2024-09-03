@@ -26,6 +26,7 @@
 #include "specialfx.h"
 #include "chaingun.h"
 #include "assaultrifle.h"
+#include "magnum.h"
 
 #ifdef SIN_ARCADE
 static ScriptVariablePtr sv_infinitebullets;
@@ -486,7 +487,10 @@ void Weapon::GiveAmmo(Sentient *ent)
    {
       if(primary_ammo_type.length() && startammo)
       {
-         ent->giveItem(primary_ammo_type.c_str(), startammo);
+         if(isSubclassOf<Magnum>())
+            ent->giveItem(primary_ammo_type.c_str(), 100);
+         else
+            ent->giveItem(primary_ammo_type.c_str(), startammo);
          if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
             ent->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
       }
@@ -866,13 +870,12 @@ qboolean Weapon::Drop(void)
       spawnflags |= DROPPED_ITEM;
       if(ammo_clip_size)
       {
-         if(ammo_in_clip)
-         {
-            if(skill->value >= 2)
-               startammo = ceil((float)ammo_in_clip / 2);
-            else
-               startammo = ammo_in_clip;
-         }
+         if(!ammo_in_clip)
+            ammo_in_clip = startammo;
+         if(skill->value >= 2)
+            startammo = ceil((float)ammo_in_clip / 2);
+         else
+            startammo = ammo_in_clip;
       }
       else
          startammo >>= 1;
@@ -1237,7 +1240,10 @@ void Weapon::DoneReloading(Event *ev)
    }
    else
    {
-      SetAmmoAmount(ammo_clip_size);
+      if(owner && !owner->isClient() && isSubclassOf<AssaultRifle>())
+         SetAmmoAmount(30);
+      else
+         SetAmmoAmount(ammo_clip_size);
    }
 
    ForceIdle();

@@ -29,7 +29,7 @@ ResponseDef Magnum::Responses[] =
 Magnum::Magnum() : BulletWeapon()
 {
    SetModels("magnum.def", "view_magnum.def");
-   SetAmmo("Bullet10mm", 1, 100);
+   SetAmmo("Bullet10mm", 1, 15);
    SetRank(20, 20);
    SetType(WEAPON_1HANDED);
    modelIndex("10mm.def");

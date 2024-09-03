@@ -1199,6 +1199,7 @@ void Entity::DamageEvent(Event *ev)
    // figure momentum add
    if((inflictor != world) &&
       (movetype != MOVETYPE_NONE) &&
+      (movetype != MOVETYPE_TOSS) &&
       (movetype != MOVETYPE_BOUNCE) &&
       (movetype != MOVETYPE_PUSH) &&
       (movetype != MOVETYPE_STOP))

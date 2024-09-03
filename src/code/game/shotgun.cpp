@@ -29,7 +29,7 @@ ResponseDef Shotgun::Responses[] =
 Shotgun::Shotgun() : BulletWeapon()
 {
    SetModels("shotgun.def", "view_shotgun.def");
-   SetAmmo("ShotgunClip", 1, 10);
+   SetAmmo("ShotgunClip", 1, 6);
    SetRank(30, 30);
    SetType(WEAPON_2HANDED_HI);
    modelIndex("shotgunclip.def");

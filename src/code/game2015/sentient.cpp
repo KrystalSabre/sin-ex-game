@@ -1780,6 +1780,7 @@ void Sentient::ArmorDamage(Event *ev)
    {
       if((knockback) &&
          (movetype != MOVETYPE_NONE) &&
+         (movetype != MOVETYPE_TOSS) &&
          (movetype != MOVETYPE_BOUNCE) &&
          (movetype != MOVETYPE_PUSH) &&
          (movetype != MOVETYPE_STOP))

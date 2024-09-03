@@ -324,6 +324,7 @@ void PulseRifle::PulseExplosion(trace_t *trace)
    {
       if((ent->takedamage) &&
          (ent->movetype != MOVETYPE_NONE) &&
+         (ent->movetype != MOVETYPE_TOSS) &&
          (ent->movetype != MOVETYPE_BOUNCE) &&
          (ent->movetype != MOVETYPE_PUSH) &&
          (ent->movetype != MOVETYPE_STOP))
