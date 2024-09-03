@@ -475,8 +475,6 @@ void Weapon::SetOwner(Sentient *ent)
 
 void Weapon::GiveAmmo(Sentient *ent)
 {
-   Ammo *ammo;
-
    assert(ent);
    if(!ent)
    {
@@ -487,9 +485,11 @@ void Weapon::GiveAmmo(Sentient *ent)
    if(ent->isClient() && !G_GetSpawnArg("savegame"))
    {
       if(primary_ammo_type.length() && startammo)
+      {
          ent->giveItem(primary_ammo_type.c_str(), startammo);
-      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
-         ent->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
+         if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
+            ent->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
+      }
    }
 }
 
@@ -744,7 +744,7 @@ void Weapon::ReadyWeapon(void)
 
    weaponstate = WEAPON_RAISING;
 
-   if(dualmode)
+   if(owner->isClient() && dualmode)
    {
       if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
          SetSecondaryMode();
@@ -864,10 +864,19 @@ qboolean Weapon::Drop(void)
    else
    {
       spawnflags |= DROPPED_ITEM;
-      if(ammo_clip_size && ammo_in_clip)
-         startammo = ammo_in_clip;
+      if(ammo_clip_size)
+      {
+         if(ammo_in_clip)
+         {
+            if(skill->value >= 2)
+               startammo = ceil((float)ammo_in_clip / 2);
+            else
+               startammo = ammo_in_clip;
+         }
+      }
       else
-         startammo >>= 2;
+         startammo >>= 1;
+      secondary_startammo >>= 1;
 
       if(startammo == 0)
       {
@@ -910,7 +919,7 @@ void Weapon::Fire(void)
       return;
    }
 
-   if(dualmode && HasAmmo())
+   if(owner->isClient() && dualmode && HasAmmo())
    {
       if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
       {
@@ -1081,20 +1090,15 @@ void Weapon::PickupWeapon(Event *ev)
       ammo = (Ammo *)sen->FindItem(primary_ammo_type.c_str());
       if(ammo && (ammo->Amount() >= ammo->MaxAmount()))
       {
-         giveammo = 0;
-      }
-      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type)
-      {
-         ammo = (Ammo *)sen->FindItem(secondary_ammo_type.c_str());
-         if(ammo && (ammo->Amount() < ammo->MaxAmount()))
+         if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
          {
-            giveammo |= 2;
+            ammo = (Ammo *)sen->FindItem(secondary_ammo_type.c_str());
+            if(ammo && (ammo->Amount() >= ammo->MaxAmount()))
+            {
+               // doesn't need the ammo or the weapon, so return.
+               return;
+            }
          }
-      }
-      if(!giveammo)
-      {
-         // doesn't need the ammo or the weapon, so return.
-         return;
       }
    }
 
@@ -1126,9 +1130,8 @@ void Weapon::PickupWeapon(Event *ev)
    // check if we should give him ammo
    if(giveammo)
    {
-      if(giveammo & 1)
-         sen->giveItem(primary_ammo_type.c_str(), startammo);
-      if((giveammo & 2) && secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
+      sen->giveItem(primary_ammo_type.c_str(), startammo);
+      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
          sen->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
    }
 }
@@ -1571,6 +1574,7 @@ int Weapon::ClipAmmo(void)
             }
          }
       }
+      return -1;
    }
    else
       return -1;
@@ -1603,12 +1607,18 @@ void Weapon::SecondaryUse(Event *ev)
 
    if(weaponmode == PRIMARY)
    {
-      RandomAnimate("primary2secondary", EV_Weapon_SecondaryMode);
+      if(owner->isClient())
+         RandomAnimate("primary2secondary", EV_Weapon_SecondaryMode);
+      else
+         PostEvent(EV_Weapon_SecondaryMode, 0);
       weaponmode = SECONDARY;
    }
    else
    {
-      RandomAnimate("secondary2primary", EV_Weapon_PrimaryMode);
+      if(owner->isClient())
+         RandomAnimate("secondary2primary", EV_Weapon_PrimaryMode);
+      else
+         PostEvent(EV_Weapon_PrimaryMode, 0);
       weaponmode = PRIMARY;
    }
 }

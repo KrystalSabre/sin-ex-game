@@ -248,6 +248,7 @@ inline EXPORT_FROM_DLL void Weapon::Archive(Archiver &arc)
    arc.WriteInteger(ammorequired);
    arc.WriteInteger(secondary_ammorequired);
    arc.WriteInteger(startammo);
+   arc.WriteInteger(secondary_startammo);
    arc.WriteInteger(rank);
    arc.WriteInteger(order);
    arc.WriteInteger(ammo_clip_size);
@@ -292,6 +293,7 @@ inline EXPORT_FROM_DLL void Weapon::Unarchive(Archiver &arc)
    arc.ReadInteger(&ammorequired);
    arc.ReadInteger(&secondary_ammorequired);
    arc.ReadInteger(&startammo);
+   arc.ReadInteger(&secondary_startammo);
    arc.ReadInteger(&rank);
    arc.ReadInteger(&order);
    arc.ReadInteger(&ammo_clip_size);
