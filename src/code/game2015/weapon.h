@@ -171,7 +171,7 @@ public:
 
    virtual void         SetOwner(Sentient *ent) override;
    
-   virtual void         GiveAmmo(Sentient *ent);
+   virtual void         GiveAmmo();
    virtual int          AmmoAvailable();
    virtual qboolean     UnlimitedAmmo();
    virtual qboolean     HasAmmo();

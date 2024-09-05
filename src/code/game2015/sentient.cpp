@@ -973,7 +973,7 @@ Weapon *Sentient::giveWeapon(const char *weaponname)
       return NULL;
 
    auto weapon = static_cast<Weapon *>(giveItem(weaponname, 1));
-   weapon->GiveAmmo(this);
+   weapon->GiveAmmo();
 
    //### don't change weapons if on a hoverbike or if autoweapon switching is turned off
    //if(!currentWeapon || (weapon->Rank() > currentWeapon->Rank()))

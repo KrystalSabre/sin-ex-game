@@ -482,25 +482,25 @@ void Weapon::SetOwner(Sentient *ent)
    setModel(viewmodel);
 }
 
-void Weapon::GiveAmmo(Sentient *ent)
+void Weapon::GiveAmmo()
 {
-   assert(ent);
-   if(!ent)
+   assert(owner);
+   if(!owner)
    {
       // return to avoid any buggy behaviour
       return;
    }
 
-   if(ent->isClient() && !G_GetSpawnArg("savegame"))
+   if(owner->isClient() && !G_GetSpawnArg("savegame"))
    {
       if(primary_ammo_type.length() && startammo)
       {
          if(isSubclassOf<Magnum>())
-            ent->giveItem(primary_ammo_type.c_str(), 100);
+            owner->giveItem(primary_ammo_type.c_str(), 100);
          else
-            ent->giveItem(primary_ammo_type.c_str(), startammo);
+            owner->giveItem(primary_ammo_type.c_str(), startammo);
          if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && secondary_startammo)
-            ent->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
+            owner->giveItem(secondary_ammo_type.c_str(), secondary_startammo);
       }
    }
 }
