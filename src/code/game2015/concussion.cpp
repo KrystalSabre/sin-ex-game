@@ -291,6 +291,12 @@ void ConcussionGun::BlastEffect(Event *ev)
          }
       }
 
+      if(owner->isClient() && tmpent->isSubclassOf<Sentient>() && !tmpent->deadflag && !(tmpent->flags & (FL_FORCEFIELD | FL_GODMODE)))
+      {
+         Player *client = (Player *)(Entity *)owner;
+         client->IncreaseActionLevel((float)action_level_increment / (CONCUSSION_COUNT + 1));
+      }
+
       // do some damage if applicable
       f = CONCUSSION_DAMG - (targdist * CONCUSSION_DAMG_DECAY);
       // scale the damage by the directional dot product

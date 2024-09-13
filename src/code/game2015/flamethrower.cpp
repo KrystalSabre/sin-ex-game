@@ -242,6 +242,12 @@ void ThrowerFlame::Burn(Event *ev)
       if(!CanToast(ent, entdot))
          continue;
 
+      if(G_GetEntity(owner)->isClient() && ent->isSubclassOf<Sentient>() && !ent->deadflag && !(ent->flags & (FL_FORCEFIELD | FL_GODMODE)))
+      {
+         Player *client = (Player *)(Entity *)G_GetEntity(owner);
+         client->IncreaseActionLevel(1);
+      }
+
       ent->Damage(this, G_GetEntity(owner), (int)(points + 0.5), org, v, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_KNOCKBACK, MOD_FLAMETHROWER, -1, -1, 1.0f);
       // make a bit of a visual cue that you hit something
       if(ent->isSubclassOf<Sentient>() && !ent->deadflag)
