@@ -629,6 +629,11 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
                hit2 = trace2.ent->entity;
                if(hit2->takedamage && hit2->isClient())
                {
+                  if(owner->isClient() && !hit2->deadflag && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
+                  {
+                     Player *client = (Player *)(Entity *)owner;
+                     client->IncreaseActionLevel((float)action_level_increment / numbullets);
+                  }
                   // probably traced to the rider, so hit him instead
                   hit2->Damage(this, owner, mindamage + (int)G_Random(maxdamage - mindamage + 1),
                                trace.endpos, dir, trace.plane.normal, kick, dflags, meansofdeath,
@@ -650,6 +655,11 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
 
          if(trace.fraction != 1.0)
          {
+            if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            {
+               Player *client = (Player *)(Entity *)owner;
+               client->IncreaseActionLevel((float)action_level_increment / numbullets);
+            }
             // do less than regular damage on a bbox hit
             TraceAttack(src, trace.endpos, (mindamage + (int)G_Random(maxdamage - mindamage + 1))*0.85, &trace, 
                         MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
@@ -672,6 +682,11 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
          damagedtarget = false;
          if(trace.fraction != 1.0)
          {
+            if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            {
+               Player *client = (Player *)(Entity *)owner;
+               client->IncreaseActionLevel((float)action_level_increment / numbullets);
+            }
             TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, 
                         MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
          }

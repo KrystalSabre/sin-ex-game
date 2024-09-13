@@ -256,7 +256,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
                hit2 = trace2.ent->entity;
                if(hit2->takedamage && hit2->isClient())
                {
-                  if(owner->isClient() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+                  if(owner->isClient() && !hit2->deadflag && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
                   {
                      Player *client = (Player *)(Entity *)owner;
                      client->IncreaseActionLevel((float)action_level_increment / numbullets);
