@@ -748,11 +748,11 @@ void Weapon::ReadyWeapon(void)
 
    weaponstate = WEAPON_RAISING;
 
-   if(owner->isClient() && dualmode)
+   if(owner->isClient() && dualmode && HasAmmo())
    {
-      if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
+      if(weaponmode == PRIMARY && !UnlimitedAmmo() && AmmoAvailable() < ammorequired)
          SetSecondaryMode();
-      else if(weaponmode == SECONDARY && AmmoAvailable() < secondary_ammorequired)
+      else if(weaponmode == SECONDARY && !UnlimitedAmmo() && AmmoAvailable() < secondary_ammorequired)
          SetPrimaryMode();
    }
 
@@ -924,14 +924,14 @@ void Weapon::Fire(void)
 
    if(owner->isClient() && dualmode && HasAmmo())
    {
-      if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
+      if(weaponmode == PRIMARY && !UnlimitedAmmo() && AmmoAvailable() < ammorequired)
       {
          weaponstate = WEAPON_CHANGING;
          RandomAnimate("primary2secondary", EV_Weapon_SecondaryMode);
          weaponmode = SECONDARY;
          return;
       }
-      else if(weaponmode == SECONDARY && AmmoAvailable() < secondary_ammorequired)
+      else if(weaponmode == SECONDARY && !UnlimitedAmmo() && AmmoAvailable() < secondary_ammorequired)
       {
          weaponstate = WEAPON_CHANGING;
          RandomAnimate("secondary2primary", EV_Weapon_PrimaryMode);
