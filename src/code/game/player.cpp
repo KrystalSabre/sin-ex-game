@@ -1949,7 +1949,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
    {
       if(firedown)
       {
-         if(currentWeapon && !Q_strcasecmp(currentWeapon->getClassname(), "QuantumDestabilizer"))
+         /*if(currentWeapon && !Q_strcasecmp(currentWeapon->getClassname(), "QuantumDestabilizer"))
          {
             Vector dir, src, end;
             trace_t trace;
@@ -1963,7 +1963,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
                action_level += currentWeapon->ActionLevelIncrement();
                action_level_decrement = 0;
             }
-         }
+         }*/
          Event *event;
          event = new Event(EV_Sentient_ReleaseAttack);
          event->AddFloat(level.time - firedowntime);
@@ -1992,7 +1992,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
          trace = G_FullTrace(src, vec_zero, vec_zero, end, 256, this, MASK_SHOT, "Player::SetCameraEntity");
          if(trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag)
          {
-            action_level += currentWeapon->ActionLevelIncrement();
+            //action_level += currentWeapon->ActionLevelIncrement();
             action_level_decrement = 0;
          }
       }
@@ -6535,6 +6535,12 @@ void Player::GetPlayerView(Vector *pos, Vector *angle)
    {
       *angle = v_angle;
    }
+}
+
+void Player::IncreaseActionLevel(float action_level_increase)
+{
+   action_level += action_level_increase;
+   action_level_decrement = 0;
 }
 
 // EOF

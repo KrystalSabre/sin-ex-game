@@ -1726,6 +1726,13 @@ void Sentient::ArmorDamage(Event *ev)
       return;
    }
 
+	if(damage && !deadflag && attacker && attacker->isClient() && inflictor && inflictor->isSubclassOf<Projectile>())
+	{
+	   Player *player = (Player *)attacker;
+
+	   player->IncreaseActionLevel(damage / 4);
+	}
+
    // do the damage
    health -= damage;
 

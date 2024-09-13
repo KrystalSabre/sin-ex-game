@@ -394,6 +394,8 @@ public:
    void              SetViewAngles(Vector ang);
    void              DropWeaponEvent(Event *ev);
    void              CTF_DropFlag(Event *ev);
+
+   void              IncreaseActionLevel(float action_level_increase);
 };
 
 inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)

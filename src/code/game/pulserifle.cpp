@@ -21,6 +21,7 @@
 #include "misc.h"
 #include "explosion.h"
 #include "surface.h"
+#include "player.h"
 
 #define PULSE_MODE 0
 
@@ -400,6 +401,12 @@ void PulseRifle::Shoot(Event *ev)
       dir = Vector(owner->orientation[0]);
       angles = dir.toAngles();
       setAngles(angles);
+
+      if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+      {
+         Player *client = (Player *)(Entity *)owner;
+         client->IncreaseActionLevel((float)action_level_increment / 6);
+      }
 
       if(ctf->value)
          damg = 30;

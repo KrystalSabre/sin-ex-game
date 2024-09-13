@@ -19,6 +19,7 @@
 #include "misc.h"
 #include "specialfx.h"
 #include "surface.h"
+#include "player.h"
 
 CLASS_DECLARATION(Weapon, Fists, nullptr);
 
@@ -87,6 +88,11 @@ void Fists::Shoot(Event * ev)
    {
       if(trace.ent->entity && trace.ent->entity->takedamage)
       {
+         if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+         {
+            Player *client = (Player *)(Entity *)owner;
+            client->IncreaseActionLevel(action_level_increment);
+         }
          if(trace.ent->entity->flags & FL_BLOOD)
          {
             if((meansofdeath == MOD_MUTANTHANDS) || (trace.ent->entity->health < -500))

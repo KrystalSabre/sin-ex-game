@@ -20,6 +20,7 @@
 #include "bullet.h"
 #include "q_shared.h"
 #include "surface.h"
+#include "player.h"
 
 CLASS_DECLARATION(Weapon, BulletWeapon, NULL);
 
@@ -236,6 +237,11 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
 #endif
       if(trace.fraction != 1.0)
       {
+         if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+         {
+            Player *client = (Player *)(Entity *)owner;
+            client->IncreaseActionLevel((float)action_level_increment / numbullets);
+         }
          TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
       }
    }

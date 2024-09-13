@@ -515,6 +515,8 @@ public:
    void              CTF_DropFlag(Event *ev);
    void              CTF_DrawHud(); //###
    void              CTF_HideHud(); //###
+   
+   void              IncreaseActionLevel(float action_level_increase);
 };
 
 inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
