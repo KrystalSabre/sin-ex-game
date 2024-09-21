@@ -1997,7 +1997,7 @@ void Player::Pain(Event *ev)
    if(attacker->isSubclassOf<Sentient>() && attacker != this)
    {
       action_level += damage;
-      action_level_decrement = 0;
+      action_level_decrement = min(action_level_decrement, 0);
    }
 
    // add to the damage inflicted on a player this frame
@@ -2455,7 +2455,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
          if(trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag)
          {
             //action_level += currentWeapon->ActionLevelIncrement();
-            action_level_decrement = 0;
+            action_level_decrement = min(action_level_decrement, 0);
          }
       }
 
@@ -7390,12 +7390,13 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
          if(str(current) == str("action"))
          {
             action_level = 80;
+            action_level_decrement = -1.0f;
          }
          else
          {
             action_level = 0;
+            action_level_decrement = 0;
          }
-         action_level_decrement = 0;
          music_current_mood = current_mood_num;
       }
    }
@@ -8723,7 +8724,7 @@ void Player::GetPlayerView(Vector *pos, Vector *angle)
 void Player::IncreaseActionLevel(float action_level_increase)
 {
    action_level += action_level_increase;
-   action_level_decrement = 0;
+   action_level_decrement = min(action_level_decrement, 0);
 }
 
 //### =========================================================================
