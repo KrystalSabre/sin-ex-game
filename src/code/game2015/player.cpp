@@ -2447,7 +2447,7 @@ EXPORT_FROM_DLL void Player::CheckButtons(void)
 
          currentWeapon->GetMuzzlePosition(&src, &dir);
 
-         if(!Q_strcasecmp(currentWeapon->getClassname(), "Fists"))
+         if(currentWeapon->GetType() == WEAPON_MELEE)
             end = src + dir * 128;
          else
             end = src + dir * 8192;
@@ -6040,6 +6040,13 @@ EXPORT_FROM_DLL void Player::FinishMove()
    {
       flags |= FL_SILENCER;
    }
+
+   // Check for stealth
+   if((flags & FL_CLOAK) && last_damage_time + 0.5 < level.time && (!currentWeapon || currentWeapon->AttackDone() && firedowntime + 0.5 < level.time 
+      || currentWeapon->GetType() == WEAPON_MELEE || (flags & FL_SILENCER) && currentWeapon->IsSilenced() || !currentWeapon->AutoChange() || currentWeapon->isSubclassOf<SpiderMine>()))
+      flags |= FL_STEALTH;
+   else
+      flags &= ~FL_STEALTH;
 
    // Check for O2
    if(!(flags & FL_OXYGEN) && FindItem("ScubaGear"))
