@@ -688,7 +688,7 @@ qboolean Actor::CanSeeEnemyFrom(Vector pos)
    for(i = 1; i <= n; i++)
    {
       ent = enemyList.ObjectAt(i);
-      if(!ent || ent->deadflag || (ent->flags & FL_NOTARGET))
+      if(!ent || ent->deadflag || (ent->flags & (FL_NOTARGET | FL_CLOAK | FL_STEALTH)))
       {
          continue;
       }
@@ -1305,7 +1305,7 @@ qboolean Actor::GetVisibleTargets(void)
       else if(ent->isSubclassOf<Actor>() && Likes(ent))
       {
          act = static_cast<Actor *>(ent);
-         if(act->currentEnemy && Hates(act->currentEnemy) && !IsEnemy(act->currentEnemy))
+         if(act->currentEnemy && !(act->currentEnemy->flags & (FL_CLOAK | FL_STEALTH)) && Hates(act->currentEnemy) && !IsEnemy(act->currentEnemy))
          {
             if(WithinDistance(ent, vision_distance) && CanSeeFOV(ent))
             {
