@@ -495,7 +495,7 @@ void Sentient::ChangeWeapon(Weapon *weapon)
          return;
       }
       newWeapon = weapon;
-      if(!currentWeapon->ReadyToChange())
+      if(!currentWeapon->ReadyToChange() || (flags & FL_MUTANT))
       {
          return;
       }
@@ -940,15 +940,15 @@ Weapon *Sentient::giveWeapon(const char *weaponname)
       return NULL;
    }
 
-   if(FindItem(weaponname))
-      return NULL;
-
-   weapon = (Weapon *)giveItem(weaponname, 1);
-   weapon->GiveAmmo();
-
-   if(!currentWeapon || (weapon->Rank() > currentWeapon->Rank()))
+   if(!(weapon = (Weapon *)FindItem(weaponname)))
    {
-      ChangeWeapon(weapon);
+      weapon = (Weapon *)giveItem(weaponname, 1);
+      weapon->GiveAmmo();
+      
+      if(!currentWeapon || (weapon->Rank() > currentWeapon->Rank()))
+      {
+         ChangeWeapon(weapon);
+      }
    }
 
    return weapon;

@@ -507,7 +507,7 @@ void Sentient::ChangeWeapon(Weapon *weapon)
          return;
       }
       newWeapon = weapon;
-      if(!currentWeapon->ReadyToChange())
+      if(!currentWeapon->ReadyToChange() || (flags & FL_MUTANT))
       {
          return;
       }
@@ -969,24 +969,25 @@ Weapon *Sentient::giveWeapon(const char *weaponname)
       return nullptr;
    }
 
-   if(FindItem(weaponname))
-      return NULL;
-
-   auto weapon = static_cast<Weapon *>(giveItem(weaponname, 1));
-   weapon->GiveAmmo();
-
-   //### don't change weapons if on a hoverbike or if autoweapon switching is turned off
-   //if(!currentWeapon || (weapon->Rank() > currentWeapon->Rank()))
-   if(autoweaponswitch &&
-      (!currentWeapon || (weapon->Rank() > currentWeapon->Rank())) && 
-      !IsOnBike())
+   auto weapon = static_cast<Weapon *>(FindItem(weaponname));
+   if(!weapon)
    {
-      ChangeWeapon( weapon );
+      weapon = static_cast<Weapon *>(giveItem(weaponname, 1));
+      weapon->GiveAmmo();
+
+      //### don't change weapons if on a hoverbike or if autoweapon switching is turned off
+      //if(!currentWeapon || (weapon->Rank() > currentWeapon->Rank()))
+      if(autoweaponswitch &&
+         (!currentWeapon || (weapon->Rank() > currentWeapon->Rank())) && 
+         !IsOnBike())
+      {
+         ChangeWeapon( weapon );
+      }
+      //###
+      else
+         NonAutoChangeWeapon(weapon);
+      //###
    }
-   //###
-   else
-      NonAutoChangeWeapon(weapon);
-   //###
 
    return weapon;
 }
@@ -2579,7 +2580,7 @@ void Sentient::NonAutoChangeWeapon(Weapon *weapon)
       if(!weapon->ReadyToUse())
          return;
 
-      if(!currentWeapon->ReadyToChange())
+      if(!currentWeapon->ReadyToChange() || (flags & FL_MUTANT))
          return;
 
       // if using a magnum, switch to dual magnum
