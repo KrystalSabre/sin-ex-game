@@ -8704,7 +8704,7 @@ void Player::DropWeaponEvent(Event *ev)
       currentWeapon->IsDroppable() &&
       (!deathmatch->value || !DM_FLAG(DF_NO_DROP_WEAPONS)))
    {
-      currentWeapon->TakeAllAmmo();
+      //currentWeapon->TakeAllAmmo();
       DropCurrentWeapon();
    }
 }

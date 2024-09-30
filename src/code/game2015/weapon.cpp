@@ -511,12 +511,23 @@ void Weapon::TakeAllAmmo()
 
    if(owner)
    {
-      if(ammotype.length())
+      if(primary_ammo_type.length())
       {
-         ammo = static_cast<Ammo *>(owner->FindItem(ammotype.c_str()));
+         ammo = static_cast<Ammo *>(owner->FindItem(primary_ammo_type.c_str()));
          if(ammo)
          {
-            owner->takeItem(ammotype.c_str(), ammo->Amount());
+            startammo = ammo->Amount() + ammo_in_clip;
+            owner->takeItem(primary_ammo_type.c_str(), ammo->Amount());
+         }
+      }
+
+      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type)
+      {
+         ammo = static_cast<Ammo *>(owner->FindItem(secondary_ammo_type.c_str()));
+         if(ammo)
+         {
+            secondary_startammo = ammo->Amount();
+            owner->takeItem(secondary_ammo_type.c_str(), ammo->Amount());
          }
       }
    }
@@ -875,16 +886,37 @@ qboolean Weapon::Drop()
    if(owner && owner->isClient())
    {
       spawnflags |= DROPPED_PLAYER_ITEM;
-      if(ammo_clip_size)
-         startammo = ammo_in_clip;
-      else
-         startammo = 0;
-
       // If owner is dead, put all his ammo of that type in the gun.
       if(owner->deadflag)
       {
-         startammo = AmmoAvailable();
+         TakeAllAmmo();
       }
+      else
+      {
+         SetPrimaryMode();
+         if(ammo_clip_size)
+            startammo = ammo_in_clip;
+         else
+         {
+            startammo = min(startammo, AmmoAvailable());
+            secondary_startammo = 0;
+            owner->takeItem(ammotype.c_str(), startammo);
+         }
+      }
+
+      //### added give stuff for rocket & missile launchers in deathmatch
+      if(deathmatch->value)
+      {
+         if(isSubclassOf<RocketLauncher>())
+         {
+            owner->takeWeapon("MissileLauncher");
+         }
+         else if(isSubclassOf<MissileLauncher>())
+         {
+            owner->takeWeapon("RocketLauncher");
+         }
+      }
+      //###
    }
    else
    {
@@ -1205,11 +1237,11 @@ void Weapon::PickupWeapon(Event *ev)
    {
       if(isSubclassOf<RocketLauncher>())
       {
-         sen->giveWeapon("MissileLauncher");
+         sen->giveItem("MissileLauncher", 1);
       }
       else if(isSubclassOf<MissileLauncher>())
       {
-         sen->giveWeapon("RocketLauncher");
+         sen->giveItem("RocketLauncher", 1);
       }
    }
    //###
@@ -1639,7 +1671,7 @@ int Weapon::ClipAmmo()
 {
    if(ammo_clip_size)
       return ammo_in_clip;
-   else if(dualmode && secondary_ammo_type != primary_ammo_type)
+   else if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && !(isSubclassOf<RocketLauncher>() && !owner->HasItem("MissileLauncher")))
    {
       Ammo *ammo;
       str altammo;

@@ -166,6 +166,7 @@ RocketLauncher::RocketLauncher() : Weapon()
    modelIndex("sprites/blastmark.spr");
    gi.soundindex("weapons/rlaunch/stmmchn.wav");
    SetAmmo("Rockets", 1, 5);
+   SetSecondaryAmmo("Missiles", 0, 0);
    SetRank(70, 70);
    SetType(WEAPON_2HANDED_LO);
 
@@ -226,7 +227,7 @@ void RocketLauncher::SecondaryUse(Event *ev)
 {
    // make sure he has it, but only in deathmatch
    if(!owner->HasItem("MissileLauncher") && deathmatch->value)
-      owner->giveWeapon("MissileLauncher");
+      owner->giveItem("MissileLauncher", 1);
 
    owner->useWeapon("MissileLauncher");
 }

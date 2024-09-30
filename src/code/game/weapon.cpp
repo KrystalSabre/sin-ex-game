@@ -503,12 +503,23 @@ void Weapon::TakeAllAmmo(void)
 
    if(owner)
    {
-      if(ammotype.length())
+      if(primary_ammo_type.length())
       {
-         ammo = (Ammo *)owner->FindItem(ammotype.c_str());
+         ammo = (Ammo *)owner->FindItem(primary_ammo_type.c_str());
          if(ammo)
          {
-            owner->takeItem(ammotype.c_str(), ammo->Amount());
+            startammo = ammo->Amount() + ammo_in_clip;
+            owner->takeItem(primary_ammo_type.c_str(), ammo->Amount());
+         }
+      }
+
+      if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type)
+      {
+         ammo = (Ammo *)owner->FindItem(secondary_ammo_type.c_str());
+         if(ammo)
+         {
+            secondary_startammo = ammo->Amount();
+            owner->takeItem(secondary_ammo_type.c_str(), ammo->Amount());
          }
       }
    }
@@ -854,15 +865,22 @@ qboolean Weapon::Drop(void)
    if(owner && owner->isClient())
    {
       spawnflags |= DROPPED_PLAYER_ITEM;
-      if(ammo_clip_size)
-         startammo = ammo_in_clip;
-      else
-         startammo = 0;
-
       // If owner is dead, put all his ammo of that type in the gun.
       if(owner->deadflag)
       {
-         startammo = AmmoAvailable();
+         TakeAllAmmo();
+      }
+      else
+      {
+         SetPrimaryMode();
+         if(ammo_clip_size)
+            startammo = ammo_in_clip;
+         else
+         {
+            startammo = min(startammo, AmmoAvailable());
+            secondary_startammo = 0;
+            owner->takeItem(ammotype.c_str(), startammo);
+         }
       }
    }
    else
@@ -1559,7 +1577,7 @@ int Weapon::ClipAmmo(void)
 {
    if(ammo_clip_size)
       return ammo_in_clip;
-   else if(dualmode && secondary_ammo_type != primary_ammo_type)
+   else if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type)
    {
       Ammo *ammo;
       str altammo;

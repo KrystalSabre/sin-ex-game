@@ -289,7 +289,8 @@ MissileLauncher::MissileLauncher() : Weapon()
    SetModels("missile_w.def", "view_missile.def");
    modelIndex("missile.def");
    modelIndex("sprites/null.spr");
-   SetAmmo("Missiles", 1, 0);
+   SetAmmo("Missiles", 1, 3);
+   SetSecondaryAmmo("Rockets", 0, 0);
    SetRank(71, 0);
    SetType(WEAPON_2HANDED_LO);
 
@@ -304,7 +305,7 @@ void MissileLauncher::SecondaryUse(Event *ev)
 
    // make sure he has it
    if(!owner->HasItem("RocketLauncher"))
-      owner->giveWeapon("RocketLauncher");
+      owner->giveItem("RocketLauncher", 1);
 
    owner->useWeapon("RocketLauncher");
 }
