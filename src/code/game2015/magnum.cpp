@@ -128,6 +128,7 @@ qboolean Magnum::Drop()
 
    const ClassDef *cls;
    Item *item;
+   int amount;
 
    if(!owner)
    {
@@ -148,42 +149,43 @@ qboolean Magnum::Drop()
    }
 
    // has two magnums
+   amount = weapon->ClipAmmo();
 
    sent = static_cast<Sentient *>(owner.ptr);
-
-   // get rid of secondary magnum
-   sent->takeWeapon("DualMagnum");
 
    // drop this magnum
    BulletWeapon::Drop();
 
    // give the player a new magnum since he had two
-   item = static_cast<Item *>(sent->FindItem("Magnum"));
-
-   if(!weapon)
+   cls = getClass("Magnum");
+   if(!cls)
    {
-      cls = getClass("Magnum");
-      if(!cls)
-      {
-         // somethin's majorly f'ed to get here :P
-         gi.dprintf("No item named 'Magnum'\n");
-         return true;
-      }
-
-      item = static_cast<Item *>(cls->newInstance());
-
-      item->SetOwner(sent);
-
-      item->ProcessPendingEvents();
-
-      item->Set(1);
-      sent->AddItem(item);
+      // somethin's majorly f'ed to get here :P
+      gi.dprintf("No item named 'Magnum'\n");
+      return true;
    }
-   else
+
+   item = static_cast<Item *>(cls->newInstance());
+
+   item->SetOwner(sent);
+
+   item->ProcessPendingEvents();
+
+   item->Set(1);
+   sent->AddItem(item);
+   
+   weapon = static_cast<Weapon *>(sent->FindItem("Magnum"));
+   if(weapon)
    {
-      // for some reason the player still had a magnum
-      gi.dprintf("Player still had magnum after dropping it\n");
+      if(amount > ammo_clip_size)
+         amount = ammo_clip_size;
+      weapon->SetAmmoAmount(amount);
+
+      static_cast<Magnum *>(weapon)->ammosynced = true;
    }
+
+   // get rid of secondary magnum
+   sent->takeWeapon("DualMagnum");
 
    return true;
    //###

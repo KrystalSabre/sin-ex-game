@@ -104,10 +104,27 @@ void DualMagnum::SecondaryUse(Event *ev)
 
 qboolean DualMagnum::Drop(void)
 {
+   int amount;
+   Event *ev;
+   Weapon *weapon = (Weapon *)owner->FindItem("Magnum");
+   if(weapon)
+   {
+      amount = ClipAmmo() * 0.5;
+      if(amount > ammo_clip_size)
+         amount = ammo_clip_size;
+      weapon->SetAmmoAmount(amount);
+
+      ammosynced = false;
+      ((Magnum *)weapon)->ammosynced = true;
+   }
+
    // drop a regular magnum
    auto magnum = new Magnum();
+   ev = new Event("ammoclipsize");
+   ev->AddInteger(ammo_clip_size * 0.5);
+   magnum->ProcessEvent(ev);
    magnum->SetOwner(owner);
-   magnum->SetAmmo("Bullet10mm", 1, 0);
+   magnum->SetAmmoAmount(ClipAmmo() - amount);
    magnum->BulletWeapon::Drop();
 
    // remove this dual magnum
