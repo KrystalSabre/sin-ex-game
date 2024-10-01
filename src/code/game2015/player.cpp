@@ -943,6 +943,8 @@ void Player::Spectator(Event *ev)
    {
       client->ps.stats[STAT_LAYOUTS] &= ~DRAW_SPECTATOR;
       spectator = false;
+      if(client->resp.score > 0)
+         client->resp.score = 0;
       if(ctf->value)
       {
          InitCTF();
@@ -6318,19 +6320,28 @@ EXPORT_FROM_DLL void Player::UpdateStats()
 {
    Armor *armor;
    int   i;
+   Player *player;
+
+   if(spectator && viewmode == SPECTATOR)
+   {
+      player = (Player*)G_GetEntity(1 + currentCameraTarget);
+      enemy = player;
+   }
+   else
+      player = this;
 
    // Current Ammo
    //### added for hoverbike
-   if(hoverbike)
+   if(player->hoverbike)
    {
       // don't want either ammo number to show up
       client->ps.stats[STAT_AMMO] = -1;
       client->ps.stats[STAT_CLIPAMMO] = -1;
    }
-   else if(currentWeapon) //###
+   else if(player->currentWeapon) //###
    {
-      client->ps.stats[STAT_AMMO] = currentWeapon->AmmoAvailable();
-      client->ps.stats[STAT_CLIPAMMO] = currentWeapon->ClipAmmo();
+      client->ps.stats[STAT_AMMO] = player->currentWeapon->AmmoAvailable();
+      client->ps.stats[STAT_CLIPAMMO] = player->currentWeapon->ClipAmmo();
    }
    else
    {
@@ -6345,7 +6356,7 @@ EXPORT_FROM_DLL void Player::UpdateStats()
       Ammo	*ammo;
 
       assert(ammo_types[i]);
-      ammo = (Ammo *)FindItem(ammo_types[i]);
+      ammo = (Ammo *)player->FindItem(ammo_types[i]);
       if(ammo)
       {
          client->ps.stats[STAT_AMMO_BASE + i] = ((float)ammo->Amount() / ammo->MaxAmount()) * 1000;
@@ -6365,7 +6376,7 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    for(i = 0; i < NUM_ARMOR_TYPES; i++)
    {
       assert(armor_types[i]);
-      armor = (Armor *)FindItem(armor_types[i]);
+      armor = (Armor *)player->FindItem(armor_types[i]);
       if(armor)
       {
          client->ps.stats[STAT_ARMOR_BASE + i] = armor->Amount();
@@ -6380,9 +6391,9 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    // Average the armor into a single value
    client->ps.stats[STAT_ARMOR] /= 3;
 
-   if(currentWeapon)
+   if(player->currentWeapon)
    {
-      client->ps.stats[STAT_CURRENT_WEAPON] = currentWeapon->GetIconIndex();
+      client->ps.stats[STAT_CURRENT_WEAPON] = player->currentWeapon->GetIconIndex();
    }
    else
    {
@@ -6397,18 +6408,18 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    //
    // Inventory
    //
-   if(currentItem && (!(flags & (FL_SP_MUTANT | FL_MUTANT))))
+   if(player->currentItem && (!(player->flags & (FL_SP_MUTANT | FL_MUTANT))))
    {
       InventoryItem *nextItem;
       InventoryItem *prevItem;
 
-      nextItem = (InventoryItem *)NextItem(currentItem);
-      prevItem = (InventoryItem *)PrevItem(currentItem);
+      nextItem = (InventoryItem *)player->NextItem(player->currentItem);
+      prevItem = (InventoryItem *)player->PrevItem(player->currentItem);
 
-      client->ps.stats[STAT_SELECTED_ICON] = currentItem->GetIconIndex();
-      client->ps.stats[STAT_SELECTED_NAME] = currentItem->GetItemIndex();
-      client->ps.stats[STAT_SELECTED_AMOUNT] = currentItem->Amount();
-      client->ps.stats[STAT_SELECTED_MODELINDEX] = currentItem->edict->s.modelindex;
+      client->ps.stats[STAT_SELECTED_ICON] = player->currentItem->GetIconIndex();
+      client->ps.stats[STAT_SELECTED_NAME] = player->currentItem->GetItemIndex();
+      client->ps.stats[STAT_SELECTED_AMOUNT] = player->currentItem->Amount();
+      client->ps.stats[STAT_SELECTED_MODELINDEX] = player->currentItem->edict->s.modelindex;
 
       if(prevItem)
          client->ps.stats[STAT_PREVIOUS_ICON] = prevItem->GetIconIndex();
@@ -6431,23 +6442,23 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    //
    // Health
    //
-   if((health < 1) && (health > 0))
+   if((player->health < 1) && (player->health > 0))
       client->ps.stats[STAT_HEALTH] = 1;
    else
-      client->ps.stats[STAT_HEALTH] = health;
+      client->ps.stats[STAT_HEALTH] = player->health;
 
    //
    // Frags
    //
-   client->ps.stats[STAT_FRAGS] = client->resp.score;
+   client->ps.stats[STAT_FRAGS] = player->client->resp.score;
 
-   if(spectator)
+   if(spectator && viewmode != SPECTATOR)
    {
       client->ps.stats[STAT_LAYOUTS] = DRAW_SPECTATOR;
    }
    else
    {
-      if(!hidestats)
+      if(!player->hidestats)
          client->ps.stats[STAT_LAYOUTS] = DRAW_STATS;
       else
          client->ps.stats[STAT_LAYOUTS] = 0;
@@ -6472,10 +6483,10 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    //
    // Powerups timer
    //
-   if(poweruptimer > 0)
+   if(player->poweruptimer > 0)
    {
-      client->ps.stats[STAT_POWERUPTIMER] = poweruptimer;
-      client->ps.stats[STAT_POWERUPTYPE] = poweruptype;
+      client->ps.stats[STAT_POWERUPTIMER] = player->poweruptimer;
+      client->ps.stats[STAT_POWERUPTYPE] = player->poweruptype;
    }
    else
    {
@@ -6484,20 +6495,20 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    }
 
    //### lap time stats
-   if(!ctf->value) // no lap tracking stuff in CTF, stat #'s used for CTF stuff
+   if(!ctf->value && level.cp_num) // no lap tracking stuff in CTF, stat #'s used for CTF stuff
    {
-      if(last_goal_time)
+      if(player->last_goal_time)
       {
-         client->ps.stats[STAT_CURRENTLAP] = (int)((level.time - last_goal_time)*10);
+         client->ps.stats[STAT_CURRENTLAP] = (int)((level.time - player->last_goal_time)*10);
       }
       else
       {
          client->ps.stats[STAT_CURRENTLAP] = 0;
       }
 
-      if(client->resp.last_lap_time)
+      if(player->client->resp.last_lap_time)
       {
-         client->ps.stats[STAT_LASTLAP] = (int)(client->resp.last_lap_time*10);
+         client->ps.stats[STAT_LASTLAP] = (int)(player->client->resp.last_lap_time*10);
       }
       else
       {
@@ -6506,7 +6517,7 @@ EXPORT_FROM_DLL void Player::UpdateStats()
 
       if(level.cp_num)
       {
-         client->ps.stats[STAT_CPCOUNT] = level.cp_num - cp_list.length();
+         client->ps.stats[STAT_CPCOUNT] = level.cp_num - player->cp_list.length();
       }
       else
       {
@@ -6515,7 +6526,7 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    }
 
    // set night vision stat value
-   if(nightvision)
+   if(player->nightvision)
    {
       client->ps.stats[STAT_NIGHTVISION] = 1;
    }
@@ -6569,7 +6580,15 @@ EXPORT_FROM_DLL void Player::UpdateStats()
 
 EXPORT_FROM_DLL void Player::UpdateMusic()
 {
-   if(music_duration > 0 && music_duration < level.time)
+   if(spectator && viewmode == SPECTATOR)
+   {
+      Player *player;
+
+      player = (Player*)G_GetEntity(1 + currentCameraTarget);
+      client->ps.current_music_mood = player->music_current_mood;
+      client->ps.fallback_music_mood = player->music_fallback_mood;
+   }
+   else if(music_duration > 0 && music_duration < level.time)
    {
       if(music_forced && music_fallback_mood != mood_normal && music_fallback_mood != mood_action && music_fallback_mood != music_current_mood)
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), true, 0);
