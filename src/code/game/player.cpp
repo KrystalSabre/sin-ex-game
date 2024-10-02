@@ -525,6 +525,7 @@ void Player::InitState(void)
    grapple_speed    = 0;
    grapple_org      = vec_zero;
    grapple_time     = 0;
+   last_camera_time = 0;
 
    takedamage = DAMAGE_AIM;
    deadflag = DEAD_NO;
@@ -2529,7 +2530,8 @@ EXPORT_FROM_DLL void Player::ClientThink(Event *ev)
       }
       else
       {
-         if(((abs(current_ucmd->forwardmove) >= 200) ||
+         if(level.time > last_camera_time + 0.3 &&
+            ((abs(current_ucmd->forwardmove) >= 200) ||
             (abs(current_ucmd->sidemove) >= 200) ||
             (current_ucmd->upmove > 0)) &&
             !(trappedInQuantum) &&
@@ -5533,6 +5535,7 @@ Camera *Player::CurrentCamera(void)
 void Player::SetCamera(Entity *ent)
 {
    CinematicCamera = ent;
+   last_camera_time = level.time;
 }
 
 void Player::WhatIs(Event *ev)

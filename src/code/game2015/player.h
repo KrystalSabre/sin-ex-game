@@ -211,6 +211,7 @@ protected:
    float             flash_color[4];
 
    float             last_damage_time;
+   float             last_camera_time;
    qboolean          music_forced;
    float             music_duration;
 
@@ -640,6 +641,7 @@ inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
    arc.WriteFloat(flash_color[3]);
 
    arc.WriteFloat(last_damage_time);
+   arc.WriteFloat(last_camera_time);
    arc.WriteBoolean(music_forced);
    arc.WriteFloat(music_duration);
 
@@ -798,6 +800,7 @@ inline EXPORT_FROM_DLL void Player::Unarchive(Archiver &arc)
    arc.ReadFloat(&flash_color[3]);
 
    arc.ReadFloat(&last_damage_time);
+   arc.ReadFloat(&last_camera_time);
    arc.ReadBoolean(&music_forced);
    arc.ReadFloat(&music_duration);
 
