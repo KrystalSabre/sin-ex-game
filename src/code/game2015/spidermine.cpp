@@ -452,7 +452,7 @@ void SpiderMine::Shoot(Event *ev)
    NextAttack(1.0f);
 }
 
-int SpiderMine::ClipAmmo(void)
+int SpiderMine::ClipAmmo()
 {
    if(last_attack_time + 0.21 >= level.time)
       return max(0, detonator->ClipAmmo()) + 1;
