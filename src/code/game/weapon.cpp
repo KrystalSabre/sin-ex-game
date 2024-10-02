@@ -890,7 +890,7 @@ qboolean Weapon::Drop(void)
       {
          if(!ammo_in_clip)
             ammo_in_clip = startammo;
-         if(skill->value >= 2)
+         if(skill->value >= 1)
             startammo = ceil((float)ammo_in_clip / 2);
          else
             startammo = ammo_in_clip;

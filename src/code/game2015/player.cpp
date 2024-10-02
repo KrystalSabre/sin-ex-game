@@ -2185,7 +2185,16 @@ void Player::DoUse(void)
    // Force a reload on a weapon
    if(currentWeapon)
    {
-      currentWeapon->ForceReload();
+      if(currentWeapon->isSubclassOf<Detonator>())
+      {
+         Weapon *mines;
+
+         mines = (Weapon *)FindItem("SpiderMine");
+         if(mines && mines->HasAmmo() && mines->ClipAmmo() < MAX_MINES)
+            ChangeWeapon(mines);
+      }
+      else
+         currentWeapon->ForceReload();
    }
 }
 
@@ -3053,12 +3062,7 @@ EXPORT_FROM_DLL void Player::ClientThink(Event *ev)
    // check to see if we want to get out of a cinematic or camera
    //
    if((viewmode == CAMERA_VIEW) &&
-      (!movecapturer)           && //### added for movement capturer
-      ((buttons & BUTTON_ATTACK)               ||
-       (buttons & BUTTON_USE)                  ||
-       (abs(current_ucmd->forwardmove) >= 200) ||
-       (abs(current_ucmd->sidemove) >= 200)    ||
-       (current_ucmd->upmove > 0)))
+      (!movecapturer)) //### added for movement capturer
    {
       if(level.cinematic)
       {
@@ -3074,10 +3078,13 @@ EXPORT_FROM_DLL void Player::ClientThink(Event *ev)
       }
       else
       {
-         if(!(buttons & BUTTON_USE) &&
-            !(buttons & BUTTON_ATTACK) &&
+         if(((abs(current_ucmd->forwardmove) >= 200) ||
+            (abs(current_ucmd->sidemove) >= 200) ||
+            (current_ucmd->upmove > 0)) &&
             !(trappedInQuantum) &&
-            !(in_console))
+            !(in_console) ||
+            CinematicCamera && CinematicCamera->isSubclassOf<Mine>() &&
+            (!currentWeapon || !currentWeapon->isSubclassOf<Detonator>()))
          {
             SetCamera(NULL);
          }

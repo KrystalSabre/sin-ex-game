@@ -886,7 +886,7 @@ Item *Sentient::giveItem(const char * itemname, int amount, int icon_index)
    }
 
    // Send icon to the player
-   if(this->isSubclassOf<Player>())
+   if(this->isSubclassOf<Player>() && !(item->spawnflags & ITEM_HIDE_ICON))
    {
       if(icon_index >= 0)
          index = icon_index;

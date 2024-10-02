@@ -925,7 +925,7 @@ qboolean Weapon::Drop()
       {
          if(!ammo_in_clip)
             ammo_in_clip = startammo;
-         if(skill->value >= 2)
+         if(skill->value >= 1)
             startammo = ceil((float)ammo_in_clip / 2);
          else
             startammo = ammo_in_clip;
@@ -1671,7 +1671,7 @@ int Weapon::ClipAmmo()
 {
    if(ammo_clip_size)
       return ammo_in_clip;
-   else if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type && !(isSubclassOf<RocketLauncher>() && !owner->HasItem("MissileLauncher")))
+   else if(secondary_ammo_type.length() && secondary_ammo_type != primary_ammo_type)
    {
       Ammo *ammo;
       str altammo;

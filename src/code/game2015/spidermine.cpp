@@ -44,15 +44,30 @@ void Mine::Run(Event *ev)
 
 void Mine::CheckForTargets(Event *ev)
 {
-   Entity      *ent;
+   Player      *player;
+   Entity      *ent, *cameraMine;
    Event       *event;
    trace_t     trace;
 
    // Playtest
-   return;
+   //return;
 
    if(detonate)
       return;
+
+   if(G_GetEntity(owner)->isClient())
+   {
+      player = (Player *)G_GetEntity(owner);
+
+      cameraMine = player->CurrentCamera();
+
+      if(cameraMine == this)
+      {
+         event = new Event(EV_Mine_CheckForTargets);
+         PostEvent(event, 0.5f);
+         return;
+      }
+   }
 
    ent = findradius(nullptr, worldorigin, 150);
    while(ent)
@@ -60,7 +75,7 @@ void Mine::CheckForTargets(Event *ev)
       if((ent != this) &&
          (!ent->deadflag) &&
          (ent->entnum != owner) &&
-         (ent->takedamage) &&
+         (ent->takedamage == DAMAGE_AIM) &&
          (!(ent->flags & FL_NOTARGET)) &&
          (strcmp(ent->getClassname(), "Mine")))
       {
@@ -76,7 +91,6 @@ void Mine::CheckForTargets(Event *ev)
 
    if(detonate)
    {
-      RandomGlobalSound("spider_arm", 1);
       event = new Event(EV_Mine_Explode);
       PostEvent(event, 0.5f);
    }
@@ -121,6 +135,7 @@ void Mine::SlideOrStick(Event *ev)
 
       CancelEventsOfType(EV_Mine_Run);
       setMoveType(MOVETYPE_NONE);
+      RandomGlobalSound("spider_arm", 1, CHAN_VOICE);
       RandomAnimate("stick", nullptr);
       norm = level.impact_trace.plane.normal;
       angles = norm.toAngles();
@@ -297,6 +312,7 @@ SpiderMine::SpiderMine() : Weapon()
    SetType(WEAPON_1HANDED);
    modelIndex("spidermine.def");
    modelIndex("mine.def");
+   spawnflags |= ITEM_HIDE_ICON;
 
    currentMine = 0;
 }
@@ -380,7 +396,7 @@ qboolean SpiderMine::ReadyToUse()
 {
    Event *ev;
 
-   if(HasAmmo())
+   if(HasAmmo() && ClipAmmo() < MAX_MINES)
    {
       return true;
    }
@@ -433,7 +449,15 @@ void SpiderMine::Shoot(Event *ev)
       detonator->AddMine(mine);
    }
 
-   NextAttack(1.8f);
+   NextAttack(1.0f);
+}
+
+int SpiderMine::ClipAmmo(void)
+{
+   if(last_attack_time + 0.21 >= level.time)
+      return max(0, detonator->ClipAmmo()) + 1;
+   else
+      return detonator->ClipAmmo();
 }
 
 CLASS_DECLARATION(Weapon, Detonator, nullptr);
@@ -453,13 +477,32 @@ Detonator::Detonator() : Weapon()
    return;
 #endif
    SetModels(nullptr, "view_detonator.def");
+   setIcon("w_spidermines");
+   SetAmmo("SpiderMines", 0, 0);
    SetType(WEAPON_1HANDED);
+   spawnflags |= ITEM_HIDE_ICON;
    currentMine = 0;
 }
 
 void Detonator::RemoveMine(Mine *mine)
 {
    mineList.RemoveObject(MinePtr(mine));
+
+   if(!mineList.NumObjects() && owner->CurrentWeapon() == this)
+   {
+      Weapon *weapon;
+
+      // Change back to spidermines if there is ammo, otherwise change weapons.
+
+      weapon = (Weapon *)owner->FindItem("SpiderMine");
+
+      if(!weapon || !weapon->HasAmmo())
+      {
+         weapon = owner->BestWeapon();
+      }
+
+      owner->ChangeWeapon(weapon);
+   }
 }
 
 void Detonator::AddMine(Mine *mine)
@@ -531,6 +574,7 @@ void Detonator::Shoot(Event *ev)
    Player   *player;
    Entity   *cameraMine;
    Event    *event;
+   qboolean sticky;
 
    // If the owner is in a camera, the only detonate that mine, 
    // otherwise detonate them all
@@ -554,6 +598,24 @@ void Detonator::Shoot(Event *ev)
    // Go through all the mines and detonate them 
 
    num = mineList.NumObjects();
+   sticky = true;
+
+   for(i = num; i >= 1; i--)
+   {
+      Event *explodeEvent;
+      Mine  *mine;
+
+      mine = mineList.ObjectAt(i);
+      if(mine->movetype != MOVETYPE_NONE)
+      {
+         sticky = false;
+         explodeEvent = new Event(EV_Mine_Explode);
+         mine->PostEvent(explodeEvent, 0);
+      }
+   }
+
+   if(!sticky)
+      return;
 
    for(i = num; i >= 1; i--)
    {
@@ -574,6 +636,14 @@ qboolean Detonator::IsDroppable()
 qboolean Detonator::AutoChange()
 {
    return false;
+}
+
+int Detonator::ClipAmmo()
+{
+   if(mineList.NumObjects())
+      return mineList.NumObjects();
+   else
+      return -1;
 }
 
 // EOF

@@ -29,6 +29,8 @@ typedef SafePtr<Detonator> DetonatorPtr;
 template class EXPORT_FROM_DLL SafePtr<Detonator>;
 #endif
 
+#define MAX_MINES 10
+
 class EXPORT_FROM_DLL Mine : public Projectile
 {
 private:
@@ -77,6 +79,7 @@ public:
    void                  CycleCamera(Event *ev);
    virtual qboolean      AutoChange()             override;
    virtual qboolean      IsDroppable()            override;
+   virtual int           ClipAmmo()               override;
    virtual void          Archive(Archiver &arc)   override;
    virtual void          Unarchive(Archiver &arc) override;
 };
@@ -151,6 +154,7 @@ public:
    void              SetDetonator(Detonator *det);
    virtual void      SetOwner(Sentient *sent) override;
    virtual qboolean  IsDroppable()            override;
+   virtual int       ClipAmmo()               override;
    virtual void      Archive(Archiver &arc)   override;
    virtual void      Unarchive(Archiver &arc) override;
 };

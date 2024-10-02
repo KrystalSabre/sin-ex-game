@@ -33,6 +33,7 @@ extern Event EV_Item_DialogNeeded;
 
 #define DROPPED_ITEM         0x00008000
 #define DROPPED_PLAYER_ITEM  0x00010000
+#define ITEM_HIDE_ICON       0x00020000
 
 class EXPORT_FROM_DLL Item : public Trigger
 {

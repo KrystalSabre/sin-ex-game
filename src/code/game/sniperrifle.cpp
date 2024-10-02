@@ -44,6 +44,9 @@ SniperRifle::SniperRifle() : BulletWeapon()
 // CTF - Fire upon release of the weapon
 void SniperRifle::ReleaseFire(float holdfiretime)
 {
+   if(!ctf->value)
+      return;
+
    StopAnimating();
    RandomAnimate("releasefire", EV_Weapon_DoneFiring);
    last_animation_time = (level.framenum + 1) * FRAMETIME;

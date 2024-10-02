@@ -59,6 +59,7 @@ public:
    RocketLauncher();
    virtual void Shoot(Event *ev);
    virtual void SecondaryUse(Event *ev) override; //### for guided missile
+   virtual int  ClipAmmo() override;
 };
 
 #endif /* rocketlauncher.h */

@@ -233,5 +233,13 @@ void RocketLauncher::SecondaryUse(Event *ev)
 }
 //###
 
+int RocketLauncher::ClipAmmo(void)
+{
+   if(!owner->HasItem("MissileLauncher"))
+      return -1;
+   else
+      return Weapon::ClipAmmo();
+}
+
 // EOF
 
