@@ -6654,11 +6654,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
    //
    if(s_debugmusic->value)
    {
-      warning("DebugMusic", "%s's action_level = %4.2f, %4.3f\n %i %i %i %i", client->pers.netname, action_level, action_level_decrement, music_current_mood, client->ps.current_music_mood, music_fallback_mood, client->ps.fallback_music_mood);
-      if(music_forced)
-      {
-         warning("DebugMusic", "FORCED");
-      }
+      gi.dprintf("%s's action_level = %4.2f, %4.3f, %4.1f\n%i %i %i %i, %i %i - (F: %i %i)\n", client->pers.netname, action_level, action_level_decrement, (music_duration ? music_duration - level.time : 0), music_current_mood, client->ps.current_music_mood, music_fallback_mood, client->ps.fallback_music_mood, MusicMood_NameToNum(level.default_current_mood.c_str()), MusicMood_NameToNum(level.default_fallback_mood.c_str()), music_forced, level.default_music_forced);
    }
 }
 
@@ -7403,9 +7399,10 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
    int current_mood_num;
    int fallback_mood_num;
 
-   if((client->ps.current_music_mood != MusicMood_NameToNum(current)) && duration > 0)
+   if(duration > 0)
    {
-      music_duration = level.time + duration;
+      if(force || !music_duration || !(client->ps.current_music_mood == MusicMood_NameToNum(current) && music_duration <= level.time + duration))
+         music_duration = level.time + duration;
    }
    else
    {

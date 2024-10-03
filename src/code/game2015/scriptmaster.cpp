@@ -2609,17 +2609,17 @@ void ScriptThread::MusicEvent(Event *ev)
          fallback = ev->GetString(2);
          break;
       case 1:
-         isdefault = ev->GetInteger(3);
+         duration = ev->GetFloat(3);
          break;
       case 2:
-         duration = ev->GetFloat(4);
+         isdefault = ev->GetInteger(4);
          break;
       default:
          break;
       }
    }
 
-   if(isdefault && !(duration > 0 && !strcmp(fallback, current)))
+   if(isdefault > 0 && !(duration > 0 && !strcmp(fallback, current)))
    {
       if(duration > 0)
          level.default_current_mood = fallback;
@@ -2628,7 +2628,7 @@ void ScriptThread::MusicEvent(Event *ev)
       level.default_fallback_mood = fallback;
       level.default_music_forced = false;
    }
-   else
+   else if(isdefault >= 0)
    {
       level.default_current_mood = "normal";
       level.default_fallback_mood = "normal";
@@ -2659,17 +2659,17 @@ void ScriptThread::ForceMusicEvent(Event *ev)
          fallback = ev->GetString(2);
          break;
       case 1:
-         isdefault = ev->GetInteger(3);
+         duration = ev->GetFloat(3);
          break;
       case 2:
-         duration = ev->GetFloat(4);
+         isdefault = ev->GetInteger(4);
          break;
       default:
          break;
       }
    }
 
-   if(isdefault)
+   if(isdefault > 0)
    {
       if(duration > 0)
          level.default_current_mood = fallback;
@@ -2681,7 +2681,7 @@ void ScriptThread::ForceMusicEvent(Event *ev)
       else
          level.default_music_forced = true;
    }
-   else
+   else if(!isdefault)
    {
       level.default_current_mood = "normal";
       level.default_fallback_mood = "normal";
