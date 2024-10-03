@@ -537,12 +537,12 @@ void Detonator::CycleCamera(Event *ev)
    }
 
    client = (Player *)(Entity *)owner;
-   if(client->edict->areanum == mine->edict->areanum)
+   //if(client->edict->areanum == mine->edict->areanum)
       client->SetCamera(mine);
-   else
+   /*else
    {
       gi.cprintf(client->edict, PRINT_HIGH, "Spidermine %d out of range\n", (currentMine % numMines) + 1);
-   }
+   }*/
 }
 
 void Detonator::DoneFiring(Event *ev)
