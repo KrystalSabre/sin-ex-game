@@ -2832,9 +2832,10 @@ void Entity::Tesselate(Event *ev)
    //
    ent = this;
    min_size = TESS_DEFAULT_MIN_SIZE;
-   max_size = TESS_DEFAULT_MIN_SIZE;
+   max_size = TESS_DEFAULT_MAX_SIZE;
    thickness = min_size;
    percentage = TESS_DEFAULT_PERCENT;
+   power = TESS_DEFAULT_POWER;
    VectorCopy(vec3_origin, origin);
    VectorCopy(vec3_origin, dir);
 

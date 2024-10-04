@@ -360,16 +360,17 @@ void Ion::Explode(Event *ev)
    // Process the explode animation, then remove this thing
    RandomAnimate("explode", EV_Remove);
 
-//#if 0
-   // Fire off some gib bursts
-   for(i = 0; i < 3; i++)
+   if(power > 0.4)
    {
-      IonBurst    *burst;
+      // Fire off some gib bursts
+      for(i = 0; i < 3; i++)
+      {
+         IonBurst    *burst;
 
-      burst = new IonBurst();
-      burst->Setup(owner, v, power);
+         burst = new IonBurst();
+         burst->Setup(owner, v, power);
+      }
    }
-//#endif
 
    FlashPlayers(v, 1, 1, 1, 0.5, 500);
 }
@@ -478,7 +479,7 @@ void QuantumDestabilizer::EatAmmo(Event *ev)
          ammo = (Ammo *)owner->FindItem(ammotype.c_str());
 
          // Eat 1 ammo per charge up
-         if(!ammo || !ammo->Use(1))
+         if(level.time - owner->firedowntime >= 2.0 && (!ammo || !ammo->Use(1)))
          {
             // Ran out of ammo, fire this sucker
             event = new Event(EV_Sentient_ReleaseAttack);
