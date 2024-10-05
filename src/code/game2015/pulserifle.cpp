@@ -389,7 +389,10 @@ void PulseRifle::Shoot(Event *ev)
       // Fire the beam
       length = ev->GetInteger(1);
       end = pos + dir * length;
-      trace = G_Trace(pos, vec_zero, vec_zero, end, owner, MASK_SHOT, "PulseRifle::Shoot");
+      if(ctf->value)
+         trace = G_Trace(pos, vec_zero, vec_zero, end, owner, MASK_SHOT, "PulseRifle::Shoot");
+      else
+         trace = G_FullTrace(pos, vec_zero, vec_zero, end, 30, owner, MASK_SHOT, "PulseRifle::Shoot");
       delta = trace.endpos - pos;
       dist = delta.length();
 
