@@ -379,6 +379,7 @@ void SpiderMine::DoneFiring(Event *ev)
    weaponstate = WEAPON_HOLSTERED;
    DetachGun();
    StopAnimating();
+   currentMine = 0;
 
    if(owner)
    {
@@ -447,6 +448,7 @@ void SpiderMine::Shoot(Event *ev)
       mine->Setup(owner, pos, dir);
       mine->SetDetonator(detonator);
       detonator->AddMine(mine);
+      currentMine = mine;
    }
 
    NextAttack(1.0f);
@@ -454,7 +456,7 @@ void SpiderMine::Shoot(Event *ev)
 
 int SpiderMine::ClipAmmo()
 {
-   if(last_attack_time + 0.21 >= level.time)
+   if(weaponstate == WEAPON_FIRING && !currentMine)
       return max(0, detonator->ClipAmmo()) + 1;
    else
       return detonator->ClipAmmo();
