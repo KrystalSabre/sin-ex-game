@@ -1125,7 +1125,7 @@ void G_ExitLevel(void)
 
       ent->entity->ProcessEvent(EV_Player_EndLevel);
    }
-   
+
    G_SaveClientData();
 
    G_ClientEndServerFrames();
