@@ -848,6 +848,8 @@ qboolean Weapon::Drop(void)
    StopAnimating();
    edict->s.frame = 0;
    edict->s.anim = 0;
+   edict->s.alpha = 1.0f;
+   edict->s.renderfx &= ~(RF_ENVMAPPED | RF_TRANSLUCENT);
 
    // drop the weapon
    PlaceItem();

@@ -86,6 +86,7 @@ void ReactiveShields::Use(Event *ev)
    event = new Event("poweruptimer");
    event->AddInteger(30);
    event->AddInteger(P_SHIELDS);
+   event->AddEntity(this);
    owner->ProcessEvent(event);
 }
 

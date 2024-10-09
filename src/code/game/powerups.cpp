@@ -57,12 +57,25 @@ void Adrenaline::Powerdown(Event *ev)
       return;
    }
 
-   owner->flags &= ~FL_ADRENALINE;
-   owner->edict->s.renderfx &= ~RF_DLIGHT;
-   owner->edict->s.color_r = 0;
-   owner->edict->s.color_g = 0;
-   owner->edict->s.color_b = 0;
-   owner->edict->s.radius = 0;
+   if(owner->flags & FL_ADRENALINE)
+   {
+      owner->flags &= ~FL_ADRENALINE;
+      owner->edict->s.renderfx &= ~RF_DLIGHT;
+      owner->edict->s.color_r = 0;
+      owner->edict->s.color_g = 0;
+      owner->edict->s.color_b = 0;
+      owner->edict->s.radius = 0;
+
+      if(!deathmatch->value)
+      {
+         if(owner->health > 1)
+            health_delta = min(health_delta, owner->health - 1);
+         else
+            health_delta = 0;
+      }
+      owner->Damage(world, world, max(health_delta, owner->health - owner->max_health), worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ADRENALINE, -1, -1, 1.0f);
+      owner->max_health -= 100;
+   }
 
    CancelPendingEvents();
    PostEvent(EV_Remove, 0);
@@ -97,9 +110,14 @@ void Adrenaline::Use(Event *ev)
 
    owner->flags |= FL_ADRENALINE;
 
+   owner->max_health += 100;
+   health_delta = owner->max_health - owner->health;
+   owner->health = owner->max_health;
+
    event = new Event("poweruptimer");
    event->AddInteger(POWERUP_TIME);
    event->AddInteger(P_ADRENALINE);
+   event->AddEntity(this);
    owner->edict->s.renderfx |= RF_DLIGHT;
    owner->edict->s.color_r = 1;
    owner->edict->s.color_g = 1;
@@ -194,6 +212,7 @@ void Cloak::Use(Event *ev)
    event = new Event("poweruptimer");
    event->AddInteger(POWERUP_TIME);
    event->AddInteger(P_CLOAK);
+   event->AddEntity(this);
    owner->ProcessEvent(event);
 
    realname = GetRandomAlias("snd_activate");
@@ -223,8 +242,6 @@ Mutagen::Mutagen() : InventoryItem()
 
 void Mutagen::Powerdown(Event *ev)
 {
-   str realname;
-
    if(!owner)
    {
       CancelPendingEvents();
@@ -232,30 +249,38 @@ void Mutagen::Powerdown(Event *ev)
       return;
    }
 
-   owner->flags &= ~FL_MUTANT;
-   realname = GetRandomAlias("snd_deactivate");
-
-   if(realname.length())
-      owner->sound(realname, 1, CHAN_ITEM, ATTN_NORM);
-
-   if(owner->isClient())
+   if(owner->flags & FL_MUTANT)
    {
-      int playernum = owner->edict - g_edicts - 1;
+      owner->flags &= ~FL_MUTANT;
 
-      owner->setModel(owner->savemodel);
-      owner->RandomAnimate("idle", NULL);
+      if(owner->isClient())
+      {
+         int playernum = owner->edict - g_edicts - 1;
+         Event *event;
 
-      strcpy(owner->client->pers.model, owner->savemodel.c_str());
-      strcpy(owner->client->pers.skin, owner->saveskin.c_str());
+         owner->setModel(owner->savemodel);
+         owner->RandomAnimate("idle", NULL);
 
-      // combine name, skin and model into a configstring
-      gi.configstring(CS_PLAYERSKINS + playernum, va("%s\\%s\\%s",
-                                                     owner->client->pers.netname,
-                                                     owner->client->pers.model,
-                                                     owner->client->pers.skin));
+         strcpy(owner->client->pers.model, owner->savemodel.c_str());
+         strcpy(owner->client->pers.skin, owner->saveskin.c_str());
+
+         // combine name, skin and model into a configstring
+         gi.configstring(CS_PLAYERSKINS + playernum, va("%s\\%s\\%s",
+                                                        owner->client->pers.netname,
+                                                        owner->client->pers.model,
+                                                        owner->client->pers.skin));
+
+         event = new Event(EV_Pain);
+         event->AddFloat(100);
+         event->AddEntity(world);
+         event->AddString("all");
+         event->AddInteger(MOD_MUTANT_DRAIN);
+         owner->ProcessEvent(event);
+      }
+
+      owner->takeWeapon("MutantHands");
    }
 
-   owner->takeWeapon("MutantHands");
    CancelPendingEvents();
    PostEvent(EV_Remove, 0);
 }
@@ -289,11 +314,16 @@ void Mutagen::Use(Event *ev)
 
    PostEvent(EV_Mutagen_Powerdown, POWERUP_TIME);
    owner->flags |= FL_MUTANT;
+   owner->health += 100;
+   owner->takeItem("RiotHelmet", 100);
+   owner->takeItem("FlakJacket", 100);
+   owner->takeItem("FlakPants", 100);
 
    //Set the timer
    event = new Event("poweruptimer");
    event->AddInteger(POWERUP_TIME);
    event->AddInteger(P_MUTAGEN);
+   event->AddEntity(this);
    owner->ProcessEvent(event);
 
    TesselateModel
@@ -329,6 +359,13 @@ void Mutagen::Use(Event *ev)
       );
 
       FixDeadBodiesForPlayer(owner->edict);
+
+      event = new Event(EV_Player_SetFlashColor);
+      event->AddFloat(1.0);
+      event->AddFloat(0);
+      event->AddFloat(0);
+      event->AddFloat(0.6);
+      owner->ProcessEvent(event);
    }
 
    // Give the mutanthands weapon. - Force it.
@@ -515,6 +552,7 @@ void Oxygen::Use(Event *ev)
    event = new Event("poweruptimer");
    event->AddInteger(60);
    event->AddInteger(P_OXYGEN);
+   event->AddEntity(this);
    owner->ProcessEvent(event);
 
    realname = GetRandomAlias("snd_activate");

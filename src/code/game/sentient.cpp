@@ -126,6 +126,7 @@ Sentient::Sentient() : Entity()
 
    poweruptype = 0;
    poweruptimer = 0;
+   currentPowerup = nullptr;
    sentientFrozen = false;
 
    // HACK FIXME
@@ -483,7 +484,7 @@ Weapon *Sentient::WeaponNumber(int weaponnum)
 
 void Sentient::ChangeWeapon(Weapon *weapon)
 {
-   if(weapon == currentWeapon)
+   if(weapon == currentWeapon || (flags & FL_MUTANT))
    {
       return;
    }
@@ -495,7 +496,7 @@ void Sentient::ChangeWeapon(Weapon *weapon)
          return;
       }
       newWeapon = weapon;
-      if(!currentWeapon->ReadyToChange() || (flags & FL_MUTANT))
+      if(!currentWeapon->ReadyToChange())
       {
          return;
       }

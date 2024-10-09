@@ -67,6 +67,7 @@ protected:
    qboolean          stopanimating_tillchange;
    int               poweruptype;
    int               poweruptimer;
+   Entity           *currentPowerup;
    qboolean          sentientFrozen;
    qboolean          dropweapon;
    HoverbikePtr      hoverbike; //###

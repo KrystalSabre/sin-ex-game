@@ -655,6 +655,43 @@ void Player::InitPhysics(void)
 void Player::InitPowerups(void)
 {
    // powerups
+   Event *event;
+
+   switch(poweruptype)
+   {
+   case P_SHIELDS:
+      if(currentPowerup)
+      {
+         event = new Event("shields_powerdown");
+         currentPowerup->ProcessEvent(event);
+      }
+      break;
+   case P_ADRENALINE:
+      if(currentPowerup)
+      {
+         event = new Event("adrenaline_powerdown");
+         currentPowerup->ProcessEvent(event);
+      }
+      break;
+   case P_CLOAK:
+      if(currentPowerup)
+      {
+         event = new Event("cloak_powerdown");
+         currentPowerup->ProcessEvent(event);
+      }
+      break;
+   case P_MUTAGEN:
+      if(currentPowerup)
+      {
+         event = new Event("mutagen_powerdown");
+         currentPowerup->ProcessEvent(event);
+      }
+      break;
+   default:
+      break;
+   }
+
+   currentPowerup = nullptr;
    poweruptimer = 0;
    poweruptype  = 0;
    flags &= ~(FL_SHIELDS | FL_ADRENALINE | FL_CLOAK | FL_MUTANT | FL_SILENCER | FL_OXYGEN);
@@ -872,9 +909,9 @@ void Player::EndLevel(Event *ev)
    }
 
    InitPowerups();
-   if(health > max_health)
+   if(health > max_health + 100)
    {
-      health = max_health;
+      health = max_health + 100;
    }
 
    if(health < 1)
@@ -1844,6 +1881,8 @@ void Player::Killed(Event *ev)
    {
       aname = prefix + str("death");
    }
+
+   InitPowerups();
 
    // moved to before the deadflag being set to prevent a definate game crash
    if(flags & (FL_MUTANT | FL_SP_MUTANT))
@@ -5677,7 +5716,7 @@ void Player::SetCameraEntity(Entity *cameraEnt)
 
       if(flags & FL_CLOAK)
       {
-         currentWeapon->edict->s.alpha = 0.1f;
+         currentWeapon->edict->s.alpha = 0.05f;
          currentWeapon->edict->s.renderfx |= RF_TRANSLUCENT;
       }
       else
@@ -7084,6 +7123,7 @@ void Player::SetPowerupTimer(Event *ev)
 
    poweruptimer = ev->GetInteger(1);
    poweruptype = ev->GetInteger(2);
+   currentPowerup = ev->GetEntity(3);
    event = new Event(EV_Player_UpdatePowerupTimer);
    PostEvent(event, 1);
 }

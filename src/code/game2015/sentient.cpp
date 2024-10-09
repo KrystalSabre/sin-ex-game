@@ -129,6 +129,7 @@ Sentient::Sentient() : Entity()
 
    poweruptype    = 0;
    poweruptimer   = 0;
+   currentPowerup = nullptr;
    sentientFrozen = false;
 
    autoweaponswitch = 1; //### default weapon switching on
@@ -495,7 +496,7 @@ Weapon *Sentient::WeaponNumber(int weaponnum)
 
 void Sentient::ChangeWeapon(Weapon *weapon)
 {
-   if(weapon == currentWeapon)
+   if(weapon == currentWeapon || (flags & FL_MUTANT))
    {
       return;
    }
@@ -507,7 +508,7 @@ void Sentient::ChangeWeapon(Weapon *weapon)
          return;
       }
       newWeapon = weapon;
-      if(!currentWeapon->ReadyToChange() || (flags & FL_MUTANT))
+      if(!currentWeapon->ReadyToChange())
       {
          return;
       }

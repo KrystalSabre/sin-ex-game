@@ -1114,8 +1114,6 @@ void G_ExitLevel(void)
 
    CTF_Init();
 
-   G_SaveClientData();
-
    // Tell all the client that the level is done
    for(j = 1; j <= game.maxclients; j++)
    {
@@ -1127,6 +1125,8 @@ void G_ExitLevel(void)
 
       ent->entity->ProcessEvent(EV_Player_EndLevel);
    }
+   
+   G_SaveClientData();
 
    G_ClientEndServerFrames();
 
