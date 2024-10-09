@@ -109,7 +109,7 @@ void Adrenaline::Use(Event *ev)
    PostEvent(EV_Adrenaline_Powerdown, POWERUP_TIME);
 
    owner->flags |= FL_ADRENALINE;
-   
+
    owner->max_health += 100;
    health_delta = owner->max_health - owner->health;
    owner->health = owner->max_health;

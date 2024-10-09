@@ -2297,6 +2297,7 @@ EXPORT_FROM_DLL void Sentient::Archive(Archiver &arc)
    arc.WriteBoolean(stopanimating_tillchange);
    arc.WriteInteger(poweruptype);
    arc.WriteInteger(poweruptimer);
+   arc.WriteObjectPointer(currentPowerup);
    arc.WriteBoolean(sentientFrozen);
    arc.WriteBoolean(dropweapon);
    arc.WriteVector(gunoffset);
@@ -2345,6 +2346,7 @@ EXPORT_FROM_DLL void Sentient::Unarchive(Archiver &arc)
    arc.ReadBoolean(&stopanimating_tillchange);
    arc.ReadInteger(&poweruptype);
    arc.ReadInteger(&poweruptimer);
+   arc.ReadObjectPointer((Class **)&currentPowerup);
    arc.ReadBoolean(&sentientFrozen);
    arc.ReadBoolean(&dropweapon);
    arc.ReadVector(&gunoffset);
