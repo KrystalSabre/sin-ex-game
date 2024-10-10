@@ -242,7 +242,7 @@ void ThrowerFlame::Burn(Event *ev)
       if(!CanToast(ent, entdot))
          continue;
 
-      if(G_GetEntity(owner)->isClient() && ent->isSubclassOf<Sentient>() && !ent->deadflag && !(ent->flags & (FL_FORCEFIELD | FL_GODMODE)))
+      if(G_GetEntity(owner)->isClient() && ent != G_GetEntity(owner) && ent->isSubclassOf<Sentient>() && !ent->deadflag && !(ent->flags & (FL_FORCEFIELD | FL_GODMODE)))
       {
          Player *client = (Player *)(Entity *)G_GetEntity(owner);
          client->IncreaseActionLevel(1);

@@ -401,7 +401,7 @@ void PulseRifle::Shoot(Event *ev)
       angles = dir.toAngles();
       setAngles(angles);
 
-      if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+      if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
       {
          Player *client = (Player *)(Entity *)owner;
          client->IncreaseActionLevel((float)action_level_increment / 6);

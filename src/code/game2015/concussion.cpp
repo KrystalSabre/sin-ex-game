@@ -291,7 +291,7 @@ void ConcussionGun::BlastEffect(Event *ev)
          }
       }
 
-      if(owner->isClient() && tmpent->isSubclassOf<Sentient>() && !tmpent->deadflag && !(tmpent->flags & (FL_FORCEFIELD | FL_GODMODE)))
+      if(owner->isClient() && tmpent != owner && tmpent->isSubclassOf<Sentient>() && !tmpent->deadflag && !(tmpent->flags & (FL_FORCEFIELD | FL_GODMODE)))
       {
          Player *client = (Player *)(Entity *)owner;
          client->IncreaseActionLevel((float)action_level_increment / (CONCUSSION_COUNT + 1));

@@ -629,7 +629,7 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
                hit2 = trace2.ent->entity;
                if(hit2->takedamage && hit2->isClient())
                {
-                  if(owner->isClient() && !hit2->deadflag && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
+                  if(owner->isClient() && hit2 != owner && !hit2->deadflag && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
                   {
                      Player *client = (Player *)(Entity *)owner;
                      client->IncreaseActionLevel((float)action_level_increment / numbullets);
@@ -655,7 +655,7 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
 
          if(trace.fraction != 1.0)
          {
-            if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
             {
                Player *client = (Player *)(Entity *)owner;
                client->IncreaseActionLevel((float)action_level_increment / numbullets);
@@ -682,7 +682,7 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
          damagedtarget = false;
          if(trace.fraction != 1.0)
          {
-            if(owner->isClient() && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
             {
                Player *client = (Player *)(Entity *)owner;
                client->IncreaseActionLevel((float)action_level_increment / numbullets);

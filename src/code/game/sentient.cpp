@@ -1727,7 +1727,7 @@ void Sentient::ArmorDamage(Event *ev)
       return;
    }
 
-	if(damage && !deadflag && attacker && attacker->isClient() && inflictor && inflictor->isSubclassOf<Projectile>())
+	if(damage && !deadflag && attacker && attacker->isClient() && attacker != this && inflictor && inflictor->isSubclassOf<Projectile>())
 	{
 	   Player *player = (Player *)attacker;
 
