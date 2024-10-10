@@ -288,7 +288,6 @@ void Mutagen::Powerdown(Event *ev)
 
       owner->takeWeapon("MutantHands");
    }
-
    CancelPendingEvents();
    PostEvent(EV_Remove, 0);
 }

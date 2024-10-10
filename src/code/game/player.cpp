@@ -965,6 +965,17 @@ void Player::Obituary(Entity *attacker, Entity *inflictor, str location, int mea
    if(!(deathmatch->value || coop->value))
       return;
 
+   if(attacker == world)
+   {
+      if((meansofdeath == MOD_CRUSH || meansofdeath == MOD_LAVA) && enemy && enemy->isClient() && (enemy != this) && level.time < lastEnemyTime)
+      {
+         attacker = world;
+         meansofdeath = MOD_FALLING;
+      }
+      else if(meansofdeath == MOD_CRUSH || meansofdeath == MOD_ADRENALINE)
+         attacker = this;
+   }
+
    // Client killed themself
    if(attacker == this)
    {
@@ -1508,8 +1519,6 @@ void Player::Killed(Event *ev)
       aname = prefix + str("death");
    }
 
-   InitPowerups();
-
    // moved to before the deadflag being set to prevent a definate game crash
    if(flags & (FL_MUTANT | FL_SP_MUTANT))
    {
@@ -1519,6 +1528,8 @@ void Player::Killed(Event *ev)
    deadflag = DEAD_DYING;
 
    respawn_time = level.time + 1.0;
+
+   InitPowerups();
 
    if(currentWeapon)
    {

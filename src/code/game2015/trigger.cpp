@@ -1242,7 +1242,7 @@ void TriggerChangeLevel::ChangeLevel(Event *ev)
    // if noexit, do a ton of damage to other
    if(deathmatch->value && DM_FLAG(DF_SAME_LEVEL) && other != world)
    {
-      other->Damage(this, other, 10 * other->max_health, other->worldorigin, vec_zero, vec_zero, 1000, 0, MOD_CRUSH, -1, -1, 1.0f);
+      other->Damage(this, world, 10 * other->max_health, other->worldorigin, vec_zero, vec_zero, 1000, 0, MOD_CRUSH, -1, -1, 1.0f);
       return;
    }
 
@@ -1389,7 +1389,7 @@ void TriggerHurt::Hurt(Event *ev)
 
    if((damage != 0) && !other->deadflag && !(other->flags & FL_GODMODE))
    {
-      other->Damage(this, other, damage, other->worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_CRUSH, -1, -1, 1.0f);
+      other->Damage(this, world, damage, other->worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_CRUSH, -1, -1, 1.0f);
    }
 }
 
@@ -1534,9 +1534,9 @@ void TriggerDamageTargets::DamageTargets(Event *ev)
          if(!ent->deadflag && !(ent->flags & FL_GODMODE))
          {
             if(damage)
-               ent->Damage(this, other, damage, ent->worldorigin, vec_zero, vec_zero, 0, 0, MOD_CRUSH, -1, -1, 1.0f);
+               ent->Damage(this, world, damage, ent->worldorigin, vec_zero, vec_zero, 0, 0, MOD_CRUSH, -1, -1, 1.0f);
             else
-               ent->Damage(this, other, ent->health + 1, ent->worldorigin, vec_zero, vec_zero, 0, 0, MOD_CRUSH, -1, -1, 1.0f);
+               ent->Damage(this, world, ent->health + 1, ent->worldorigin, vec_zero, vec_zero, 0, 0, MOD_CRUSH, -1, -1, 1.0f);
          }
       }
       while(1);
@@ -2278,7 +2278,7 @@ void TriggeredHurt::Hurt(Event *ev)
 
    Entity *other = ev->GetEntity(1);
    if((damage != 0) && !other->deadflag && !(other->flags & FL_GODMODE))
-      other->Damage(this, other, damage, other->origin, vec_zero, vec_zero, 0, 0, MOD_CRUSH, -1, -1, 1.0f);
+      other->Damage(this, world, damage, other->origin, vec_zero, vec_zero, 0, 0, MOD_CRUSH, -1, -1, 1.0f);
 }
 
 // EOF
