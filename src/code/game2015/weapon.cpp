@@ -1190,6 +1190,8 @@ void Weapon::PickupWeapon(Event *ev)
                return;
             }
          }
+         else
+            return;
       }
    }
 
