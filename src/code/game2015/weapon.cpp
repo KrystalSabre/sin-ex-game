@@ -188,12 +188,14 @@ void Weapon::SetAmmo(const char *type, int amount, int startamount)
 {
    if(type)
    {
-      ammotype = type;
+      if(weaponmode == PRIMARY)
+         ammotype = type;
       primary_ammo_type = type;
    }
    else
    {
-      ammotype = "";
+      if(weaponmode == PRIMARY)
+         ammotype = "";
       primary_ammo_type = "";
    }
 
@@ -205,10 +207,14 @@ void Weapon::SetSecondaryAmmo(const char *type, int amount, int startamount)
 {
    if(type)
    {
+      if(weaponmode == SECONDARY)
+         ammotype = type;
       secondary_ammo_type = type;
    }
    else
    {
+      if(weaponmode == SECONDARY)
+         ammotype = "";
       secondary_ammo_type = "";
    }
 
@@ -780,11 +786,21 @@ void Weapon::ReadyWeapon()
 
    weaponstate = WEAPON_RAISING;
 
-   if(owner->isClient() && dualmode && HasAmmo())
+   // Set the ammo type
+   if(weaponmode == PRIMARY)
    {
-      if(weaponmode == PRIMARY && !UnlimitedAmmo() && AmmoAvailable() < ammorequired)
+      ammotype = primary_ammo_type;
+   }
+   else if(weaponmode == SECONDARY)
+   {
+      ammotype = secondary_ammo_type;
+   }
+
+   if(owner->isClient() && dualmode && !UnlimitedAmmo() && HasAmmo())
+   {
+      if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
          SetSecondaryMode();
-      else if(weaponmode == SECONDARY && !UnlimitedAmmo() && AmmoAvailable() < secondary_ammorequired)
+      else if(weaponmode == SECONDARY && AmmoAvailable() < secondary_ammorequired)
          SetPrimaryMode();
    }
 
@@ -977,20 +993,18 @@ void Weapon::Fire()
       return;
    }
 
-   if(owner->isClient() && dualmode && HasAmmo())
+   if(owner->isClient() && dualmode && !UnlimitedAmmo() && HasAmmo())
    {
-      if(weaponmode == PRIMARY && !UnlimitedAmmo() && AmmoAvailable() < ammorequired)
+      if(weaponmode == PRIMARY && AmmoAvailable() < ammorequired)
       {
          weaponstate = WEAPON_CHANGING;
          RandomAnimate("primary2secondary", EV_Weapon_SecondaryMode);
-         weaponmode = SECONDARY;
          return;
       }
-      else if(weaponmode == SECONDARY && !UnlimitedAmmo() && AmmoAvailable() < secondary_ammorequired)
+      else if(weaponmode == SECONDARY && AmmoAvailable() < secondary_ammorequired)
       {
          weaponstate = WEAPON_CHANGING;
          RandomAnimate("secondary2primary", EV_Weapon_PrimaryMode);
-         weaponmode = PRIMARY;
          return;
       }
    }
@@ -1305,16 +1319,6 @@ void Weapon::DoneRaising(Event *ev)
    {
       PostEvent(EV_Remove, 0);
       return;
-   }
-
-   // Set the ammo type
-   if(weaponmode == PRIMARY)
-   {
-      ammotype = primary_ammo_type;
-   }
-   else if(weaponmode == SECONDARY)
-   {
-      ammotype = secondary_ammo_type;
    }
 
    if(owner)
@@ -1682,9 +1686,9 @@ int Weapon::ClipAmmo()
 
       if(owner)
       {
-         if(ammotype == primary_ammo_type)
+         if(weaponmode == PRIMARY)
             altammo = secondary_ammo_type;
-         else if(ammotype == secondary_ammo_type)
+         else
             altammo = primary_ammo_type;
 
          if(altammo.length())
@@ -1733,7 +1737,6 @@ void Weapon::SecondaryUse(Event *ev)
          RandomAnimate("primary2secondary", EV_Weapon_SecondaryMode);
       else
          PostEvent(EV_Weapon_SecondaryMode, 0);
-      weaponmode = SECONDARY;
    }
    else
    {
@@ -1741,7 +1744,6 @@ void Weapon::SecondaryUse(Event *ev)
          RandomAnimate("secondary2primary", EV_Weapon_PrimaryMode);
       else
          PostEvent(EV_Weapon_PrimaryMode, 0);
-      weaponmode = PRIMARY;
    }
 }
 
@@ -1749,6 +1751,7 @@ void Weapon::PrimaryMode(Event *ev)
 {
    RandomAnimate("primaryidle", EV_Weapon_Idle);
    weaponstate = WEAPON_READY;
+   weaponmode = PRIMARY;
    ammotype = primary_ammo_type;
 }
 
@@ -1756,6 +1759,7 @@ void Weapon::SecondaryMode(Event *ev)
 {
    RandomAnimate("secondaryidle", EV_Weapon_Idle);
    weaponstate = WEAPON_READY;
+   weaponmode = SECONDARY;
    ammotype = secondary_ammo_type;
 }
 
