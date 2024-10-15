@@ -965,14 +965,13 @@ void Player::Obituary(Entity *attacker, Entity *inflictor, str location, int mea
    if(!(deathmatch->value || coop->value))
       return;
 
-   if(attacker == world)
+   if(attacker == world && meansofdeath != MOD_DEATHQUAD)
    {
-      if((meansofdeath == MOD_CRUSH || meansofdeath == MOD_LAVA) && enemy && enemy->isClient() && (enemy != this) && level.time < lastEnemyTime)
-      {
-         attacker = world;
+      if(meansofdeath == MOD_ADRENALINE)
+         attacker = this;
+      else if(enemy && enemy->isClient() && (enemy != this) && level.time < lastEnemyTime)
          meansofdeath = MOD_FALLING;
-      }
-      else if(meansofdeath == MOD_CRUSH || meansofdeath == MOD_ADRENALINE)
+      else if(meansofdeath == MOD_CRUSH)
          attacker = this;
    }
 

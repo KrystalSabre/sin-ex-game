@@ -1193,6 +1193,12 @@ typedef enum
    MOD_SPIDERSPLASH,
    MOD_MUTANTHANDS,
    MOD_MUTANT_DRAIN,
+   MOD_GRAPPLE,
+   MOD_EMPATHY,
+   MOD_THRALLBALL,
+   MOD_THRALLSPLASH,
+   MOD_DEATHQUAD,
+   MOD_CTFTURRET,
    //### MoD's for 2015 stuff
    MOD_STINGERROCKET,
    MOD_STINGERSPLASH,
@@ -1210,12 +1216,6 @@ typedef enum
    MOD_HB_GUN,
    MOD_HB_MINE,
    //###
-   MOD_GRAPPLE,
-   MOD_EMPATHY,
-   MOD_THRALLBALL,
-   MOD_THRALLSPLASH,
-   MOD_DEATHQUAD,
-   MOD_CTFTURRET,
    MOD_RESET         //### used for when the server is reset
 } mod_type_t;
 

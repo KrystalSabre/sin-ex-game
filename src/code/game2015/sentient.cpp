@@ -2202,7 +2202,7 @@ qboolean Sentient::PowerupActive()
 {
    if(poweruptype && this->client)
    {
-      gi.cprintf(edict, PRINT_HIGH, "You are already using a powerup\n");
+      gi.centerprintf(edict, "jcx yv 20 string \"You are already using a powerup\"");
    }
 
    return poweruptype;
