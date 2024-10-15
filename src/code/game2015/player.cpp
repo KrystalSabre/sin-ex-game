@@ -2240,7 +2240,7 @@ void Player::DoUse(void)
          Weapon *mines;
 
          mines = (Weapon *)FindItem("SpiderMine");
-         if(mines && mines->HasAmmo() && mines->ClipAmmo() < MAX_MINES)
+         if(mines && mines->HasAmmo())
             ChangeWeapon(mines);
       }
       else

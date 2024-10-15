@@ -55,6 +55,23 @@ void Mine::CheckForTargets(Event *ev)
    if(detonate)
       return;
 
+   CancelEventsOfType(EV_Mine_CheckForTargets);
+
+   if(movetype != MOVETYPE_NONE)
+   {
+      int num, i;
+      Mine *mine;
+
+      num = detonator->mineList.NumObjects();
+      
+      for(i = num; i >= 1; i--)
+      {
+         mine = detonator->mineList.ObjectAt(i);
+         if(mine != this && mine->movetype != MOVETYPE_NONE)
+            sticky = true;
+      }
+   }
+
    if(G_GetEntity(owner)->isClient())
    {
       player = (Player *)G_GetEntity(owner);
@@ -64,7 +81,7 @@ void Mine::CheckForTargets(Event *ev)
       if(cameraMine == this)
       {
          event = new Event(EV_Mine_CheckForTargets);
-         PostEvent(event, 0.5f);
+         PostEvent(event, 0.1f);
          return;
       }
    }
@@ -97,7 +114,7 @@ void Mine::CheckForTargets(Event *ev)
    else
    {
       event = new Event(EV_Mine_CheckForTargets);
-      PostEvent(event, 0.5f);
+      PostEvent(event, 0.1f);
    }
 }
 
@@ -107,7 +124,7 @@ void Mine::SlideOrStick(Event *ev)
    Event    *event;
    Vector   norm;
 
-   if(detonate)
+   if(detonate || movetype == MOVETYPE_NONE)
       return;
 
    other = ev->GetEntity(1);
@@ -116,8 +133,12 @@ void Mine::SlideOrStick(Event *ev)
    if(other->takedamage)
    {
       setMoveType(MOVETYPE_BOUNCE);
+      event = new Event(EV_Mine_Explode);
+      PostEvent(event, 2.5);
       return;
    }
+
+   CancelEventsOfType(EV_Mine_Explode);
 
    // Check to see if we hit the ground, if so then slide along,
    // otherwise stick to the wall.
@@ -132,6 +153,27 @@ void Mine::SlideOrStick(Event *ev)
    {
       // So that we can shoot our own mines
       edict->owner = world->edict;
+
+      if(detonator->ClipAmmo() >= MAX_MINES)
+      {
+         int num, i;
+         Event *explodeEvent;
+         Mine  *mine;
+
+         num = detonator->mineList.NumObjects();
+      
+         for(i = 1; i <= num; i++)
+         {
+            mine = detonator->mineList.ObjectAt(i);
+            if(mine->movetype == MOVETYPE_NONE)
+            {
+               explodeEvent = new Event(EV_Mine_Explode);
+               mine->ProcessEvent(explodeEvent);
+               if(detonator->ClipAmmo() < MAX_MINES)
+                  break;
+            }
+         }
+      }
 
       CancelEventsOfType(EV_Mine_Run);
       setMoveType(MOVETYPE_NONE);
@@ -269,7 +311,8 @@ void Mine::Setup(Entity *owner, Vector pos, Vector dir)
    PostEvent(ev, 180);
 
    takedamage = DAMAGE_YES;
-   health = 150;
+   //health = 150;
+   health = 5;
    edict->svflags |= (SVF_SHOOTABLE);
    setSize({ -4, -4, -4 }, { 4, 4, 4 });
 
@@ -393,7 +436,7 @@ qboolean SpiderMine::ReadyToUse(void)
 {
    Event *ev;
 
-   if(HasAmmo() && ClipAmmo() < MAX_MINES)
+   if(HasAmmo())
    {
       return true;
    }
@@ -452,10 +495,22 @@ void SpiderMine::Shoot(Event *ev)
 
 int SpiderMine::ClipAmmo(void)
 {
-   if(weaponstate == WEAPON_FIRING && !currentMine)
-      return max(0, detonator->ClipAmmo()) + 1;
+   int num, i;
+   Mine *mine;
+
+   num = detonator->mineList.NumObjects();
+      
+   for(i = num; i >= 1; i--)
+   {
+      mine = detonator->mineList.ObjectAt(i);
+      if(mine->movetype != MOVETYPE_NONE)
+         num--;
+   }
+
+   if(num)
+      return num;
    else
-      return detonator->ClipAmmo();
+      return -1;
 }
 
 CLASS_DECLARATION(Weapon, Detonator, NULL);
@@ -638,8 +693,20 @@ qboolean Detonator::AutoChange(void)
 
 int Detonator::ClipAmmo(void)
 {
-   if(mineList.NumObjects())
-      return mineList.NumObjects();
+   int num, i;
+   Mine *mine;
+
+   num = mineList.NumObjects();
+      
+   for(i = num; i >= 1; i--)
+   {
+      mine = mineList.ObjectAt(i);
+      if(mine->movetype != MOVETYPE_NONE)
+         num--;
+   }
+
+   if(num)
+      return num;
    else
       return -1;
 }

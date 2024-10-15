@@ -82,7 +82,7 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
    ent = findradius(NULL, inflictorent->worldorigin.vec3(), rad);
    while(ent)
    {
-      if((ent != ignoreent) && (ent->takedamage))
+      if((ent != ignoreent) && (ent->takedamage) && !(mod == MOD_SPIDERSPLASH && ent->isSubclassOf<Projectile>()))
       {
          org = ent->centroid;
          v = org - inflictorent->worldorigin;

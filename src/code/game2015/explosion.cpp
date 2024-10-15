@@ -152,7 +152,7 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
    {
       //### don't do radius damage to a hoverbike's extra bounding boxes
       //if ( ( ent != ignoreent ) && ( ent->takedamage ) )
-      if((ent != ignoreent) && (ent->takedamage) && (!ent->isSubclassOf<HoverbikeBox>()))
+      if((ent != ignoreent) && (ent->takedamage) && (!ent->isSubclassOf<HoverbikeBox>()) && !(mod == MOD_SPIDERSPLASH && ent->isSubclassOf<Projectile>()))
       //###
       {
          org = ent->centroid;
