@@ -134,7 +134,7 @@ void Mine::SlideOrStick(Event *ev)
    {
       setMoveType(MOVETYPE_BOUNCE);
       event = new Event(EV_Mine_Explode);
-      PostEvent(event, 2.5);
+      PostEvent(event, 1.8);
       return;
    }
 
@@ -153,6 +153,7 @@ void Mine::SlideOrStick(Event *ev)
    {
       // So that we can shoot our own mines
       edict->owner = world->edict;
+      health = 5;
 
       if(detonator->ClipAmmo() >= MAX_MINES)
       {
@@ -311,8 +312,7 @@ void Mine::Setup(Entity *owner, Vector pos, Vector dir)
    PostEvent(ev, 180);
 
    takedamage = DAMAGE_YES;
-   //health = 150;
-   health = 5;
+   health = 150;
    edict->svflags |= (SVF_SHOOTABLE);
    setSize({ -4, -4, -4 }, { 4, 4, 4 });
 
@@ -418,7 +418,6 @@ void SpiderMine::DoneFiring(Event *ev)
    weaponstate = WEAPON_HOLSTERED;
    DetachGun();
    StopAnimating();
-   currentMine = 0;
 
    if(owner)
    {
@@ -487,7 +486,6 @@ void SpiderMine::Shoot(Event *ev)
       mine->Setup(owner, pos, dir);
       mine->SetDetonator(detonator);
       detonator->AddMine(mine);
-      currentMine = mine;
    }
 
    NextAttack(1.0f);
