@@ -6062,10 +6062,16 @@ EXPORT_FROM_DLL void Player::FinishMove()
    // check if we're over the limit health-wise
    if(ctf->value)
    {
-      if(HasItem("CTF_Tech_Vampire") && health > max_health + CTF_TECH_VAMPIRE_HEALTH)
-         health = max_health + CTF_TECH_VAMPIRE_HEALTH;
-      else if(HasItem("CTF_Tech_Regeneration") && health > max_health + CTF_TECH_REGENERATION_HEALTH)
-         health = max_health + CTF_TECH_REGENERATION_HEALTH;
+      if(HasItem("CTF_Tech_Vampire"))
+      {
+         if(health > max_health + CTF_TECH_VAMPIRE_HEALTH)
+            health = max_health + CTF_TECH_VAMPIRE_HEALTH;
+      }
+      else if(HasItem("CTF_Tech_Regeneration"))
+      {
+         if(health > max_health + CTF_TECH_REGENERATION_HEALTH)
+            health = max_health + CTF_TECH_REGENERATION_HEALTH;
+      }
       else if(health > max_health + 100)
          health = max_health + 100;
    }
