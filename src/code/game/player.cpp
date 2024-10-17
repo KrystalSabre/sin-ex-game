@@ -4605,12 +4605,17 @@ EXPORT_FROM_DLL void Player::FinishMove(void)
    CalcBob();
 
    // check if we're over the limit health-wise
-   if(!FindItem("CTF_Tech_Regeneration") && health > max_health + 100)
+   if(ctf->value && HasItem("CTF_Tech_Regeneration"))
+   {
+      if(health > max_health + CTF_TECH_REGENERATION_HEALTH)
+         health = max_health + CTF_TECH_REGENERATION_HEALTH;
+   }
+   else if(health > max_health + 100)
       health = max_health + 100;
    if(((int)health > (int)max_health) && ((float)((int)level.time) == level.time))
    {
       // CTF: Regeneration Tech doesn't drain health over 100
-      if(!FindItem("CTF_Tech_Regeneration"))
+      if(!HasItem("CTF_Tech_Regeneration"))
       {
          health -= 1;
       }

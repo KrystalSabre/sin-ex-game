@@ -16,6 +16,7 @@
 #include "powerups.h"
 #include "specialfx.h"
 #include "player.h"
+#include "ctf.h"
 
 #define POWERUP_TIME 30
 
@@ -73,8 +74,13 @@ void Adrenaline::Powerdown(Event *ev)
          else
             health_delta = 0;
       }
-      owner->Damage(world, world, max(health_delta, owner->health - owner->max_health), worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ADRENALINE, -1, -1, 1.0f);
       owner->max_health -= 100;
+      if(ctf->value && owner->HasItem("CTF_Tech_Regeneration"))
+         health_delta = max(health_delta, owner->health - (owner->max_health + CTF_TECH_REGENERATION_HEALTH));
+      else
+         health_delta = max(health_delta, owner->health - (owner->max_health + 100));
+
+      owner->Damage(world, world, health_delta, worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ADRENALINE, -1, -1, 1.0f);
    }
 
    CancelPendingEvents();
@@ -111,8 +117,9 @@ void Adrenaline::Use(Event *ev)
    owner->flags |= FL_ADRENALINE;
 
    owner->max_health += 100;
-   health_delta = owner->max_health - owner->health;
-   owner->health = owner->max_health;
+   health_delta = max(0, owner->max_health - owner->health);
+   if(owner->health < owner->max_health)
+      owner->health = owner->max_health;
 
    event = new Event("poweruptimer");
    event->AddInteger(POWERUP_TIME);

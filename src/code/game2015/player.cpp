@@ -6060,14 +6060,23 @@ EXPORT_FROM_DLL void Player::FinishMove()
    CalcBob();
 
    // check if we're over the limit health-wise
-   if((!FindItem("CTF_Tech_Regeneration") || !FindItem("CTF_Tech_Vampire")) && health > max_health + 100)
+   if(ctf->value)
+   {
+      if(HasItem("CTF_Tech_Vampire") && health > max_health + CTF_TECH_VAMPIRE_HEALTH)
+         health = max_health + CTF_TECH_VAMPIRE_HEALTH;
+      else if(HasItem("CTF_Tech_Regeneration") && health > max_health + CTF_TECH_REGENERATION_HEALTH)
+         health = max_health + CTF_TECH_REGENERATION_HEALTH;
+      else if(health > max_health + 100)
+         health = max_health + 100;
+   }
+   else if(health > max_health + 100)
       health = max_health + 100;
    if(((int)health > (int)max_health) && ((float)((int)level.time) == level.time))
    {
       // ### Vampire has different decay limit
       if(ctf->value)
       {
-         if(FindItem( "CTF_Tech_Vampire"))
+         if(HasItem( "CTF_Tech_Vampire"))
          {
             if((int)health > max_health + CTF_TECH_VAMPIRE_DECAY_HEALTH)
             {
@@ -6078,7 +6087,7 @@ EXPORT_FROM_DLL void Player::FinishMove()
             }
          }
          // CTF: Regeneration Tech doesn't drain health over 100
-         else if(!FindItem("CTF_Tech_Regeneration"))
+         else if(!HasItem("CTF_Tech_Regeneration"))
          {
             health -= 1;
          }
