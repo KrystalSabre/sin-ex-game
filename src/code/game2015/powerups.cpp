@@ -342,10 +342,27 @@ void Mutagen::Use(Event *ev)
 
    PostEvent(EV_Mutagen_Powerdown, POWERUP_TIME);
    owner->flags |= FL_MUTANT;
-   owner->health += 100;
    owner->takeItem("RiotHelmet", 100);
    owner->takeItem("FlakJacket", 100);
    owner->takeItem("FlakPants", 100);
+   owner->health += 100;
+   if(ctf->value)
+   {
+      if(owner->HasItem("CTF_Tech_Regeneration"))
+      {
+         if(owner->health > owner->max_health + CTF_TECH_REGENERATION_HEALTH)
+            owner->health = owner->max_health + CTF_TECH_REGENERATION_HEALTH;
+      }
+      else if(owner->HasItem("CTF_Tech_Vampire"))
+      {
+         if(owner->health > owner->max_health + CTF_TECH_VAMPIRE_HEALTH)
+            owner->health = owner->max_health + CTF_TECH_VAMPIRE_HEALTH;
+      }
+      else if(owner->health > owner->max_health + 100)
+         owner->health = owner->max_health + 100;
+   }
+   else if(owner->health > owner->max_health + 100)
+      owner->health = owner->max_health + 100;
 
    //Set the timer
    event = new Event("poweruptimer");
