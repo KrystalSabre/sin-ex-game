@@ -576,7 +576,7 @@ void QuantumDestabilizer::StartSelfDestruct(Event *ev)
 
 void QuantumDestabilizer::ReleaseFire(float holdfiretime)
 {
-   if(weaponmode == PRIMARY)
+   if(weaponmode == PRIMARY && weaponstate == WEAPON_FIRING)
    {
       CancelEventsOfType(EV_Quantum_EatAmmo);
       CancelEventsOfType(EV_Quantum_Destruct);
