@@ -3364,8 +3364,10 @@ void Entity::DamageSkin(trace_t *trace, float damage)
 
 void Entity::Kill(Event *ev)
 {
+   if(getMoveType() == MOVETYPE_NOCLIP)
+      setMoveType(MOVETYPE_NONE);
    health = 0;
-   Damage(this, this, 10, worldorigin, vec_zero, vec_zero, 0, 0, MOD_SUICIDE, -1, -1, 1.0f);
+   Damage(this, this, 10, worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_PROTECTION, MOD_SUICIDE, -1, -1, 1.0f);
 }
 
 void Entity::GroupModelEvent(Event *ev)

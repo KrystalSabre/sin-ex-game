@@ -1405,7 +1405,7 @@ void Sentient::ArmorDamage(Event *ev)
       return;
 
    // Forcefields make objects invulnerable
-   if(flags & FL_FORCEFIELD)
+   if((flags & FL_FORCEFIELD) && !(dflags & DAMAGE_NO_PROTECTION))
    {
       float    alpha;
       float    radius;
@@ -1500,16 +1500,6 @@ void Sentient::ArmorDamage(Event *ev)
       }
    }
 
-   // Shields reduce damage by 75%
-   if(flags & FL_SHIELDS)
-   {
-      damage *= 0.25f;
-   }
-   else if(flags & FL_MUTANT)
-   {
-      damage *= 0.33f;
-   }
-
    // If in deathmatch, client takes a minimum of 33% damage from source
    if(deathmatch->value)
    {
@@ -1518,7 +1508,7 @@ void Sentient::ArmorDamage(Event *ev)
    }
 
    // check to see if we have armor in this location to reduce the damage
-   if(location[0] && !(dflags & DAMAGE_NO_ARMOR))
+   if(location[0] && !(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)))
    {
       if(!strncmp(location, "all", 3))
       {
@@ -1559,15 +1549,17 @@ void Sentient::ArmorDamage(Event *ev)
       // else check for specific location based
       else if(!strncmp(location, "head", 4))
          armor = static_cast<Armor *>(FindItem("RiotHelmet"));
-      else if(!strncmp(location, "torso", 4))
+      else if(!strncmp(location, "torso", 5))
          armor = static_cast<Armor *>(FindItem("FlakJacket"));
       //      else if ( !strncmp( location,"arm",3 ) )
       //         armor = ( Armor * )FindItem( "FlakJacket" );
       else if(!strncmp(location, "leg", 3))
          armor = static_cast<Armor *>(FindItem("FlakPants"));
+      else if(!strncmp(location, "hair", 4))
+         armor = static_cast<Armor *>(FindItem("FlakJacket"));
 
       // If armor is there, remove the appropriate amount
-      if(armor && (armor->Amount() > 0) && !(dflags & DAMAGE_NO_ARMOR))
+      if(armor && (armor->Amount() > 0) && !(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)))
       {
          float odam = damage;
          damage -= armor->Amount();
@@ -1584,6 +1576,19 @@ void Sentient::ArmorDamage(Event *ev)
 
    // Damage multiplier
    damage *= damage_mult;
+
+   // Shields reduce damage by 75%
+   if(!(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)))
+   {
+      if(flags & FL_SHIELDS)
+      {
+         damage *= 0.25f;
+      }
+      else if(flags & FL_MUTANT)
+      {
+         damage *= 0.33f;
+      }
+   }
 
    if(ctf->value)
    {
@@ -1627,7 +1632,7 @@ void Sentient::ArmorDamage(Event *ev)
 
          pl_defender = static_cast<Player *>(this);
 
-         if(pl_defender->HasItem("CTF_Tech_Shield") && !(dflags & DAMAGE_NO_ARMOR))
+         if(pl_defender->HasItem("CTF_Tech_Shield") && !(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)))
          {
             damage *= 0.5f; // ##! for testing our less powerful runes
 
@@ -1664,7 +1669,7 @@ void Sentient::ArmorDamage(Event *ev)
             }
          }
          //###
-         else if(pl_defender->HasItem("CTF_Tech_SplashShield") && !(dflags & DAMAGE_NO_ARMOR) && (dflags & DAMAGE_RADIUS)) 
+         else if(pl_defender->HasItem("CTF_Tech_SplashShield") && !(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)) && (dflags & DAMAGE_RADIUS)) 
          {
             damage *= CTF_TECH_SPLASH_SHIELD_REDUCTION;
 
@@ -1811,7 +1816,7 @@ void Sentient::ArmorDamage(Event *ev)
    }
 
    // check for godmode or invincibility
-   if(flags & FL_GODMODE)
+   if((flags & FL_GODMODE) && !(dflags & DAMAGE_NO_PROTECTION))
    {
       return;
    }

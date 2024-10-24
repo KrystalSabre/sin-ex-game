@@ -1874,6 +1874,8 @@ void Player::Killed(Event *ev)
          dname += str("gibdeath_upper");
       else if(strstr(location.c_str(), "head"))
          dname += str("gibdeath_upper");
+      else if(strstr(location.c_str(), "hair"))
+         dname += str("gibdeath_upper");
       else if(G_Random() > 0.5)
          dname += str("gibdeath_upper");
       else
@@ -3576,7 +3578,8 @@ void Player::Kill(Event *ev)
       return;
    }
 
-   flags &= ~FL_GODMODE;
+   if(getMoveType() == MOVETYPE_NOCLIP)
+      setMoveType(MOVETYPE_NONE);
    health = 0;
    Damage(this, this, 10, worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_PROTECTION, MOD_SUICIDE, -1, -1, 1.0f);
 }

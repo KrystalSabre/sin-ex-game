@@ -3791,6 +3791,8 @@ void Actor::Killed(Event *ev)
          dname += str("gibdeath_upper");
       else if(strstr(location.c_str(), "head"))
          dname += str("gibdeath_upper");
+      else if(strstr(location.c_str(), "hair"))
+         dname += str("gibdeath_upper");
       else if(G_Random() > 0.5)
          dname += str("gibdeath_upper");
       else
