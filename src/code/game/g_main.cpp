@@ -1183,6 +1183,12 @@ void G_RunFrame(void)
    level.framenum++;
    level.time = level.framenum * FRAMETIME;
 
+   if(Director.PlayerReady() && !level.cinematic)
+   {
+      level.playtime += FRAMETIME;
+      game.playtime += FRAMETIME;
+   }
+
    if(g_showmem->value)
    {
       DisplayMemoryUsage();
@@ -2285,6 +2291,8 @@ game_locals_t::game_locals_t() : Class()
    force_entnum = false;
    spawn_entnum = 0;
 
+   playtime = 0;
+
    ValidPlayerModels.FreeObjectList();
 }
 
@@ -2299,6 +2307,8 @@ EXPORT_FROM_DLL void game_locals_t::Archive(Archiver &arc)
    arc.WriteString(spawnpoint);
    arc.WriteBoolean(force_entnum);
    arc.WriteInteger(spawn_entnum);
+
+   arc.WriteFloat(playtime);
 
    // List of valid player models loaded from players global scriptfile
    num = ValidPlayerModels.NumObjects();
@@ -2331,6 +2341,8 @@ EXPORT_FROM_DLL void game_locals_t::Unarchive(Archiver &arc)
    arc.ReadString(&spawnpoint);
    arc.ReadBoolean(&force_entnum);
    arc.ReadInteger(&spawn_entnum);
+
+   arc.ReadFloat(&playtime);
 
    // Load list of valid player models
    arc.ReadInteger(&num);
@@ -2404,6 +2416,7 @@ level_locals_t::level_locals_t() : Class()
    missionfailedtime = 0;
 
    defaultcamera = NULL;
+   playtime = 0;
 }
 
 EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
@@ -2447,6 +2460,8 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
 
    arc.WriteBoolean(missionfailed);
    arc.WriteFloat(missionfailedtime);
+
+   arc.WriteFloat(playtime);
 }
 
 EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
@@ -2496,6 +2511,8 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
 
    arc.ReadBoolean(&missionfailed);
    arc.ReadFloat(&missionfailedtime);
+
+   arc.ReadFloat(&playtime);
 }
 
 /*

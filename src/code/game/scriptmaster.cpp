@@ -1235,6 +1235,9 @@ EXPORT_FROM_DLL void ScriptThread::Execute(Event *ev)
 
    GameTime->setFloatValue(level.time);
 
+   levelVars.SetVariable("playtime", level.playtime);
+   gameVars.SetVariable("playtime", game.playtime);
+
    // clear the updateList so that all objects moved this frame are notified before they receive any commands
    // we have to do this here as well as in DoMove, since DoMove may not be called
    updateList.ClearObjectList();

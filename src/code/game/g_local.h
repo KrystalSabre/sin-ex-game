@@ -190,6 +190,8 @@ public:
    qboolean          force_entnum;
    int               spawn_entnum;
 
+   float             playtime;
+
    // List of valid player models loaded from players global scriptfile
    Container<str>    ValidPlayerModels;
 
@@ -260,6 +262,7 @@ public:
    qboolean    training;
 
    Entity      *defaultcamera;
+   float       playtime;
 
    level_locals_t();
    virtual void   Archive(Archiver &arc)   override;
