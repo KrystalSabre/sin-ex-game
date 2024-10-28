@@ -232,7 +232,7 @@ public:
    qboolean          force_entnum;
    int               spawn_entnum;
 
-   float             playtime;
+   int               playtime;
 
    // List of valid player models loaded from players global scriptfile
    Container<str>    ValidPlayerModels;
@@ -307,7 +307,7 @@ public:
    qboolean    training;
 
    Entity      *defaultcamera;
-   float       playtime;
+   int         playtime;
 
    //### added checkpoint stuff
    float       fastest_lap;      // fastest lap time so far

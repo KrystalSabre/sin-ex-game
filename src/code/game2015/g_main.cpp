@@ -1383,8 +1383,8 @@ void G_RunFrame(void)
 
    if(Director.PlayerReady() && !level.cinematic)
    {
-      level.playtime += FRAMETIME;
-      game.playtime += FRAMETIME;
+      level.playtime++;
+      game.playtime++;
    }
 
    if(g_showmem->value)
@@ -2713,7 +2713,7 @@ EXPORT_FROM_DLL void game_locals_t::Archive(Archiver &arc)
    arc.WriteBoolean(force_entnum);
    arc.WriteInteger(spawn_entnum);
 
-   arc.WriteFloat(playtime);
+   arc.WriteInteger(playtime);
 
    // List of valid player models loaded from players global scriptfile
    num = ValidPlayerModels.NumObjects();
@@ -2756,7 +2756,7 @@ EXPORT_FROM_DLL void game_locals_t::Unarchive(Archiver &arc)
    arc.ReadBoolean(&force_entnum);
    arc.ReadInteger(&spawn_entnum);
 
-   arc.ReadFloat(&playtime);
+   arc.ReadInteger(&playtime);
 
    // Load list of valid player models
    arc.ReadInteger(&num);
@@ -2884,7 +2884,7 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
    arc.WriteBoolean(missionfailed);
    arc.WriteFloat(missionfailedtime);
 
-   arc.WriteFloat(playtime);
+   arc.WriteInteger(playtime);
 
    //### added checkpoint stuff
    arc.WriteFloat(fastest_lap);
@@ -2946,7 +2946,7 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
    arc.ReadBoolean(&missionfailed);
    arc.ReadFloat(&missionfailedtime);
 
-   arc.ReadFloat(&playtime);
+   arc.ReadInteger(&playtime);
 
    //### added checkpoint stuff
    arc.ReadFloat(&fastest_lap);
