@@ -122,9 +122,9 @@ EXPORT_FROM_DLL void Grenade::Setup(Entity *owner, Vector pos, Vector forward, V
    edict->owner = owner->edict;
    setMoveType(MOVETYPE_BOUNCE);
    setSolidType(SOLID_BBOX);
-   takedamage = DAMAGE_YES;
+   takedamage = DAMAGE_NO;
    edict->clipmask = MASK_PROJECTILE;
-   health = 10;
+   //health = 10;
    SetGravityAxis(owner->gravaxis);
 
    velocity = forward * (500 + G_Random(200));
