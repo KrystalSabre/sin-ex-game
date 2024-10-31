@@ -117,8 +117,8 @@ EXPORT_FROM_DLL void Rocket::Setup(Entity *owner, Vector pos, Vector dir)
    ev->AddEntity(world);
    PostEvent(ev, 20);
 
-   takedamage = DAMAGE_YES;
-   health = 10;
+   takedamage = DAMAGE_NO;
+   //health = 10;
 
    setModel("rocket.def");
    edict->s.renderfx |= RF_DLIGHT;
