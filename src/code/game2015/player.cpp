@@ -6669,9 +6669,9 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
       if(music_forced && music_fallback_mood != mood_normal && music_fallback_mood != mood_action && music_fallback_mood != music_current_mood)
          ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), true, 0);
       else if(!music_forced && music_fallback_mood == music_current_mood)
-         ChangeMusic("normal", "normal", false, 0);
+         ChangeMusic("normal", "normal", false, -1);
       else
-         ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), false, 0);
+         ChangeMusic(MusicMood_NumToName(music_fallback_mood), MusicMood_NumToName(music_fallback_mood), false, (music_forced ? 0 : -1));
    }
    else if(music_forced)
    {
@@ -6680,6 +6680,11 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
    }
    else if(action_level > 30)
    {
+      if(music_duration > 0 && music_fallback_mood == mood_action)
+      {
+         action_level = 80;
+         action_level_decrement = -1.0f;
+      }
       music_current_mood = mood_action;
       music_fallback_mood = mood_normal;
       client->ps.current_music_mood = mood_action;
@@ -7493,7 +7498,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
             action_level = 80;
             action_level_decrement = -1.0f;
          }
-         else
+         else if(duration != -1)
          {
             action_level = 0;
             action_level_decrement = 0;
