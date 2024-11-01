@@ -5088,12 +5088,9 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
 
       if(music_forced && music_fallback_mood != mood_normal && music_fallback_mood != mood_action && music_fallback_mood != music_current_mood)
       {
+         music_current_mood = music_fallback_mood;
          client->ps.current_music_mood = music_fallback_mood;
          client->ps.fallback_music_mood = music_fallback_mood;
-         music_current_mood = music_fallback_mood;
-         music_fallback_mood = music_fallback_mood;
-         action_level = 0;
-         action_level_decrement = 0;
       }
       else if(!music_forced && music_fallback_mood == music_current_mood)
       {
@@ -5104,10 +5101,11 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       }
       else
       {
+         music_current_mood = music_fallback_mood;
          client->ps.current_music_mood = music_fallback_mood;
          client->ps.fallback_music_mood = music_fallback_mood;
-         music_current_mood = music_fallback_mood;
-         music_fallback_mood = (music_fallback_mood == mood_action ? mood_normal : music_fallback_mood);
+         if(music_fallback_mood == mood_action)
+            music_fallback_mood = mood_normal;
 
          if(music_current_mood == mood_action)
          {
