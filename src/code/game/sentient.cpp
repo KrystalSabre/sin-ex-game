@@ -1736,7 +1736,7 @@ void Sentient::ArmorDamage(Event *ev)
 	{
 	   Player *player = (Player *)attacker;
 
-	   player->IncreaseActionLevel(damage / 4);
+	   player->IncreaseActionLevel(damage / 8);
 	}
 
    // do the damage

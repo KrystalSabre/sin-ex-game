@@ -77,7 +77,15 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
    Vector	v;
    float		rad;
 
-   rad = (float)(damage + 60);
+   if(mod == MOD_PULSE)
+   {
+      if(!deathmatch->value && attackerent && attackerent->isClient())
+         rad = 210;
+      else
+         rad = 160;
+   }
+   else
+      rad = (float)(damage + 60);
 
    ent = findradius(NULL, inflictorent->worldorigin.vec3(), rad);
    while(ent)
@@ -91,7 +99,15 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
          {
             points = 0;
          }
-         points = damage - points;
+         if(mod == MOD_PULSE)
+         {
+            if(!deathmatch->value && attackerent && attackerent->isClient())
+               points = min(150 - points, damage);
+            else
+               points = min(100 - points, damage);
+         }
+         else
+            points = damage - points;
          if(ent == attackerent)
          {
             points *= 0.5;

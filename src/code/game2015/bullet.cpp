@@ -213,6 +213,10 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
    Vector	right;
    Vector	up;
    int		i;
+   int      action_per_bullet;
+   int      action_count;
+   int      action_max;
+   qboolean hitenemy;
 
    assert(owner);
    if(!owner)
@@ -226,6 +230,16 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
 
    angles = dir.toAngles();
    setAngles(angles);
+
+   action_per_bullet = action_level_increment;
+   action_count = 0;
+   action_max = 1;
+   hitenemy = false;
+   if(numbullets > 1)
+   {
+      action_max = numbullets * 0.6;
+      action_per_bullet /= action_max;
+   }
 
    for(i = 0; i < numbullets; i++)
    {
@@ -256,10 +270,12 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
                hit2 = trace2.ent->entity;
                if(hit2->takedamage && hit2->isClient())
                {
-                  if(owner->isClient() && hit2 != owner && !hit2->deadflag && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
+                  if(owner->isClient() && action_count < action_max && hit2 != owner && !(hit2->deadflag == DEAD_DEAD || !hitenemy && hit2->deadflag == DEAD_DYING) && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
                   {
                      Player *client = (Player *)(Entity *)owner;
-                     client->IncreaseActionLevel((float)action_level_increment / numbullets);
+                     client->IncreaseActionLevel(action_per_bullet);
+                     action_count++;
+                     hitenemy = true;
                   }
                   // probably traced to the rider, so hit him instead
                   hit2->Damage(this, owner, mindamage + (int)G_Random(maxdamage - mindamage + 1),
@@ -281,10 +297,12 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
 
          if(trace.fraction != 1.0)
          {
-            if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
             {
                Player *client = (Player *)(Entity *)owner;
-               client->IncreaseActionLevel((float)action_level_increment / numbullets);
+               client->IncreaseActionLevel(action_per_bullet);
+               action_count++;
+               hitenemy = true;
             }
             // do less than regular damage on a bbox hit
             TraceAttack(src, trace.endpos, (mindamage + (int)G_Random(maxdamage - mindamage + 1))*0.85, &trace, 
@@ -307,10 +325,12 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
 #endif
          if(trace.fraction != 1.0)
          {
-            if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
             {
                Player *client = (Player *)(Entity *)owner;
-               client->IncreaseActionLevel((float)action_level_increment / numbullets);
+               client->IncreaseActionLevel(action_per_bullet);
+               action_count++;
+               hitenemy = true;
             }
             TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
          }

@@ -136,7 +136,17 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
    //###
    //	rad = ( float )( damage + 60 );
    if(falloff_rate == 0.5)
-      rad = (float)(damage + 60);
+   {
+      if(mod == MOD_PULSE)
+      {
+         if(!deathmatch->value && attackerent && attackerent->isClient())
+            rad = 210;
+         else
+            rad = 160;
+      }
+      else
+         rad = (float)(damage + 60);
+   }
    else if(falloff_rate == 0)
       rad = 999999;
    else
@@ -166,7 +176,15 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
          {
             points = 0;
          }
-         points = damage - points;
+         if(mod == MOD_PULSE)
+         {
+            if(!deathmatch->value && attackerent && attackerent->isClient())
+               points = min(150 - points, damage);
+            else
+               points = min(100 - points, damage);
+         }
+         else
+            points = damage - points;
          if(ent == attackerent)
          {
             points *= 0.5;

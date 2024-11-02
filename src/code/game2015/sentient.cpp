@@ -1825,10 +1825,7 @@ void Sentient::ArmorDamage(Event *ev)
 	{
 	   Player *player = (Player *)attacker;
 
-      if(meansofdeath >= MOD_STINGERROCKET && meansofdeath <= MOD_PLASMABOWSPLASH)
-	      player->IncreaseActionLevel(damage / 8);
-      else
-	      player->IncreaseActionLevel(damage / 4);
+	   player->IncreaseActionLevel(damage / 8);
 	}
 
    // do the damage

@@ -100,11 +100,11 @@ void Pulse::Explode(Event *ev)
    // Damage the surface
    surfaceManager.DamageSurface(&level.impact_trace, damg, owner);
 
-   damg = 100;
+   /*damg = 100;
 
    // Single player packs a bigger punch
    if(!deathmatch->value && owner->isClient())
-      damg *= 1.5;
+      damg *= 1.5;*/
 
    // Do an explosion but don't hurt other, since he already took damage.
    RadiusDamage(this, owner, damg, other, MOD_PULSE);
