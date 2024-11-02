@@ -1364,10 +1364,7 @@ void Weapon::DoneReloading(Event *ev)
    }
    else
    {
-      if(owner && !owner->isClient() && isSubclassOf<AssaultRifle>())
-         SetAmmoAmount(30);
-      else
-         SetAmmoAmount(ammo_clip_size);
+      SetAmmoAmount(ammo_clip_size);
    }
 
    ForceIdle();
@@ -1712,6 +1709,9 @@ void Weapon::ProcessWeaponCommandsEvent(Event *ev)
 
    index = ev->GetInteger(1);
    ProcessInitCommands(index);
+
+   if(owner && !owner->isClient() && isSubclassOf<AssaultRifle>())
+      ammo_clip_size = 30;
 }
 
 void Weapon::SetKick(Event *ev)
