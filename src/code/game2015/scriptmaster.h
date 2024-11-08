@@ -66,6 +66,9 @@ extern Event EV_ScriptThread_Trigger;
 extern Event EV_ScriptThread_Spawn;
 extern Event EV_ScriptThread_Map;
 extern Event EV_ScriptThread_SetCvar;
+extern Event EV_ScriptThread_SaveScores;
+extern Event EV_ScriptThread_LoadScores;
+extern Event EV_ScriptThread_Achievement;
 extern Event EV_ScriptThread_CueCamera;
 extern Event EV_ScriptThread_CuePlayer;
 extern Event EV_ScriptThread_FreezePlayer;
@@ -157,6 +160,9 @@ protected:
    void                 RegisterAliasAndCache(Event *ev);
    void                 MapEvent(Event *ev);
    void                 SetCvarEvent(Event *ev);
+   void                 SaveScoresEvent(Event *ev);
+   void                 LoadScoresEvent(Event *ev);
+   void                 AchievementEvent(Event *ev);
 
    TargetList           *GetTargetList(str &targetname);
 

@@ -262,6 +262,7 @@ public:
    qboolean    training;
 
    Entity      *defaultcamera;
+   qboolean    defaulthud;
    int         playtime;
 
    level_locals_t();

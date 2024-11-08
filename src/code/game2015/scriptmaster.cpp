@@ -74,6 +74,9 @@ Event EV_ScriptThread_Trigger("trigger");
 Event EV_ScriptThread_Spawn("spawn", EV_CHEAT);
 Event EV_ScriptThread_Map("map");
 Event EV_ScriptThread_SetCvar("setcvar");
+Event EV_ScriptThread_SaveScores("savescores");
+Event EV_ScriptThread_LoadScores("loadscores");
+Event EV_ScriptThread_Achievement("achievement");
 Event EV_ScriptThread_CueCamera("cuecamera");
 Event EV_ScriptThread_CuePlayer("cueplayer");
 Event EV_ScriptThread_FreezePlayer("freezeplayer");
@@ -706,6 +709,9 @@ ResponseDef ScriptThread::Responses[] =
    { &EV_ScriptThread_RegisterAliasAndCache, (Response)&ScriptThread::RegisterAliasAndCache },
    { &EV_ScriptThread_Map,                   (Response)&ScriptThread::MapEvent },
    { &EV_ScriptThread_SetCvar,               (Response)&ScriptThread::SetCvarEvent },
+   { &EV_ScriptThread_SaveScores,            (Response)&ScriptThread::SaveScoresEvent },
+   { &EV_ScriptThread_LoadScores,            (Response)&ScriptThread::LoadScoresEvent },
+   { &EV_ScriptThread_Achievement,           (Response)&ScriptThread::AchievementEvent },
    { &EV_ScriptThread_CueCamera,             (Response)&ScriptThread::CueCamera },
    { &EV_ScriptThread_CuePlayer,             (Response)&ScriptThread::CuePlayer },
    { &EV_ScriptThread_FreezePlayer,          (Response)&ScriptThread::FreezePlayer },
@@ -719,7 +725,7 @@ ResponseDef ScriptThread::Responses[] =
    { &EV_ScriptThread_MusicEvent,            (Response)&ScriptThread::MusicEvent },
    { &EV_ScriptThread_ForceMusicEvent,       (Response)&ScriptThread::ForceMusicEvent },
    { &EV_ScriptThread_SoundtrackEvent,       (Response)&ScriptThread::SoundtrackEvent },
-   { &EV_ScriptThread_ExitMusicEvent,  (Response)&ScriptThread::ExitMusicEvent },
+   { &EV_ScriptThread_ExitMusicEvent,        (Response)&ScriptThread::ExitMusicEvent },
    { &EV_ScriptThread_LoadOverlay,           (Response)&ScriptThread::LoadOverlay },
    { &EV_ScriptThread_LoadIntermission,      (Response)&ScriptThread::LoadIntermission },
    { &EV_ScriptThread_IntermissionLayout,    (Response)&ScriptThread::IntermissionLayout },
@@ -1122,9 +1128,13 @@ EXPORT_FROM_DLL void ScriptThread::ProcessCommand(int argc, const char **argv)
    // Check for entnum commands
    if(name[0] == '*')
    {
-      if(!IsNumeric(&name[1]) && name[1] != '*')
+      if(name[1] != '*' && !IsNumeric(&name[1]))
       {
          ScriptError("Expecting numeric value for * command, but found '%s'\n", &name[1]);
+      }
+      else if(name[1] == '*' && !IsNumeric(&name[2]))
+      {
+         ScriptError("Expecting numeric value for ** command, but found '%s'\n", &name[2]);
       }
       else if(FindEvent(command.c_str()))
       {
@@ -2103,6 +2113,160 @@ void ScriptThread::SetCvarEvent(Event *ev)
    }
 }
 
+void ScriptThread::SaveScoresEvent(Event *ev)
+{
+   FILE   *f;
+   char   filename[MAX_OSPATH];
+   int    i;
+   const char *scoreprefix;
+   int    numscores;
+   ScriptVariable *var1, *var2;
+   cvar_t *game;
+
+   scoreprefix = ev->GetString(1);
+   numscores = ev->GetInteger(2);
+
+   game = gi.cvar("game", "", 0);
+
+   if(!*game->string)
+   {
+      snprintf(filename, sizeof(filename), "%s/players/scores_%s.hq", GAMEVERSION, scoreprefix);
+   }
+   else
+   {
+      snprintf(filename, sizeof(filename), "%s/players/scores_%s.hq", game->string, scoreprefix);
+   }
+
+   gi.dprintf("Writing %s.\n", filename);
+
+   f = fopen(filename, "wb");
+   if(!f)
+   {
+      gi.cprintf(NULL, PRINT_HIGH, "Couldn't open %s\n", filename);
+      return;
+   }
+
+   for(i = 1; i <= numscores; i++)
+   {
+      char name[256];
+      char score[256];
+      snprintf(name, sizeof(name), "%s_Name%i", scoreprefix, i);
+      snprintf(score, sizeof(score), "%s_Score%i", scoreprefix, i);
+
+      var1 = gameVars.GetVariable(name);
+      var2 = gameVars.GetVariable(score);
+      if(!var1 || !var2)
+      {
+         gi.dprintf("Score '%s' doesn't exist\n", score);
+         fprintf(f, "\"null\" 0\n");
+         continue;
+      }
+
+      fprintf(f, "\"%s\" %i\n", var1->stringValue(), var2->intValue());
+   }
+
+   fclose(f);
+}
+
+void ScriptThread::LoadScoresEvent(Event *ev)
+{
+   FILE   *f;
+   char   filename[MAX_OSPATH];
+   int    i;
+   const char *scoreprefix;
+   ScriptVariable *var1, *var2;
+   cvar_t *game;
+
+   scoreprefix = ev->GetString(1);
+
+   game = gi.cvar("game", "", 0);
+
+   if(!*game->string)
+   {
+      snprintf(filename, sizeof(filename), "%s/players/scores_%s.hq", GAMEVERSION, scoreprefix);
+   }
+   else
+   {
+      snprintf(filename, sizeof(filename), "%s/players/scores_%s.hq", game->string, scoreprefix);
+   }
+
+   gi.dprintf("Reading %s.\n", filename);
+
+   f = fopen(filename, "rb");
+   if(!f)
+   {
+      gi.cprintf(NULL, PRINT_HIGH, "Couldn't open %s\n", filename);
+      return;
+   }
+
+   char name[256];
+   char score[256];
+   char buf[512];
+   char val1[256];
+   char val2[256];
+
+   i = 1;
+
+   while(fgets(buf, sizeof(buf), f))
+   {
+      snprintf(name, sizeof(name), "%s_Name%i", scoreprefix, i);
+      snprintf(score, sizeof(score), "%s_Score%i", scoreprefix, i);
+      sscanf(buf, "\"%[^\"]\" %s", val1, val2);
+      var1 = gameVars.SetVariable(name, val1);
+      var2 = gameVars.SetVariable(score, val2);
+      i++;
+   }
+
+   fclose(f);
+}
+
+void ScriptThread::AchievementEvent(Event *ev)
+{
+   FILE   *f;
+   char   filename[MAX_OSPATH];
+   int    achievement;
+   cvar_t *game;
+   cvar_t *player;
+
+   achievement = ev->GetInteger(1);
+
+   if(achievement > 255 || achievement < 0)
+   {
+      gi.dprintf("Invalid achievement ID %d\n", achievement);
+      return;
+   }
+
+   game = gi.cvar("game", "", 0);
+   player = gi.cvar("player", "", 0);
+
+   if(!*game->string)
+   {
+      snprintf(filename, sizeof(filename), "%s/players/%s/achievements.dat", GAMEVERSION, player->string);
+   }
+   else
+   {
+      snprintf(filename, sizeof(filename), "%s/players/%s/achievements.dat", game->string, player->string);
+   }
+
+   gi.dprintf("Writing %s.\n", filename);
+
+   f = fopen(filename, "rb+");
+   if(!f)
+   {
+      f = fopen(filename, "wb");
+      if(!f)
+      {
+         gi.cprintf(NULL, PRINT_HIGH, "Couldn't open %s\n", filename);
+         return;
+      }
+   }
+
+   fseek(f, achievement, SEEK_SET);
+   fputs("1", f);
+
+   fclose(f);
+}
+
 void ScriptThread::CueCamera(Event *ev)
 {
    Entity *ent;
@@ -2520,6 +2684,7 @@ void ScriptThread::Hud(Event *ev)
    edict_t		*other;
 
    val = !ev->GetInteger(1);
+   level.defaulthud = val;
 
    for(j = 1; j <= game.maxclients; j++)
    {

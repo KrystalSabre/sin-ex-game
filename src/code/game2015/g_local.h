@@ -307,6 +307,7 @@ public:
    qboolean    training;
 
    Entity      *defaultcamera;
+   qboolean    defaulthud;
    int         playtime;
 
    //### added checkpoint stuff

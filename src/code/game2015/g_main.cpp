@@ -14,7 +14,7 @@
 // 
 
 //### upped savegame version for the add-on pack
-#define SAVEGAME_VERSION 16
+#define SAVEGAME_VERSION 17
 
 #include <setjmp.h>
 #include "limits.h"
@@ -464,11 +464,11 @@ void ReadGame(const char *name)
    arc.ReadInteger(&savegame_version);
    if(savegame_version < SAVEGAME_VERSION)
    {
-      gi.error("Savegame from an older version (%d) of Sin.\n", version);
+      gi.error("Savegame from an older version (%d) of Sin.\n", savegame_version);
    }
    else if(savegame_version > SAVEGAME_VERSION)
    {
-      gi.error("Savegame from version %d of Sin.\n", version);
+      gi.error("Savegame from version %d of Sin.\n", savegame_version);
    }
 
    // Read the map name (needed by G_MapInit)
@@ -1192,7 +1192,7 @@ void G_CheckDMRules(void)
 void G_MoveClientToIntermission(Entity *ent)
 {
    // Display the scores for the client
-   if(deathmatch->value || coop->value)
+   if(deathmatch->value)
    {
       ent->client->showinfo = true;
       G_DeathmatchScoreboardMessage(ent, NULL);
@@ -1240,7 +1240,7 @@ void G_BeginIntermission(const char *map)
 
    level.clearsavegames = false;
 
-   level.exitintermission = !(deathmatch->value || coop->value);
+   level.exitintermission = !(deathmatch->value);
 
    // find an intermission spot
    num = G_FindClass(0, "info_player_intermission");
@@ -1804,6 +1804,17 @@ void G_ClientUserinfoChanged(edict_t *ent, const char *userinfo)
          {
             strcpy(ent->client->pers.model, "pl_blade.def");
          }
+
+         if(parentmode->value)
+         {
+            str cleanmodel;
+
+            cleanmodel = "clean_";
+            cleanmodel += ent->client->pers.model;
+            if(game.ValidPlayerModels.ObjectInList(cleanmodel))
+               strcpy(ent->client->pers.model, cleanmodel.c_str());
+         }
+
          // Call the player's setModel function if he exists
          // Prepend 'models/' to make things easier
          if(!strchr(ent->client->pers.model, '*') && !strchr(ent->client->pers.model, '\\') && !strchr(ent->client->pers.model, '/'))
@@ -2824,8 +2835,8 @@ level_locals_t::level_locals_t() : Class()
    cinematic = false;
    no_jc = false;
    exitmusic = 0;
-   default_current_mood = "";
-   default_fallback_mood = "";
+   default_current_mood = "normal";
+   default_fallback_mood = "normal";
    default_music_forced = false;
 
    water_color = vec_zero;
@@ -2839,6 +2850,7 @@ level_locals_t::level_locals_t() : Class()
    missionfailedtime = 0;
 
    defaultcamera = NULL;
+   defaulthud = false;
    playtime = 0;
 }
 
@@ -2884,6 +2896,8 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
    arc.WriteBoolean(missionfailed);
    arc.WriteFloat(missionfailedtime);
 
+   arc.WriteObjectPointer(defaultcamera);
+   arc.WriteBoolean(defaulthud);
    arc.WriteInteger(playtime);
 
    //### added checkpoint stuff
@@ -2946,6 +2960,8 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
    arc.ReadBoolean(&missionfailed);
    arc.ReadFloat(&missionfailedtime);
 
+   arc.ReadObjectPointer((Class **)&defaultcamera);
+   arc.ReadBoolean(&defaulthud);
    arc.ReadInteger(&playtime);
 
    //### added checkpoint stuff
