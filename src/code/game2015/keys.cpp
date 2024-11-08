@@ -337,6 +337,8 @@ Item *PulsePart1::ItemPickup(Entity *other)
 {
    if(!level.no_jc)
       ExecuteThread("global/pulse_parts.scr::blade_finds_piece1", true);
+   else
+      ExecuteThread("global/pulse_parts.scr::blade_finds_piece1_nojc", true);
    gameVars.CreateVariable("pulse1", 1);
    if(other->isClient())
    {
@@ -347,7 +349,7 @@ Item *PulsePart1::ItemPickup(Entity *other)
       var2 = gameVars.GetVariable("pulse2");
       var3 = gameVars.GetVariable("pulse3");
 
-      if(var1 && var2 && var3)
+      if(var1->intValue() && var2->intValue() && var3->intValue())
       {
          player = (Player *)other;
          player->giveWeapon("PulseRifle");
@@ -388,6 +390,8 @@ Item *PulsePart2::ItemPickup(Entity *other)
 {
    if(!level.no_jc)
       ExecuteThread("global/pulse_parts.scr::blade_finds_piece2", true);
+   else
+      ExecuteThread("global/pulse_parts.scr::blade_finds_piece2_nojc", true);
    gameVars.CreateVariable("pulse2", 1);
    if(other->isClient())
    {
@@ -398,7 +402,7 @@ Item *PulsePart2::ItemPickup(Entity *other)
       var2 = gameVars.GetVariable("pulse2");
       var3 = gameVars.GetVariable("pulse3");
 
-      if(var1 && var2 && var3)
+      if(var1->intValue() && var2->intValue() && var3->intValue())
       {
          player = (Player *)other;
          player->giveWeapon("PulseRifle");
@@ -439,6 +443,8 @@ Item *PulsePart3::ItemPickup(Entity *other)
 {
    if(!level.no_jc)
       ExecuteThread("global/pulse_parts.scr::blade_finds_piece3", true);
+   else
+      ExecuteThread("global/pulse_parts.scr::blade_finds_piece3_nojc", true);
    gameVars.CreateVariable("pulse3", 1);
    if(other->isClient())
    {
@@ -449,7 +455,7 @@ Item *PulsePart3::ItemPickup(Entity *other)
       var2 = gameVars.GetVariable("pulse2");
       var3 = gameVars.GetVariable("pulse3");
 
-      if(var1 && var2 && var3)
+      if(var1->intValue() && var2->intValue() && var3->intValue())
       {
          player = (Player *)other;
          player->giveWeapon("PulseRifle");
@@ -652,7 +658,7 @@ GenericPulsePart::GenericPulsePart() : InventoryItem()
    // Based on what pulserifle pieces that have already been found,
    // spawn the correct model in the game.
 
-   if(!var1)
+   if(!var1->intValue())
    {
       PulsePart1 *part1;
 
@@ -661,7 +667,7 @@ GenericPulsePart::GenericPulsePart() : InventoryItem()
       part1->setOrigin(origin);
       part1->worldorigin.copyTo(part1->edict->s.old_origin);
    }
-   else if(!var2)
+   else if(!var2->intValue())
    {
       PulsePart2 *part2;
 
@@ -670,7 +676,7 @@ GenericPulsePart::GenericPulsePart() : InventoryItem()
       part2->setOrigin(origin);
       part2->worldorigin.copyTo(part2->edict->s.old_origin);
    }
-   else if(!var3)
+   else if(!var3->intValue())
    {
       PulsePart3 *part3;
 
@@ -678,6 +684,15 @@ GenericPulsePart::GenericPulsePart() : InventoryItem()
       part3->setModel("pulsepart3.def");
       part3->setOrigin(origin);
       part3->worldorigin.copyTo(part3->edict->s.old_origin);
+   }
+   else
+   {
+      BulletPulse *ammo;
+
+      ammo = new BulletPulse();
+      ammo->setModel("pulse_ammo.def");
+      ammo->setOrigin(origin);
+      ammo->worldorigin.copyTo(ammo->edict->s.old_origin);
    }
 
    PostEvent(EV_Remove, 0);
