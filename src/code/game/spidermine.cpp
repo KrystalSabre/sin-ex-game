@@ -97,8 +97,8 @@ void Mine::CheckForTargets(Event *ev)
          (strcmp(ent->getClassname(), "Mine")))
       {
          detonate = true;
-         trace = G_Trace(worldorigin, vec_zero, vec_zero, ent->worldorigin, ent, MASK_PROJECTILE, "Mine::CheckForTargets");
-         if(trace.fraction != 1.0f)
+         trace = G_Trace(worldorigin, vec_zero, vec_zero, ent->worldorigin, this, MASK_PROJECTILE, "Mine::CheckForTargets");
+         if(trace.ent != ent->edict)
             detonate = false;
          else
             break;
