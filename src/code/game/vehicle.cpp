@@ -444,7 +444,7 @@ void Vehicle::DriverUse(Event *ev)
             pos = worldorigin + (forward * ofs);
             pos[2] += height;
             trace = G_Trace(worldorigin, driver->mins, driver->maxs, pos, this, MASK_PLAYERSOLID, "Vehicle::DriverUse 0");
-            if(trace.endpos == pos)
+            if(trace.fraction == 1.0f)
             {
                trace = G_Trace(pos, driver->mins, driver->maxs, pos, NULL, MASK_PLAYERSOLID, "Vehicle::DriverUse 1");
                if(!trace.allsolid)
