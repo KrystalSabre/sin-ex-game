@@ -38,7 +38,7 @@ Magnum::Magnum() : BulletWeapon()
 void Magnum::Shoot(Event *ev)
 {
    NextAttack(0.20);
-   FireBullets(1, { 10, 10, 10 }, 12, 24, DAMAGE_BULLET, MOD_MAGNUM, false);
+   FireBullets(1, { 10, 10, 10 }, 12, 24, DAMAGE_BULLET, MOD_MAGNUM, true);
 }
 
 qboolean Magnum::Drop(void)

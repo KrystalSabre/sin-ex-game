@@ -39,9 +39,9 @@ void Shotgun::Shoot(Event *ev)
 {
    // Non clients use a toned down version of the shotgun
    if(owner->isClient())
-      FireBullets(10, { 375, 375, 375 }, 8, 16, DAMAGE_BULLET, MOD_SHOTGUN, false);
+      FireBullets(10, { 375, 375, 375 }, 8, 16, DAMAGE_BULLET, MOD_SHOTGUN, true);
    else
-      FireBullets(5, { 100, 100, 100 }, 5, 10, DAMAGE_BULLET, MOD_SHOTGUN, false);
+      FireBullets(5, { 100, 100, 100 }, 5, 10, DAMAGE_BULLET, MOD_SHOTGUN, true);
 
    NextAttack(0.95f);
 }

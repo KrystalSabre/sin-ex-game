@@ -192,9 +192,9 @@ void ChainGun::Shoot(Event *ev)
    if(weaponmode == PRIMARY)
    {
       if(deathmatch->value)
-         FireBullets(1, { 300, 300, 300 }, 20, 28, DAMAGE_BULLET, MOD_CHAINGUN, false);
+         FireBullets(1, { 300, 300, 300 }, 20, 28, DAMAGE_BULLET, MOD_CHAINGUN, true);
       else
-         FireBullets(1, { 300, 300, 300 }, 16, 24, DAMAGE_BULLET, MOD_CHAINGUN, false);
+         FireBullets(1, { 300, 300, 300 }, 16, 24, DAMAGE_BULLET, MOD_CHAINGUN, true);
       NextAttack(0);
    }
    else

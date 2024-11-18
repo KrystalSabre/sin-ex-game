@@ -71,15 +71,15 @@ void SniperRifle::Shoot(Event *ev)
    if(ctf->value)
    {
       // CTF - kill the target
-      FireBullets(1, vec_zero, 10000, 10000, DAMAGE_BULLET | DAMAGE_NO_ARMOR, MOD_SNIPER, false);
+      FireBullets(1, vec_zero, 10000, 10000, DAMAGE_BULLET | DAMAGE_NO_ARMOR, MOD_SNIPER, true);
    }
    else if(deathmatch->value)
    {
-      FireBullets(1, vec_zero, 105, 135, DAMAGE_BULLET | DAMAGE_NO_ARMOR, MOD_SNIPER, false);
+      FireBullets(1, vec_zero, 105, 135, DAMAGE_BULLET | DAMAGE_NO_ARMOR, MOD_SNIPER, true);
    }
    else
    {
-      FireBullets(1, vec_zero, 105, 135, DAMAGE_BULLET, MOD_SNIPER, false);
+      FireBullets(1, vec_zero, 105, 135, DAMAGE_BULLET, MOD_SNIPER, true);
    }
 
    NextAttack(1.5);

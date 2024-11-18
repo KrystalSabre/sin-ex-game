@@ -37,7 +37,7 @@ HeliGun::HeliGun() : BulletWeapon()
 
 void HeliGun::Shoot(Event *ev)
 {
-   FireBullets(1, { 20, 20, 20 }, 16, 28, DAMAGE_BULLET, MOD_HELIGUN, false);
+   FireBullets(1, { 20, 20, 20 }, 16, 28, DAMAGE_BULLET, MOD_HELIGUN, true);
    NextAttack(0);
 }
 
