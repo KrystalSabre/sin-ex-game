@@ -97,23 +97,24 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    {
       if(!(ent->flags & FL_SHIELDS))
       {
+         // Take care of ricochet effects on the server
+         if(server_effects && !ricochet)
+         {
+            timeofs = MAX_RICOCHETS - numricochets;
+            if(timeofs > 0xf)
+            {
+               timeofs = 0xf;
+            }
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_GUNSHOT);
+            gi.WritePosition(org.vec3());
+            gi.WriteDir(trace->plane.normal);
+            gi.WriteByte(0);
+            gi.multicast(org.vec3(), MULTICAST_PVS);
+         }
+
          if(ent->flags & FL_SPARKS)
          {
-            // Take care of ricochet effects on the server
-            if(server_effects && !ricochet)
-            {
-               timeofs = MAX_RICOCHETS - numricochets;
-               if(timeofs > 0xf)
-               {
-                  timeofs = 0xf;
-               }
-               gi.WriteByte(svc_temp_entity);
-               gi.WriteByte(TE_GUNSHOT);
-               gi.WritePosition(org.vec3());
-               gi.WriteDir(trace->plane.normal);
-               gi.WriteByte(0);
-               gi.multicast(org.vec3(), MULTICAST_PVS);
-            }
             MadeBreakingSound(org, owner);
          }
 
