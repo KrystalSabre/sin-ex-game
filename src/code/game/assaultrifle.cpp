@@ -39,7 +39,7 @@ AssaultRifle::AssaultRifle()
 
 void AssaultRifle::Shoot(Event *ev)
 {
-   FireBullets(1, { 120, 120, 120 }, 8, 14, DAMAGE_BULLET, MOD_ASSRIFLE, true);
+   FireBullets(1, { 120, 120, 120 }, 8, 14, DAMAGE_BULLET, MOD_ASSRIFLE, 2);
    NextAttack(0);
 }
 

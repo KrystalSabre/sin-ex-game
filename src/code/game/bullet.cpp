@@ -249,6 +249,9 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
       Com_Printf("Server Trace End    :%0.2f %0.2f %0.2f\n", trace.endpos[0], trace.endpos[1], trace.endpos[2]);
       Com_Printf("\n");
 #endif
+      if(server_effects >= 2)
+         FireTracer(src, Vector(trace.dir));
+
       if(trace.fraction != 1.0)
       {
          if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
@@ -263,29 +266,29 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
    }
 }
 
-void BulletWeapon::FireTracer(void)
+void BulletWeapon::FireTracer(Vector src, Vector dir)
 {
    Entity   *tracer;
-   Vector   src, dir, end;
-   trace_t  trace;
+   //Vector   src, dir, end;
+   //trace_t  trace;
 
-   GetMuzzlePosition(&src, &dir);
-   end = src + dir * 8192;
-   trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
+   //GetMuzzlePosition(&src, &dir);
+   //end = src + dir * 8192;
+   //trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
 
    tracer = new Entity();
 
    tracer->angles = dir.toAngles();
-   tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
-   //tracer->angles[PITCH] *= -1;
+   //tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
+   tracer->angles[PITCH] *= -1;
 
    tracer->setAngles(tracer->angles);
 
    tracer->setMoveType(MOVETYPE_NONE);
    tracer->setSolidType(SOLID_NOT);
-   tracer->setModel("sprites/tracer.spr");
+   tracer->setModel("models/tracer.def");
    tracer->setSize({ 0, 0, 0 }, { 0, 0, 0 });
-   tracer->setOrigin(trace.endpos);
+   tracer->setOrigin(src);
    tracer->edict->s.renderfx &= ~RF_FRAMELERP;
 
    VectorCopy(src, tracer->edict->s.old_origin);

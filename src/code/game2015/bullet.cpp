@@ -250,6 +250,10 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
       
       //### first need to do a regular trace to check for hitting a hoverbike
       trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
+
+      if(server_effects >= 2)
+         FireTracer(src, Vector(trace.dir));
+
       if(trace.fraction != 1)
       {
          Entity *hit;
@@ -338,29 +342,29 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
    }
 }
 
-void BulletWeapon::FireTracer(void)
+void BulletWeapon::FireTracer(Vector src, Vector dir)
 {
    Entity   *tracer;
-   Vector   src, dir, end;
-   trace_t  trace;
+   //Vector   src, dir, end;
+   //trace_t  trace;
 
-   GetMuzzlePosition(&src, &dir);
-   end = src + dir * 8192;
-   trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
+   //GetMuzzlePosition(&src, &dir);
+   //end = src + dir * 8192;
+   //trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
 
    tracer = new Entity();
 
    tracer->angles = dir.toAngles();
-   tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
-   //tracer->angles[PITCH] *= -1;
+   //tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
+   tracer->angles[PITCH] *= -1;
 
    tracer->setAngles(tracer->angles);
 
    tracer->setMoveType(MOVETYPE_NONE);
    tracer->setSolidType(SOLID_NOT);
-   tracer->setModel("sprites/tracer.spr");
+   tracer->setModel("models/tracer.def");
    tracer->setSize({ 0, 0, 0 }, { 0, 0, 0 });
-   tracer->setOrigin(trace.endpos);
+   tracer->setOrigin(src);
    tracer->edict->s.renderfx &= ~RF_FRAMELERP;
 
    VectorCopy(src, tracer->edict->s.old_origin);

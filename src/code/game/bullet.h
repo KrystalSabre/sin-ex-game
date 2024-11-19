@@ -28,7 +28,7 @@ class EXPORT_FROM_DLL BulletWeapon : public Weapon
 protected:
    virtual void TraceAttack(Vector start, Vector end, int damage, trace_t *trace, int numricochets, 
                             int kick, int dflags, int meansofdeath, qboolean server_effects);
-   virtual void FireTracer(void);
+   virtual void FireTracer(Vector src, Vector dir);
 
 public:
    CLASS_PROTOTYPE(BulletWeapon);
