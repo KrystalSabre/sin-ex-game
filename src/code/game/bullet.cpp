@@ -312,6 +312,7 @@ void BulletWeapon::FireTracer(Vector end)
    tracer->edict->s.renderfx &= ~RF_FRAMELERP;
    tracer->edict->s.renderfx |= RF_DETAIL;
    tracer->edict->clipmask = 0x80000000;
+   tracer->flags |= FL_DONTSAVE;
    /*if(owner->isClient())
    {
       tracer->edict->owner = owner->edict;
