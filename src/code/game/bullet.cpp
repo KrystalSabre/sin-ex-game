@@ -251,7 +251,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
       Com_Printf("\n");
 #endif
       if(server_effects >= 2)
-         FireTracer(src, Vector(trace.dir));
+         FireTracer(trace.endpos);
 
       if(trace.fraction != 1.0)
       {
@@ -267,33 +267,59 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
    }
 }
 
-void BulletWeapon::FireTracer(Vector src, Vector dir)
+void BulletWeapon::FireTracer(Vector end)
 {
    Entity   *tracer;
-   //Vector   src, dir, end;
+   Vector   src, dir;
+   Player   *client;
+   //int      savedhand;
    //trace_t  trace;
+   if(G_Random(1.0) >= 0.7)
+      return;
 
-   //GetMuzzlePosition(&src, &dir);
+   /*client = (Player *)(Entity *)owner;
+   if(owner->isClient() && client->ViewMode() == THIRD_PERSON)
+   {
+      savedhand = owner->client->pers.hand;
+      owner->client->pers.hand = RIGHT_HANDED;
+      GetMuzzlePosition(&src, &dir);
+      owner->client->pers.hand = savedhand;
+   }
+   else*/
+      GetMuzzlePosition(&src, &dir);
    //end = src + dir * 8192;
    //trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
-
+   Vector tempangles, forward;
+   dir = end - src;
+   velocity = forward * 100;
    tracer = new Entity();
 
    tracer->angles = dir.toAngles();
-   //tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
-   tracer->angles[PITCH] *= -1;
+   tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
+   //tracer->angles[PITCH] *= -1;
 
    tracer->setAngles(tracer->angles);
+   tempangles = dir.toAngles();
+   tempangles[PITCH] *= -1;
+   AngleVectors(tempangles.vec3(), forward.vec3(), NULL, NULL);
 
-   tracer->setMoveType(MOVETYPE_NONE);
+   tracer->setMoveType(MOVETYPE_FLY);
    tracer->setSolidType(SOLID_NOT);
-   tracer->setModel("models/tracer.def");
+   tracer->setModel("sprites/tracer.spr");
    tracer->setSize({ 0, 0, 0 }, { 0, 0, 0 });
+   tracer->velocity = forward * 1500;
    tracer->setOrigin(src);
    tracer->edict->s.renderfx &= ~RF_FRAMELERP;
+   tracer->edict->s.renderfx |= RF_DETAIL;
+   tracer->edict->clipmask = 0x80000000;
+   /*if(owner->isClient())
+   {
+      tracer->edict->owner = owner->edict;
+      tracer->edict->svflags |= SVF_ONLYPARENT;
+   }*/
 
    VectorCopy(src, tracer->edict->s.old_origin);
-   tracer->PostEvent(EV_Remove, 0.1f);
+   tracer->PostEvent(EV_Remove, floor(dir.length() / 150) / 10);
 }
 
 // EOF
