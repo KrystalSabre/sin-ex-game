@@ -96,24 +96,45 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    {
       if(!(ent->flags & FL_SHIELDS))
       {
-         // Take care of ricochet effects on the server
-         if(server_effects && !ricochet)
+         if(ent->edict->solid == SOLID_BSP)
          {
-            timeofs = MAX_RICOCHETS - numricochets;
-            if(timeofs > 0xf)
+            // Take care of ricochet effects on the server
+            if(server_effects && !ricochet)
             {
-               timeofs = 0xf;
-            }
-            gi.WriteByte(svc_temp_entity);
-            gi.WriteByte(TE_GUNSHOT);
-            gi.WritePosition(org.vec3());
-            gi.WriteDir(trace->plane.normal);
-            gi.WriteByte(0);
-            gi.multicast(org.vec3(), MULTICAST_PVS);
-         }
+               if(ent == world)
+               {
+                  timeofs = MAX_RICOCHETS - numricochets;
+                  if(timeofs > 0xf)
+                  {
+                     timeofs = 0xf;
+                  }
+                  gi.WriteByte(svc_temp_entity);
+                  gi.WriteByte(TE_GUNSHOT);
+                  gi.WritePosition(org.vec3());
+                  gi.WriteDir(trace->plane.normal);
+                  gi.WriteByte(0);
+                  gi.multicast(org.vec3(), MULTICAST_PVS);
+               }
+               else
+               {
+                  Particles(trace->endpos, trace->plane.normal, 8, 120, 0);
+               }
 
-         if(ent->flags & FL_SPARKS)
-         {
+               switch(surfflags & MASK_SURF_TYPE)
+               {
+               case SURF_TYPE_METAL:
+               case SURF_TYPE_GRILL:
+               case SURF_TYPE_MONITOR:
+               case SURF_TYPE_DUCT:
+                  SpawnSparks(trace->endpos, trace->plane.normal, 12);
+                  break;
+               case SURF_TYPE_FLESH:
+                  SpawnBlood(trace->endpos, trace->plane.normal, 12);
+                  break;
+               default:
+                  break;
+               }
+            }
             MadeBreakingSound(org, owner);
          }
 
@@ -160,19 +181,41 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
       }
    }
 
-   if(ricochet && (server_effects || (numricochets < MAX_RICOCHETS)))
+   if(ent->edict->solid == SOLID_BSP && ricochet && (server_effects || (numricochets < MAX_RICOCHETS)))
    {
-      timeofs = MAX_RICOCHETS - numricochets;
-      if(timeofs > 0xf)
+      if(ent == world)
       {
-         timeofs = 0xf;
+         timeofs = MAX_RICOCHETS - numricochets;
+         if(timeofs > 0xf)
+         {
+            timeofs = 0xf;
+         }
+         gi.WriteByte(svc_temp_entity);
+         gi.WriteByte(TE_GUNSHOT);
+         gi.WritePosition(org.vec3());
+         gi.WriteDir(trace->plane.normal);
+         gi.WriteByte(timeofs);
+         gi.multicast(org.vec3(), MULTICAST_PVS);
       }
-      gi.WriteByte(svc_temp_entity);
-      gi.WriteByte(TE_GUNSHOT);
-      gi.WritePosition(org.vec3());
-      gi.WriteDir(trace->plane.normal);
-      gi.WriteByte(timeofs);
-      gi.multicast(org.vec3(), MULTICAST_PVS);
+      else
+      {
+         Particles(trace->endpos, trace->plane.normal, 8, 120, 0);
+      }
+
+      switch(surfflags & MASK_SURF_TYPE)
+      {
+      case SURF_TYPE_METAL:
+      case SURF_TYPE_GRILL:
+      case SURF_TYPE_MONITOR:
+      case SURF_TYPE_DUCT:
+         SpawnSparks(trace->endpos, trace->plane.normal, 12);
+         break;
+      case SURF_TYPE_FLESH:
+         SpawnBlood(trace->endpos, trace->plane.normal, 12);
+         break;
+      default:
+         break;
+      }
    }
 
    if(ricochet &&
@@ -272,20 +315,24 @@ void BulletWeapon::FireTracer(Vector end)
    Entity   *tracer;
    Vector   src, dir;
    Player   *client;
-   //int      savedhand;
+   int      savedhand;
+   qboolean server_effects;
    //trace_t  trace;
-   if(G_Random(1.0) >= 0.7)
+
+   server_effects = owner->isClient() && !deathmatch->value && !coop->value;
+
+   if(server_effects && G_Random(1.0) >= 0.7)
       return;
 
-   /*client = (Player *)(Entity *)owner;
-   if(owner->isClient() && client->ViewMode() == THIRD_PERSON)
+   client = (Player *)(Entity *)owner;
+   if(server_effects && client->ViewMode() == THIRD_PERSON)
    {
       savedhand = owner->client->pers.hand;
       owner->client->pers.hand = RIGHT_HANDED;
       GetMuzzlePosition(&src, &dir);
       owner->client->pers.hand = savedhand;
    }
-   else*/
+   else
       GetMuzzlePosition(&src, &dir);
    //end = src + dir * 8192;
    //trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
@@ -295,19 +342,32 @@ void BulletWeapon::FireTracer(Vector end)
    tracer = new Entity();
 
    tracer->angles = dir.toAngles();
-   tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
-   //tracer->angles[PITCH] *= -1;
+   if(server_effects)
+      tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
+   else
+      tracer->angles[PITCH] *= -1;
 
    tracer->setAngles(tracer->angles);
-   tempangles = dir.toAngles();
-   tempangles[PITCH] *= -1;
-   AngleVectors(tempangles.vec3(), forward.vec3(), NULL, NULL);
 
-   tracer->setMoveType(MOVETYPE_FLY);
+   if(server_effects)
+   {
+      tempangles = dir.toAngles();
+      tempangles[PITCH] *= -1;
+      AngleVectors(tempangles.vec3(), forward.vec3(), NULL, NULL);
+      tracer->setMoveType(MOVETYPE_FLY);
+      tracer->setModel("sprites/tracer.spr");
+      tracer->velocity = forward * 1500;
+      tracer->PostEvent(EV_Remove, floor(dir.length() / 150) / 10);
+   }
+   else
+   {
+      tracer->setMoveType(MOVETYPE_NONE);
+      tracer->setModel("models/tracer.def");
+      tracer->PostEvent(EV_Remove, 0.1f);
+   }
+
    tracer->setSolidType(SOLID_NOT);
-   tracer->setModel("sprites/tracer.spr");
    tracer->setSize({ 0, 0, 0 }, { 0, 0, 0 });
-   tracer->velocity = forward * 1500;
    tracer->setOrigin(src);
    tracer->edict->s.renderfx &= ~RF_FRAMELERP;
    tracer->edict->s.renderfx |= RF_DETAIL;
@@ -320,7 +380,6 @@ void BulletWeapon::FireTracer(Vector end)
    }*/
 
    VectorCopy(src, tracer->edict->s.old_origin);
-   tracer->PostEvent(EV_Remove, floor(dir.length() / 150) / 10);
 }
 
 // EOF
