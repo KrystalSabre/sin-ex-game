@@ -126,7 +126,7 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
                case SURF_TYPE_GRILL:
                case SURF_TYPE_MONITOR:
                case SURF_TYPE_DUCT:
-                  SpawnSparks(trace->endpos, trace->plane.normal, 12);
+                  SpawnSparks(trace->endpos, trace->plane.normal, 4);
                   break;
                case SURF_TYPE_FLESH:
                   SpawnBlood(trace->endpos, trace->plane.normal, 12);
@@ -208,7 +208,7 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
       case SURF_TYPE_GRILL:
       case SURF_TYPE_MONITOR:
       case SURF_TYPE_DUCT:
-         SpawnSparks(trace->endpos, trace->plane.normal, 12);
+         SpawnSparks(trace->endpos, trace->plane.normal, 4);
          break;
       case SURF_TYPE_FLESH:
          SpawnBlood(trace->endpos, trace->plane.normal, 12);
