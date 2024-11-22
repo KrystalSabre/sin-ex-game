@@ -443,7 +443,10 @@ void Vehicle::DriverUse(Event *ev)
             angles.AngleVectors(&forward, NULL, NULL);
             pos = worldorigin + (forward * ofs);
             pos[2] += height;
-            trace = G_Trace(worldorigin, driver->mins, driver->maxs, pos, this, MASK_PLAYERSOLID, "Vehicle::DriverUse 1");
+            if(ev->GetSource() == EV_FROM_SCRIPT)
+               trace = G_Trace(pos, driver->mins, driver->maxs, pos, this, MASK_PLAYERSOLID, "Vehicle::DriverUse 1");
+            else
+               trace = G_Trace(worldorigin, driver->mins, driver->maxs, pos, this, MASK_PLAYERSOLID, "Vehicle::DriverUse 1");
             if(trace.fraction == 1 && !trace.allsolid)
             {
                Vector end;
