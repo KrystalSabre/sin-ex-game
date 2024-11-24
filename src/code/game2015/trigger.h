@@ -473,6 +473,7 @@ inline EXPORT_FROM_DLL void TriggerHurt::Archive(Archiver &arc)
    Trigger::Archive(arc);
 
    arc.WriteFloat(damage);
+   arc.WriteInteger(meansofdeath);
 }
 
 inline EXPORT_FROM_DLL void TriggerHurt::Unarchive(Archiver &arc)
@@ -480,6 +481,7 @@ inline EXPORT_FROM_DLL void TriggerHurt::Unarchive(Archiver &arc)
    Trigger::Unarchive(arc);
 
    arc.ReadFloat(&damage);
+   arc.ReadInteger(&meansofdeath);
 }
 
 class EXPORT_FROM_DLL TriggerDamageTargets : public Trigger
