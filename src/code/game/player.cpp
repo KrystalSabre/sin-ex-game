@@ -1688,7 +1688,17 @@ void Player::Pain(Event *ev)
    last_damage_time = level.time;
 
    // If damage > 5 then play a pain animation, otherwise play a pain sound
-   if(!firing && !deadflag && !vehicle && damage > 5)
+   if(meansofdeath == MOD_LAVA)
+   {
+      RandomSound("snd_burn", 1, CHAN_VOICE);
+      ProcessEvent(EV_PainSound);
+   }
+   else if(meansofdeath == MOD_SLIME)
+   {
+      RandomSound("snd_acid", 1, CHAN_VOICE);
+      ProcessEvent(EV_PainSound);
+   }
+   else if(!firing && !deadflag && !vehicle && damage > 5)
    {
       str prefix;
       str aname;
@@ -1709,7 +1719,7 @@ void Player::Pain(Event *ev)
    }
    else
    {
-      RandomSound("snd_pain", 1);
+      RandomSound("snd_pain", 1, CHAN_VOICE);
       ProcessEvent(EV_PainSound);
    }
 }

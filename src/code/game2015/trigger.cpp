@@ -1371,6 +1371,7 @@ ResponseDef TriggerHurt::Responses[] =
 TriggerHurt::TriggerHurt() : TriggerUse()
 {
    damage = G_GetFloatArg("damage", 10);
+   meansofdeath = MOD_CRUSH;
    //###
    //respondto = spawnflags ^ ( TRIGGER_PLAYERS | TRIGGER_MONSTERS );
    respondto = spawnflags ^ (TRIGGER_PLAYERS | TRIGGER_MONSTERS | TRIGGER_HOVERBIKES);
@@ -1379,6 +1380,8 @@ TriggerHurt::TriggerHurt() : TriggerUse()
 void TriggerHurt::SetDamage(Event *ev)
 {
    damage = ev->GetInteger(1);
+   if(ev->NumArgs() > 1)
+      meansofdeath = ev->GetInteger(2);
 }
 
 void TriggerHurt::Hurt(Event *ev)
@@ -1389,7 +1392,7 @@ void TriggerHurt::Hurt(Event *ev)
 
    if((damage != 0) && !other->deadflag && !(other->flags & FL_GODMODE))
    {
-      other->Damage(this, world, damage, other->worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_CRUSH, -1, -1, 1.0f);
+      other->Damage(this, world, damage, other->worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, meansofdeath, -1, -1, 1.0f);
    }
 }
 

@@ -455,6 +455,7 @@ class EXPORT_FROM_DLL TriggerHurt : public TriggerUse
 {
 protected:
    float    damage;
+   int      meansofdeath;
 
    void     Hurt(Event *ev);
    void     SetDamage(Event *ev);
