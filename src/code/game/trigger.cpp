@@ -1296,7 +1296,7 @@ ResponseDef TriggerHurt::Responses[] =
 TriggerHurt::TriggerHurt() : TriggerUse()
 {
    damage = G_GetFloatArg("damage", 10);
-   meansofdeath = MOD_CRUSH;
+   meansofdeath = G_GetIntArg("meansofdeath", MOD_CRUSH);
    respondto = spawnflags ^ (TRIGGER_PLAYERS | TRIGGER_MONSTERS);
 }
 
