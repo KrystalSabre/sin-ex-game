@@ -1273,6 +1273,7 @@ TriggerUseOnce::TriggerUseOnce() : TriggerUse()
 /*SINED trigger_hurt (0.5 0.5 0.5) ? x x NOT_PLAYERS NOT_MONSTERS PROJECTILES
 
 "damage" amount of damage to cause. (default 10)
+"meansofdeath" type of damage to cause. (default crush)
 "key"          The item needed to activate this. (default nothing)
 
 If NOT_PLAYERS is set, the trigger does not hurt players
