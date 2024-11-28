@@ -5084,6 +5084,9 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
 
 EXPORT_FROM_DLL void Player::UpdateMusic(void)
 {
+   if(music_duration < 0)
+      music_duration = level.time + fabs(music_duration);
+
    if(spectator && viewmode == SPECTATOR)
    {
       Player *player;
@@ -5092,7 +5095,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       client->ps.current_music_mood = player->music_current_mood;
       client->ps.fallback_music_mood = player->music_fallback_mood;
    }
-   else if(music_duration > 0 && music_duration <= level.time)
+   else if(music_duration > 0 && music_duration <= level.time + 0.001)
    {
       music_duration = 0;
 
@@ -5933,7 +5936,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
          if(duration > 0)
          {
             if(force || !music_duration || !(client->ps.current_music_mood == current_mood_num && music_duration <= level.time + duration))
-               music_duration = level.time + duration;
+               music_duration = -duration;
          }
          else
             music_duration = 0;
