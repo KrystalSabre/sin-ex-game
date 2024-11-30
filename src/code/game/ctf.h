@@ -224,7 +224,7 @@ void     CTF_Init(void);
 char     *CTF_TeamName(int team);
 char     *CTF_OtherTeamName(int team);
 int      CTF_OtherTeam(int team);
-void     CTF_UpdateStats(Player *player);
+void     CTF_UpdateStats(Player *player, Player *target);
 void     CTF_ScoreboardMessage(Entity *ent, Entity *killer);
 qboolean CTF_CheckRules(void);
 void     CTF_CheckTeams(void);

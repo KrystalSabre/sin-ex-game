@@ -2197,6 +2197,9 @@ void G_DeathmatchScoreboardMessage(Entity *ent, Entity *killer)
       stringlength += j;
    }
 
+   if(entedict->client->ps.stats[STAT_LAYOUTS] & DRAW_SPECTATOR)
+      strcat(string, va("jcx jb hstring 0 0 1 \"SPECTATOR MODE\" "));
+
    gi.WriteByte(svc_layout);
    gi.WriteString(string);
 }

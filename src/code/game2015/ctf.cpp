@@ -228,7 +228,7 @@ void CTF_CalcScores(void)
    }
 }
 
-void CTF_UpdateStats(Player *player)
+void CTF_UpdateStats(Player *player, Player *target)
 {
    int i;
    int p1, p2;
@@ -267,7 +267,7 @@ void CTF_UpdateStats(Player *player)
    // tech icon
    player->client->ps.stats[STAT_CTF_TECH] = 0;
 
-   if((tech = (CTF_Tech *)player->HasItemOfSuperclass("CTF_Tech")))
+   if((tech = (CTF_Tech *)target->HasItemOfSuperclass("CTF_Tech")))
    {
       player->client->ps.stats[STAT_CTF_TECH] = tech->GetIconIndex();
    }
@@ -433,9 +433,9 @@ void CTF_UpdateStats(Player *player)
    player->client->ps.stats[STAT_CTF_JOINED_TEAM1_PIC] = 0;
    player->client->ps.stats[STAT_CTF_JOINED_TEAM2_PIC] = 0;
 
-   if(player->client->resp.ctf_team == CTF_TEAM_HARDCORPS)
+   if(target->client->resp.ctf_team == CTF_TEAM_HARDCORPS)
       player->client->ps.stats[STAT_CTF_JOINED_TEAM1_PIC] = gi.imageindex("i_ctfj");
-   else if(player->client->resp.ctf_team == CTF_TEAM_SINTEK)
+   else if(target->client->resp.ctf_team == CTF_TEAM_SINTEK)
       player->client->ps.stats[STAT_CTF_JOINED_TEAM2_PIC] = gi.imageindex("i_ctfj");
 
    if(

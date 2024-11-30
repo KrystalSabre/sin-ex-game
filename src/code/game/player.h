@@ -395,6 +395,8 @@ public:
    void              SetViewAngles(Vector ang);
    void              DropWeaponEvent(Event *ev);
    void              CTF_DropFlag(Event *ev);
+   void              CTF_DrawHud(); //###
+   void              CTF_HideHud(); //###
 
    void              IncreaseActionLevel(float action_level_increase);
 };

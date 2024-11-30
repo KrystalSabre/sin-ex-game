@@ -719,7 +719,8 @@ void Player::InitView(void)
    flash_color[0] = flash_color[1] = flash_color[2] = flash_color[3] = 0;
 
    // hud
-   hidestats = false;
+   hidestats = level.defaulthud;
+   CTF_DrawHud();
 }
 
 void Player::ChooseSpawnPoint(void)
@@ -3214,7 +3215,8 @@ void Player::ExitConsole(Event *ev)
    SetCamera(NULL);
 
    showModel();
-   hidestats = false;
+   hidestats = level.defaulthud;
+   CTF_DrawHud();
 }
 
 void Player::KickConsole(Event *ev)
@@ -4883,6 +4885,13 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    {
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
       enemy = player;
+      if(!player)
+      {
+         player = this;
+         defaultViewMode = FIRST_PERSON;
+         SetViewMode(FIRST_PERSON);
+         CTF_UpdateNumberOfPlayers();
+      }
    }
    else
       player = this;
@@ -5002,22 +5011,18 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    //
    client->ps.stats[STAT_FRAGS] = player->client->resp.score;
 
-   if(spectator && viewmode != SPECTATOR)
-   {
-      client->ps.stats[STAT_LAYOUTS] = DRAW_SPECTATOR;
-   }
+   if(!player->hidestats && !(spectator && viewmode != SPECTATOR))
+      client->ps.stats[STAT_LAYOUTS] = DRAW_STATS;
    else
-   {
-      if(!player->hidestats)
-         client->ps.stats[STAT_LAYOUTS] = DRAW_STATS;
-      else
-         client->ps.stats[STAT_LAYOUTS] = 0;
-   }
+      client->ps.stats[STAT_LAYOUTS] = 0;
+
+   if(spectator)
+      client->ps.stats[STAT_LAYOUTS] |= DRAW_SPECTATOR;
 
    //
    // Overlays
    //
-   if(drawoverlay)
+   if(drawoverlay && !(ctf->value && spectator && viewmode != SPECTATOR))
    {
       client->ps.stats[STAT_LAYOUTS] |= DRAW_OVERLAY;
    }
@@ -5063,7 +5068,24 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    }
 
    if(ctf->value)
-      CTF_UpdateStats(this);
+      CTF_UpdateStats(this, player);
+   else if(spectator && !(client->showinfo || (client->ps.stats[STAT_LAYOUTS] & DRAW_SCORES)))
+   {
+      char  string[1400];
+
+      snprintf(string, sizeof(string), "jcx jb hstring 0 0 1 \"SPECTATOR MODE\" ");
+
+      if(viewmode == SPECTATOR && player && player->client)
+      {
+         strcat(string, va("client %i %i %i %i %i %i",
+                           100, 176, currentCameraTarget, player->client->resp.score, player->client->ping, 
+                           (level.framenum - player->client->resp.enterframe) / 600));
+      }
+      gi.WriteByte(svc_layout);
+      gi.WriteString(string);
+      gi.unicast(edict, true);
+   }
+
    //
    // if the player has not joined a team, then update the number of players 
    // or if the scoreboard is up, update it 
@@ -5092,6 +5114,8 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       Player *player;
 
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
+      if(!player)
+         player = this;
       client->ps.current_music_mood = player->music_current_mood;
       client->ps.fallback_music_mood = player->music_fallback_mood;
    }
@@ -5215,14 +5239,7 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
    }
 
    if(coop->value && level.defaultcamera)
-   {
       CinematicCamera = level.defaultcamera;
-      hidestats = true;
-   }
-   else if(coop->value && !watchCamera)
-   {
-      hidestats = false;
-   }
 
    if(movieCamera != CinematicCamera)
    {
@@ -5253,7 +5270,8 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       else
       {
          drawoverlay = false;
-         hidestats = false;
+         hidestats = level.defaulthud;
+         CTF_DrawHud();
          SetViewMode(defaultViewMode);
       }
    }
@@ -5910,11 +5928,13 @@ void Player::HideOverlay(Event *ev)
 void Player::DrawStats(Event *ev)
 {
    hidestats = false;
+   CTF_DrawHud();
 }
 
 void Player::HideStats(Event *ev)
 {
    hidestats = true;
+   CTF_HideHud();
 }
 
 void Player::ChangeMusic(const char * current, const char * fallback, qboolean force, float duration)
@@ -6679,6 +6699,35 @@ void Player::IncreaseActionLevel(float action_level_increase)
    action_level += action_level_increase;
    action_level_decrement = min(action_level_decrement, 0);
 }
+
+//### =========================================================================
+// 2015 stuff
+
+// due to CTF using different stat values than regular WOS, a different hud file
+// must be used, but I didn't want to overwrite players' cl_hudfile, so I 
+// implemented the CTF hud as an overlay. Didn't add ability to change the CTF 
+// hud since this is all server side stuff.
+void Player::CTF_DrawHud()
+{
+   if(!ctf->value)
+      return;
+
+   SendOverlay(this, "ctfhud");
+   hidestats   = true;
+   drawoverlay = true;
+}
+
+void Player::CTF_HideHud()
+{
+   if(!ctf->value)
+      return;
+
+   hidestats   = true;
+   drawoverlay = false;
+}
+
+// end 2015 stuff
+//### =========================================================================
 
 // EOF
 
