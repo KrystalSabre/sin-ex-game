@@ -218,6 +218,8 @@ Spawn::Spawn() : Entity()
       warning("Spawn", "modelname not set");
 
    spawntargetname = G_GetStringArg("spawntargetname", NULL);
+   if(!spawntargetname.length())
+      spawntargetname = G_GetStringArg("modeltargetname", NULL);
    attackmode = G_GetIntArg("attackmode", 0);
 }
 
