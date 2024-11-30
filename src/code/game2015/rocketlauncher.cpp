@@ -166,7 +166,6 @@ RocketLauncher::RocketLauncher() : Weapon()
    modelIndex("sprites/blastmark.spr");
    gi.soundindex("weapons/rlaunch/stmmchn.wav");
    SetAmmo("Rockets", 1, 5);
-   SetSecondaryAmmo("Missiles", 0, 0);
    SetRank(70, 70);
    SetType(WEAPON_2HANDED_LO);
 
@@ -238,7 +237,13 @@ int RocketLauncher::ClipAmmo(void)
    if(!owner->HasItem("MissileLauncher"))
       return -1;
    else
-      return Weapon::ClipAmmo();
+   {
+      int clip;
+      secondary_ammo_type = "Missiles";
+      clip = Weapon::ClipAmmo();
+      secondary_ammo_type = "Rockets";
+      return clip;
+   }
 }
 
 // EOF

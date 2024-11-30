@@ -907,6 +907,8 @@ qboolean Weapon::Drop()
       // If owner is dead, put all his ammo of that type in the gun.
       if(owner->deadflag)
       {
+         if(isSubclassOf<RocketLauncher>())
+            secondary_ammo_type = "Missiles";
          TakeAllAmmo();
       }
       else
@@ -917,9 +919,9 @@ qboolean Weapon::Drop()
          else
          {
             startammo = min(startammo, AmmoAvailable());
-            secondary_startammo = 0;
             owner->takeItem(ammotype.c_str(), startammo);
          }
+         secondary_startammo = 0;
       }
 
       //### added give stuff for rocket & missile launchers in deathmatch
@@ -1695,6 +1697,8 @@ int Weapon::ClipAmmo()
             {
                return ammo->Amount();
             }
+            else
+               return 0;
          }
       }
       return -1;

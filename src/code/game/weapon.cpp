@@ -896,9 +896,9 @@ qboolean Weapon::Drop(void)
          else
          {
             startammo = min(startammo, AmmoAvailable());
-            secondary_startammo = 0;
             owner->takeItem(ammotype.c_str(), startammo);
          }
+         secondary_startammo = 0;
       }
    }
    else
@@ -1601,6 +1601,8 @@ int Weapon::ClipAmmo(void)
             {
                return ammo->Amount();
             }
+            else
+               return 0;
          }
       }
       return -1;
