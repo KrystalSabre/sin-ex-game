@@ -1035,6 +1035,7 @@ void Player::Spectator(Event *ev)
       spectator = true;
       takedamage = DAMAGE_NO;
       FreeInventory();
+      SetCamera(NULL);
       defaultViewMode = FIRST_PERSON;
       SetViewMode(FIRST_PERSON);
 
@@ -2284,13 +2285,6 @@ extern "C" trace_t PM_trace(vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end)
 EXPORT_FROM_DLL void Player::SetViewMode(viewmode_t mode, Entity * newCamera)
 {
    Camera *c;
-
-   if(viewmode == CAMERA_VIEW)
-   {
-      drawoverlay = false;
-      hidestats = level.defaulthud;
-      CTF_DrawHud();
-   }
 
    viewmode = mode;
 
@@ -6425,18 +6419,16 @@ EXPORT_FROM_DLL void Player::UpdateStats()
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
       enemy = player;
 
-      if(!player || player->spectator)
+      if(!player || !player->isClient() || player->spectator)
       {
          ChangeSpectator();
          player = (Player*)G_GetEntity(1 + currentCameraTarget);
          enemy = player;
-         if(!player || player->spectator)
+         if(!player || !player->isClient() || player->spectator)
          {
             player = this;
             enemy = NULL;
-            defaultViewMode = FIRST_PERSON;
             SetViewMode(FIRST_PERSON);
-            CTF_UpdateNumberOfPlayers();
          }
       }
    }
@@ -6714,7 +6706,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
       Player *player;
 
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
-      if(!player || player->spectator)
+      if(!player || !player->isClient() || player->spectator)
          player = this;
       client->ps.current_music_mood = player->music_current_mood;
       client->ps.fallback_music_mood = player->music_fallback_mood;
