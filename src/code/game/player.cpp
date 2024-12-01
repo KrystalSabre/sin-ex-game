@@ -1846,6 +1846,13 @@ EXPORT_FROM_DLL void Player::SetViewMode(viewmode_t mode, Entity * newCamera)
 {
    Camera *c;
 
+   if(viewmode == CAMERA_VIEW)
+   {
+      drawoverlay = false;
+      hidestats = level.defaulthud;
+      CTF_DrawHud();
+   }
+
    viewmode = mode;
 
    if(watchCamera && ((watchCamera == thirdpersonCamera) || (watchCamera == spectatorCamera)))
@@ -4548,6 +4555,9 @@ EXPORT_FROM_DLL void Player::FinishMove(void)
       AddPathNodes();
    }
 
+   if(spectatorCamera)
+      worldorigin = spectatorCamera->worldorigin;
+
    //
    // If the origin or velocity have changed since ClientThink(),
    // update the pmove values.  This will happen when the client
@@ -4885,12 +4895,20 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    {
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
       enemy = player;
-      if(!player)
+
+      if(!player || player->spectator)
       {
-         player = this;
-         defaultViewMode = FIRST_PERSON;
-         SetViewMode(FIRST_PERSON);
-         CTF_UpdateNumberOfPlayers();
+         ChangeSpectator();
+         player = (Player*)G_GetEntity(1 + currentCameraTarget);
+         enemy = player;
+         if(!player || player->spectator)
+         {
+            player = this;
+            enemy = NULL;
+            defaultViewMode = FIRST_PERSON;
+            SetViewMode(FIRST_PERSON);
+            CTF_UpdateNumberOfPlayers();
+         }
       }
    }
    else
@@ -5073,7 +5091,7 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    {
       char  string[1400];
 
-      snprintf(string, sizeof(string), "jcx jb hstring 0 0 1 \"SPECTATOR MODE\" ");
+      snprintf(string, sizeof(string), "jcx yb 50 hstring 0 0 1 \"SPECTATOR MODE\" ");
 
       if(viewmode == SPECTATOR && player && player->client)
       {
@@ -5114,7 +5132,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
       Player *player;
 
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
-      if(!player)
+      if(!player || player->spectator)
          player = this;
       client->ps.current_music_mood = player->music_current_mood;
       client->ps.fallback_music_mood = player->music_fallback_mood;
@@ -6329,8 +6347,8 @@ void Player::CTF_UpdateNumberOfPlayers(void)
 
    // Add in an overlay that shows the number of players on each team so far.
    snprintf(string, sizeof(string),
-            "jcx yb 24 string \"Team Hardcorps: %d players  Score: %d\""
-            "jcx yb 16 string \"Team Sintek: %d players  Score: %d\"",
+            "jcx yb 28 string \"Team Hardcorps: %d players  Score: %d\""
+            "jcx yb 20 string \"Team Sintek: %d players  Score: %d\"",
             num_hardcorps, ctfgame.team_hardcorps, num_sintek, ctfgame.team_sintek);
 
    if(spectator)
@@ -6340,7 +6358,7 @@ void Player::CTF_UpdateNumberOfPlayers(void)
       if(viewmode == FIRST_PERSON)
       {
          gi.WriteByte(svc_layout);
-         gi.WriteString(va("jcx jb hstring 0 0 1 \"SPECTATOR MODE\" %s ", string));
+         gi.WriteString(va("jcx yb 38 hstring 0 0 1 \"SPECTATOR MODE\" %s ", string));
          gi.unicast(edict, true);
       }
       else if(viewmode == SPECTATOR)
@@ -6355,7 +6373,7 @@ void Player::CTF_UpdateNumberOfPlayers(void)
                         100, 176, currentCameraTarget, cl_ent->entity->client->resp.score, cl_ent->entity->client->ping, 
                         (level.framenum - cl_ent->entity->client->resp.enterframe) / 600);
             gi.WriteByte(svc_layout);
-            gi.WriteString(va("jcx jb hstring 0 0 1 \"SPECTATOR MODE\" %s %s ", entry, string));
+            gi.WriteString(va("jcx yb 38 hstring 0 0 1 \"SPECTATOR MODE\" %s %s ", entry, string));
             gi.unicast(edict, true);
          }
       }
