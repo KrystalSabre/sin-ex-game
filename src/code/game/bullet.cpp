@@ -293,7 +293,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
       Com_Printf("Server Trace End    :%0.2f %0.2f %0.2f\n", trace.endpos[0], trace.endpos[1], trace.endpos[2]);
       Com_Printf("\n");
 #endif
-      if(server_effects >= 2)
+      if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
          FireTracer(trace.endpos);
 
       if(trace.fraction != 1.0)

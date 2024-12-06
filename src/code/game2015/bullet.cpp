@@ -295,7 +295,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
       //### first need to do a regular trace to check for hitting a hoverbike
       trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
 
-      if(server_effects >= 2)
+      if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
          FireTracer(trace.endpos);
 
       if(trace.fraction != 1)
