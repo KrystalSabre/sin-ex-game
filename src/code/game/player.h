@@ -399,6 +399,7 @@ public:
    void              CTF_HideHud(); //###
 
    void              IncreaseActionLevel(float action_level_increase);
+   qboolean          InCameraPVS(Vector pos);
 };
 
 inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)

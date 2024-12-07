@@ -4151,6 +4151,20 @@ void Player::SetCameraValues(Vector position, Vector cameraoffset, Vector ang, V
    client->ps.kick_angles[0] = camerakick[0];
    client->ps.kick_angles[1] = camerakick[1];
    client->ps.kick_angles[2] = camerakick[2];
+
+   if(viewmode == SPECTATOR)
+   {
+      setOrigin(position + cameraoffset - Vector(0, 0, viewheight));
+      worldorigin.copyTo(edict->s.old_origin);
+      setAngles(ang);
+      v_angle = worldangles;
+      v_kick = camerakick;
+
+      // set the delta angle
+      client->ps.pmove.delta_angles[0] = ANGLE2SHORT(ang.x - client->resp.cmd_angles[0]);
+      client->ps.pmove.delta_angles[1] = ANGLE2SHORT(ang.y - client->resp.cmd_angles[1]);
+      client->ps.pmove.delta_angles[2] = ANGLE2SHORT(ang.z - client->resp.cmd_angles[2]);
+   }
 }
 
 void Player::SetCameraEntity(Entity *cameraEnt)
@@ -4549,9 +4563,6 @@ EXPORT_FROM_DLL void Player::FinishMove(void)
       AddPathNodes();
    }
 
-   if(spectatorCamera)
-      worldorigin = spectatorCamera->worldorigin;
-
    //
    // If the origin or velocity have changed since ClientThink(),
    // update the pmove values.  This will happen when the client
@@ -4901,7 +4912,11 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
             enemy = NULL;
             SetViewMode(FIRST_PERSON);
          }
+         else
+            SetGravityAxis(player->gravaxis);
       }
+      else
+         SetGravityAxis(player->gravaxis);
    }
    else
       player = this;
@@ -6711,6 +6726,25 @@ void Player::IncreaseActionLevel(float action_level_increase)
 
    action_level += action_level_increase;
    action_level_decrement = min(action_level_decrement, 0);
+}
+
+qboolean Player::InCameraPVS(Vector pos)
+{
+   Vector playerorigin;
+
+   if(!viewmode || gi.inPVS(pos.vec3(), centroid.vec3()))
+      return false;
+
+   playerorigin.x = client->ps.pmove.origin[0];
+   playerorigin.y = client->ps.pmove.origin[1];
+   playerorigin.z = client->ps.pmove.origin[2];
+   playerorigin *= 0.125;
+   playerorigin += client->ps.viewoffset;
+
+   if(gi.inPVS(playerorigin.vec3(), pos.vec3()))
+      return true;
+   
+   return false;
 }
 
 //### =========================================================================

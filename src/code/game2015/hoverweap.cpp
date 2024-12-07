@@ -499,6 +499,25 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
                gi.WritePosition(org.vec3());
                gi.WriteByte(16);
                gi.multicast(org.vec3(), MULTICAST_PVS);
+
+               int i;
+               for(i = 1; i <= maxclients->value; i++)
+               {
+                  if(g_edicts[i].inuse && g_edicts[i].client)
+                  {
+                     Player *player;
+                     player = (Player *)g_edicts[i].entity;
+
+                     if(player->InCameraPVS(org))
+                     {
+                        gi.WriteByte(svc_temp_entity);
+                        gi.WriteByte(TE_SCALED_EXPLOSION);
+                        gi.WritePosition(org.vec3());
+                        gi.WriteByte(16);
+                        gi.unicast(player->edict, false);
+                     }
+                  }
+               }
             }
             MadeBreakingSound(org, owner);
          }
@@ -559,6 +578,26 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
       gi.WriteDir(trace->plane.normal);
       gi.WriteByte(timeofs);
       gi.multicast(org.vec3(), MULTICAST_PVS);
+
+      int i;
+      for(i = 1; i <= maxclients->value; i++)
+      {
+         if(g_edicts[i].inuse && g_edicts[i].client)
+         {
+            Player *player;
+            player = (Player *)g_edicts[i].entity;
+
+            if(player->InCameraPVS(org))
+            {
+               gi.WriteByte(svc_temp_entity);
+               gi.WriteByte(TE_GUNSHOT);
+               gi.WritePosition(org.vec3());
+               gi.WriteDir(trace->plane.normal);
+               gi.WriteByte(timeofs);
+               gi.unicast(player->edict, false);
+            }
+         }
+      }
    }
 
    if(ricochet && numricochets && damage)

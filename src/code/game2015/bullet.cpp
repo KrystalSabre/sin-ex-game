@@ -115,6 +115,26 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
                   gi.WriteDir(trace->plane.normal);
                   gi.WriteByte(0);
                   gi.multicast(org.vec3(), MULTICAST_PVS);
+
+                  int i;
+                  for(i = 1; i <= maxclients->value; i++)
+                  {
+                     if(g_edicts[i].inuse && g_edicts[i].client)
+                     {
+                        Player *player;
+                        player = (Player *)g_edicts[i].entity;
+
+                        if(player->InCameraPVS(org))
+                        {
+                           gi.WriteByte(svc_temp_entity);
+                           gi.WriteByte(TE_GUNSHOT);
+                           gi.WritePosition(org.vec3());
+                           gi.WriteDir(trace->plane.normal);
+                           gi.WriteByte(0);
+                           gi.unicast(player->edict, false);
+                        }
+                     }
+                  }
                }
                else
                {
@@ -197,6 +217,26 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
          gi.WriteDir(trace->plane.normal);
          gi.WriteByte(timeofs);
          gi.multicast(org.vec3(), MULTICAST_PVS);
+
+         int i;
+         for(i = 1; i <= maxclients->value; i++)
+         {
+            if(g_edicts[i].inuse && g_edicts[i].client)
+            {
+               Player *player;
+               player = (Player *)g_edicts[i].entity;
+
+               if(player->InCameraPVS(org))
+               {
+                  gi.WriteByte(svc_temp_entity);
+                  gi.WriteByte(TE_GUNSHOT);
+                  gi.WritePosition(org.vec3());
+                  gi.WriteDir(trace->plane.normal);
+                  gi.WriteByte(0);
+                  gi.unicast(player->edict, false);
+               }
+            }
+         }
       }
       else
       {

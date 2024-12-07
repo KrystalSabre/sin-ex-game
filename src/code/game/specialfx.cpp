@@ -85,6 +85,28 @@ void Particles(Vector org, Vector norm, int count, int lightstyle, int flags)
    gi.WriteByte(count);
    gi.WriteByte(flags);
    gi.multicast(org.vec3(), MULTICAST_PVS);
+
+   int i;
+   for(i = 1; i <= maxclients->value; i++)
+   {
+      if(g_edicts[i].inuse && g_edicts[i].client)
+      {
+         Player *player;
+         player = (Player *)g_edicts[i].entity;
+
+         if(player->InCameraPVS(org))
+         {
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_PARTICLES);
+            gi.WritePosition(org.vec3());
+            gi.WriteDir(norm.vec3());
+            gi.WriteByte(lightstyle);
+            gi.WriteByte(count);
+            gi.WriteByte(flags);
+            gi.unicast(player->edict, false);
+         }
+      }
+   }
 }
 
 /*
@@ -140,6 +162,35 @@ void SpawnBeam(Vector start, Vector end, int parent_entnum, int modelindex, floa
       gi.WriteShort(life);
 
    gi.multicast(start.vec3(), MULTICAST_PVS);
+
+   int i;
+   for(i = 1; i <= maxclients->value; i++)
+   {
+      if(g_edicts[i].inuse && g_edicts[i].client)
+      {
+         Player *player;
+         player = (Player *)g_edicts[i].entity;
+
+         if(player->InCameraPVS(start))
+         {
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_BEAM);
+            gi.WriteByte(sendflags);
+            gi.WritePosition(start.vec3());
+            gi.WritePosition(end.vec3());
+            gi.WriteShort(modelindex);
+
+            if(sendflags & BM_ALPHA)
+               gi.WriteByte(alpha * 255);
+            if(sendflags & BM_FLAGS)
+               gi.WriteByte(flags);
+            if(sendflags & BM_LIFE)
+               gi.WriteShort(life);
+
+            gi.unicast(player->edict, false);
+         }
+      }
+   }
 }
 
 /*
@@ -153,6 +204,24 @@ void SpawnRocketExplosion(Vector org)
    gi.WriteByte(TE_ROCKET_EXPLOSION);
    gi.WritePosition(org.vec3());
    gi.multicast(org.vec3(), MULTICAST_PVS);
+
+   int i;
+   for(i = 1; i <= maxclients->value; i++)
+   {
+      if(g_edicts[i].inuse && g_edicts[i].client)
+      {
+         Player *player;
+         player = (Player *)g_edicts[i].entity;
+
+         if(player->InCameraPVS(org))
+         {
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_ROCKET_EXPLOSION);
+            gi.WritePosition(org.vec3());
+            gi.unicast(player->edict, false);
+         }
+      }
+   }
 }
 
 /*
@@ -172,6 +241,25 @@ void SpawnScaledExplosion(Vector org, float scale)
    gi.WritePosition(org.vec3());
    gi.WriteByte(scale);
    gi.multicast(org.vec3(), MULTICAST_PVS);
+
+   int i;
+   for(i = 1; i <= maxclients->value; i++)
+   {
+      if(g_edicts[i].inuse && g_edicts[i].client)
+      {
+         Player *player;
+         player = (Player *)g_edicts[i].entity;
+
+         if(player->InCameraPVS(org))
+         {
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_SCALED_EXPLOSION);
+            gi.WritePosition(org.vec3());
+            gi.WriteByte(scale);
+            gi.unicast(player->edict, false);
+         }
+      }
+   }
 }
 
 /*
@@ -191,6 +279,30 @@ void SpawnTempDlight(Vector org, float r, float g, float b, float radius, float 
    gi.WriteByte(decay*255.0f);
    gi.WriteByte(life*25.5f);
    gi.multicast(org.vec3(), MULTICAST_PVS);
+
+   int i;
+   for(i = 1; i <= maxclients->value; i++)
+   {
+      if(g_edicts[i].inuse && g_edicts[i].client)
+      {
+         Player *player;
+         player = (Player *)g_edicts[i].entity;
+
+         if(player->InCameraPVS(org))
+         {
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_DLIGHT);
+            gi.WritePosition(org.vec3());
+            gi.WriteByte(r*255.0f);
+            gi.WriteByte(g*255.0f);
+            gi.WriteByte(b*255.0f);
+            gi.WriteByte(radius / 4);
+            gi.WriteByte(decay*255.0f);
+            gi.WriteByte(life*25.5f);
+            gi.unicast(player->edict, false);
+         }
+      }
+   }
 }
 
 /*
@@ -205,6 +317,25 @@ void SpawnTeleportEffect(Vector org, int lightstyle)
    gi.WritePosition(org.vec3());
    gi.WriteByte(lightstyle);
    gi.multicast(org.vec3(), MULTICAST_PVS);
+
+   int i;
+   for(i = 1; i <= maxclients->value; i++)
+   {
+      if(g_edicts[i].inuse && g_edicts[i].client)
+      {
+         Player *player;
+         player = (Player *)g_edicts[i].entity;
+
+         if(player->InCameraPVS(org))
+         {
+            gi.WriteByte(svc_temp_entity);
+            gi.WriteByte(TE_TELEPORT_EFFECT);
+            gi.WritePosition(org.vec3());
+            gi.WriteByte(lightstyle);
+            gi.unicast(player->edict, false);
+         }
+      }
+   }
 }
 
 /*
@@ -360,7 +491,47 @@ void TesselateModel(Entity * ent, int min_size, int max_size, Vector dir, float 
    if(ent)
    {
       if(gi.IsModel(ent->edict->s.modelindex))
+      {
          gi.multicast(((ent->absmax + ent->absmin)*0.5).vec3(), MULTICAST_PVS);
+
+         int i;
+         for(i = 1; i <= maxclients->value; i++)
+         {
+            if(g_edicts[i].inuse && g_edicts[i].client)
+            {
+               Player *player;
+               player = (Player *)g_edicts[i].entity;
+
+               if(player->InCameraPVS((ent->absmax + ent->absmin)*0.5))
+               {
+                  gi.WriteByte(svc_temp_entity);
+                  gi.WriteByte(TE_TESSELATE);
+                  gi.WriteShort(sendflags);
+                  if(sendflags & TESS_ORIGIN)
+                     gi.WritePosition(origin.vec3());
+                  if(sendflags & TESS_DIR)
+                     gi.WriteDir(dir.vec3());
+                  if(sendflags & TESS_ENTNUM)
+                     gi.WriteShort(ent->entnum);
+                  if(sendflags & TESS_MINSIZE)
+                     gi.WriteByte(min_size);
+                  if(sendflags & TESS_MAXSIZE)
+                     gi.WriteByte(max_size);
+                  if(sendflags & TESS_POWER)
+                     gi.WriteByte(power);
+                  if(sendflags & TESS_PERCENT)
+                     gi.WriteByte(percentage * 255.0f);
+                  if(sendflags & TESS_THICK)
+                     gi.WriteByte(thickness);
+                  if(sendflags & TESS_LIGHTSTYLE)
+                     gi.WriteByte(lightstyle);
+                  if(sendflags & TESS_TYPE)
+                     gi.WriteByte(type);
+                  gi.unicast(player->edict, false);
+               }
+            }
+         }
+      }
       else
          gi.multicast(ent->worldorigin.vec3(), MULTICAST_ALL);
    }
