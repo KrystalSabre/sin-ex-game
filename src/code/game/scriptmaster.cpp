@@ -1136,7 +1136,7 @@ EXPORT_FROM_DLL void ScriptThread::ProcessCommand(int argc, const char **argv)
       {
          if(name[1] == '*')
          {
-            if(maxclients->value > 1)
+            if(game.maxclients > 1)
             {
                ent = G_GetEntity(atoi(&name[2]) + (maxclients->value + 3));
             }

@@ -5664,7 +5664,7 @@ void Player::SetCameraEntity(Entity *cameraEnt)
       else if(cameraEnt->isSubclassOf<Camera>())
       {
          camerafov = static_cast<Camera *>(cameraEnt)->fov;
-         if(cameraEnt->isSubclassOf<SecurityCamera>())
+         if(game.maxclients == 1 && cameraEnt->isSubclassOf<SecurityCamera>())
             cameraEnt->edict->s.renderfx |= RF_DONTDRAW;
       }
       else if(trappedInQuantum)
@@ -6850,7 +6850,7 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
 
    if(movieCamera != CinematicCamera)
    {
-      if(movieCamera && movieCamera->isSubclassOf<SecurityCamera>())
+      if(game.maxclients == 1 && movieCamera && movieCamera->isSubclassOf<SecurityCamera>())
       {
          movieCamera->edict->s.renderfx &= ~RF_DONTDRAW;
       }
@@ -8935,10 +8935,7 @@ qboolean Player::InCameraPVS(Vector pos)
    playerorigin *= 0.125;
    playerorigin += client->ps.viewoffset;
 
-   if(gi.inPVS(playerorigin.vec3(), pos.vec3()))
-      return true;
-
-   return false;
+   return gi.inPVS(playerorigin.vec3(), pos.vec3());
 }
 
 //### =========================================================================
