@@ -5440,7 +5440,7 @@ void Player::SetCameraEntity(Entity *cameraEnt)
 {
    assert(cameraEnt);
 
-   int videomode = (!stricmp(Info_ValueForKey(client->pers.userinfo, "vid_ref"), "soft") ? atof(Info_ValueForKey(client->pers.userinfo, "sw_mode")) : atof(Info_ValueForKey(client->pers.userinfo, "gl_mode")));
+   int videomode = (!stricmp(Info_ValueForKey(client->pers.userinfo, "vid_ref"), "soft") ? atoi(Info_ValueForKey(client->pers.userinfo, "sw_mode")) : atoi(Info_ValueForKey(client->pers.userinfo, "gl_mode")));
    float realfov = fov;
 
    if(zoom_mode == ZOOMED_IN && fov > 20)
@@ -8925,15 +8925,15 @@ void Player::IncreaseActionLevel(float action_level_increase)
 qboolean Player::InCameraPVS(Vector pos)
 {
    Vector playerorigin;
+   gravityaxis_t grav;
 
    if(!viewmode || gi.inPVS(pos.vec3(), centroid.vec3()))
       return false;
 
-   playerorigin.x = client->ps.pmove.origin[0];
-   playerorigin.y = client->ps.pmove.origin[1];
-   playerorigin.z = client->ps.pmove.origin[2];
-   playerorigin *= 0.125;
-   playerorigin += client->ps.viewoffset;
+   grav = gravity_axis[client->ps.pmove.gravity_axis];
+   playerorigin[grav.x] = client->ps.pmove.origin[grav.x] * 0.125 + client->ps.viewoffset[0];
+   playerorigin[grav.y] = client->ps.pmove.origin[grav.y] * 0.125 + client->ps.viewoffset[1] * grav.sign;
+   playerorigin[grav.z] = client->ps.pmove.origin[grav.z] * 0.125 + client->ps.viewoffset[2] * grav.sign;
 
    return gi.inPVS(playerorigin.vec3(), pos.vec3());
 }

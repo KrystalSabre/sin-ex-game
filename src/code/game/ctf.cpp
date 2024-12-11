@@ -189,6 +189,7 @@ void CTF_UpdateStats(Player *player, Player *target)
 {
    int i;
    int p1, p2;
+   int crosshair;
    CTF_Tech *tech;
 
    if(!hardcorps_flag || !sintek_flag)
@@ -387,13 +388,13 @@ void CTF_UpdateStats(Player *player, Player *target)
       player->client->ps.stats[STAT_CTF_FLAG_PIC] = gi.imageindex("i_ctf_hcflag");
    }
 
-   player->client->ps.stats[STAT_CTF_JOINED_TEAM1_PIC] = 0;
-   player->client->ps.stats[STAT_CTF_JOINED_TEAM2_PIC] = 0;
+   //player->client->ps.stats[STAT_CTF_JOINED_TEAM1_PIC] = 0;
+   player->client->ps.stats[STAT_CTF_JOINED_TEAM2_PIC] = target->client->resp.ctf_team == CTF_TEAM_SINTEK;
 
-   if(target->client->resp.ctf_team == CTF_TEAM_HARDCORPS)
+   /*if(target->client->resp.ctf_team == CTF_TEAM_HARDCORPS)
       player->client->ps.stats[STAT_CTF_JOINED_TEAM1_PIC] = gi.imageindex("i_ctfj");
    else if(target->client->resp.ctf_team == CTF_TEAM_SINTEK)
-      player->client->ps.stats[STAT_CTF_JOINED_TEAM2_PIC] = gi.imageindex("i_ctfj");
+      player->client->ps.stats[STAT_CTF_JOINED_TEAM2_PIC] = gi.imageindex("i_ctfj");*/
 
    if(
       (level.time > player->client->resp.ctf_idtime) ||
@@ -403,6 +404,41 @@ void CTF_UpdateStats(Player *player, Player *target)
       player->client->resp.ctf_idtime = level.time + 1.0f;
       CTF_SetIDView(player);
    }
+
+   if((player->client->ps.stats[STAT_LAYOUTS] & DRAW_OVERLAY) && (crosshair = atoi(Info_ValueForKey(player->client->pers.userinfo, "crosshair")) && (player->ViewMode() == FIRST_PERSON || player->ViewMode() == THIRD_PERSON && player->gravaxis)))
+   {
+      char picname[128];
+      Vector pos, end, dir;
+      trace_t trace;
+      gravityaxis_t grav;
+
+      if(crosshair > 5 || crosshair < 0)
+         crosshair = 1;
+
+      if((player->client->ps.pmove.pm_type == PM_ZOOM) || (player->client->ps.pmove.pm_type == PM_INVEHICLE_ZOOM))
+         Com_sprintf(picname, sizeof(picname), "ch%i_zoom", crosshair);
+      else
+         Com_sprintf(picname, sizeof(picname), "ch%i", crosshair);
+
+      grav = gravity_axis[player->client->ps.pmove.gravity_axis];
+      pos[grav.x] = player->client->ps.pmove.origin[grav.x] * 0.125 + player->client->ps.viewoffset[0];
+      pos[grav.y] = player->client->ps.pmove.origin[grav.y] * 0.125 + player->client->ps.viewoffset[1] * grav.sign;
+      pos[grav.z] = player->client->ps.pmove.origin[grav.z] * 0.125 + player->client->ps.viewoffset[2] * grav.sign;
+      dir[grav.x] = player->orientation[0][0];
+      dir[grav.y] = player->orientation[0][1] * grav.sign;
+      dir[grav.z] = player->orientation[0][2] * grav.sign;
+      end = pos + dir * 8192;
+      trace = G_FullTrace(pos, vec_zero, vec_zero, end, 5, player, MASK_SHOT, "CTF_UpdateStats");
+
+      if(trace.intersect.valid)
+         sprintf(picname, "%s_on", picname);
+      else
+         sprintf(picname, "%s_off", picname);
+
+      player->client->ps.stats[STAT_CROSSHAIR] = gi.imageindex(picname);
+   }
+   else
+      player->client->ps.stats[STAT_CROSSHAIR] = 0;
 }
 
 /*
