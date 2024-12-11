@@ -1022,34 +1022,22 @@ void G_CheckDMRules(void)
       return;
    }
 
-   if(timelimit->value)
-   {
-      //### added time reset thinggy
-      //if ( level.time >= timelimit->value * 60 )
-      if(level.time >= (timelimit->value - reset_timeofs) * 60)
-      {
-         gi.bprintf(PRINT_HIGH, "Timelimit hit.\n");
-         G_EndDMLevel();
-         return;
-      }
-   }
-
    //### added cvar for auto server reset (warm up time type thing)
    // only do if server hasn't been reset yet
    if(!reset_timeofs && resettime->value)
    {
-      if(resettime->value < level.time)
+      if(resettime->value < (level.playtime * FRAMETIME))
       {
          SVCmd_Reset_f(); // just use the function for the 'sv reset' command
          return;
       }
 
       // give update to players on how long till the game is to be reset
-      float timeleft = resettime->value - level.time;
+      float timeleft = resettime->value - (level.playtime * FRAMETIME);
       if(timeleft <= 10)
       { 
          // give time update every second when less than 10 sec left
-         if(level.time == floor(level.time))
+         if((level.playtime * FRAMETIME) == floor(level.playtime * FRAMETIME))
          {
             if((int)timeleft == 1)
                G_CenterPrintAll("1 second left till game starts\n");
@@ -1057,12 +1045,12 @@ void G_CheckDMRules(void)
                G_CenterPrintAll(va("%i seconds left till game starts\n", (int)timeleft));
          }
       }
-      else if(level.time == floor(level.time))
+      else if((level.playtime * FRAMETIME) == floor(level.playtime * FRAMETIME))
       {
          if(timeleft >= 60)
          { 
             // give time update every 30 sec when over a minute left
-            if(!(((int)level.time)%30))
+            if(!(((int)(level.playtime * FRAMETIME))%30))
             {
                timeleft = (timeleft + 1)*(1.0 / 60.0); // convert timeleft to minutes
                if((timeleft - floor(timeleft)) >= 0.5)
@@ -1073,7 +1061,7 @@ void G_CheckDMRules(void)
                   G_CenterPrintAll(va("%i minutes left till game starts\n", (int)floor(timeleft)));
             }
          }
-         else if(timeleft <= 30 && !(((int)level.time)%10))
+         else if(timeleft <= 30 && !(((int)(level.playtime * FRAMETIME))%10))
          { 
             // update every ten sec when less than half a minute left
             G_CenterPrintAll(va("%i seconds left till game starts\n", (int)timeleft));
@@ -1081,6 +1069,17 @@ void G_CheckDMRules(void)
       }
    }
    //###
+   else if(timelimit->value)
+   {
+      //### added time reset thinggy
+      //if ( level.time >= timelimit->value * 60 )
+      if((level.playtime * FRAMETIME) >= (timelimit->value * 60) + reset_timeofs)
+      {
+         gi.bprintf(PRINT_HIGH, "Timelimit hit.\n");
+         G_EndDMLevel();
+         return;
+      }
+   }
 
    // CTF
    if(ctf->value)
@@ -3386,7 +3385,7 @@ void SVCmd_Reset_f(void)
    }
 
    // reset the time limit
-   reset_timeofs = level.time;
+   reset_timeofs = level.playtime * FRAMETIME;
 }
 //###
 

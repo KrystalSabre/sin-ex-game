@@ -956,7 +956,7 @@ void G_CheckDMRules(void)
 
    if(timelimit->value)
    {
-      if(level.time >= timelimit->value * 60)
+      if((level.playtime * FRAMETIME) >= timelimit->value * 60)
       {
          gi.bprintf(PRINT_HIGH, "Timelimit hit.\n");
          G_EndDMLevel();
