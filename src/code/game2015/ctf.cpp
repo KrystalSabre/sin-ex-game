@@ -232,7 +232,6 @@ void CTF_UpdateStats(Player *player, Player *target)
 {
    int i;
    int p1, p2;
-   int crosshair;
    CTF_Tech *tech;
 
    if(!hardcorps_flag || !sintek_flag)
@@ -448,8 +447,22 @@ void CTF_UpdateStats(Player *player, Player *target)
       CTF_SetIDView(player);
    }
 
-   if((player->client->ps.stats[STAT_LAYOUTS] & DRAW_OVERLAY) && (crosshair = atoi(Info_ValueForKey(player->client->pers.userinfo, "crosshair"))) && (player->ViewMode() == FIRST_PERSON || player->ViewMode() == THIRD_PERSON && player->gravaxis))
+   if((player->client->ps.stats[STAT_LAYOUTS] & DRAW_OVERLAY) && (player->ViewMode() == FIRST_PERSON || player->ViewMode() == THIRD_PERSON && player->gravaxis))
    {
+      int crosshair;
+
+      if(Info_ValueForKey(player->client->pers.userinfo, "crosshair") == "")
+         crosshair = 1;
+      else
+      {
+         crosshair = atoi(Info_ValueForKey(player->client->pers.userinfo, "crosshair"));
+         if(!crosshair)
+         {
+            player->client->ps.stats[STAT_CROSSHAIR] = 0;
+            return;
+         }
+      }
+
       char picname[128];
       Vector pos, end, dir;
       trace_t trace;

@@ -6469,24 +6469,25 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    }
 
    // not used, so don't set to save net bandwidth
-//#if 0
-   // All ammo types
-   for(i = 0; i < NUM_AMMO_TYPES; i++)
+   if(!ctf->value)
    {
-      Ammo	*ammo;
+      // All ammo types
+      for(i = 0; i < NUM_AMMO_TYPES; i++)
+      {
+         Ammo	*ammo;
 
-      assert(ammo_types[i]);
-      ammo = (Ammo *)player->FindItem(ammo_types[i]);
-      if(ammo)
-      {
-         client->ps.stats[STAT_AMMO_BASE + i] = ((float)ammo->Amount() / ammo->MaxAmount()) * 1000;
+         assert(ammo_types[i]);
+         ammo = (Ammo *)player->FindItem(ammo_types[i]);
+         if(ammo)
+         {
+            client->ps.stats[STAT_AMMO_BASE + i] = ((float)ammo->Amount() / ammo->MaxAmount()) * 1000;
+         }
+         else
+         {
+            client->ps.stats[STAT_AMMO_BASE + i] = 0;
+         }
       }
-      else
-      {
-         client->ps.stats[STAT_AMMO_BASE + i] = 0;
-      }
-}
-//#endif
+   }
 
    //
    // Armor
