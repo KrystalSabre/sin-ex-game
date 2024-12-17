@@ -1032,8 +1032,8 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
    else
    {
       mid = (absmax - absmin) * 0.5;
-      other->worldorigin = dest->worldorigin + Vector(0, 0, 1);
-      other->origin += mid;
+      other->worldorigin = dest->worldorigin + Vector(0, 0, 56);
+      other->origin += mid + Vector(0, 0, 56);
    }
 
    // draw the teleport splash at the destination

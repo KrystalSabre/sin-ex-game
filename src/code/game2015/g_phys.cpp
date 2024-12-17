@@ -122,6 +122,31 @@ void G_Impact(Entity *e1, trace_t *trace)
    Vector      tmpvec, vecdiff;
    int         hitdmg;
    //###
+   int		i;
+   int		num;
+   edict_t	*touch[MAX_EDICTS];
+   edict_t	*hit;
+
+   if(e1->movetype != MOVETYPE_VEHICLE)
+   {
+      num = gi.BoxEdicts(e1->absmin.vec3(), e1->absmax.vec3(), touch, MAX_EDICTS, AREA_TRIGGERS);
+
+      // be careful, it is possible to have an entity in this
+      // list removed before we get to it (killtriggered)
+      for(i = 0; i < num; i++)
+      {
+         hit = touch[i];
+         if(!hit->inuse || (hit->entity == e1) || !hit->entity->isSubclassOf<Teleporter>())
+         {
+            continue;
+         }
+
+         assert(hit->entity);
+
+         trace->ent = hit;
+         return;
+      }
+   }
 
    e2 = trace->ent;
 
@@ -1155,7 +1180,7 @@ void G_Physics_Toss(Entity *ent)
       return;
    }
 
-   if(trace.fraction < 1)
+   if(trace.fraction < 1 && !trace.ent->entity->isSubclassOf<Teleporter>())
    {
       if(ent->movetype == MOVETYPE_BOUNCE)
       {
