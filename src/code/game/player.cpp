@@ -5217,9 +5217,13 @@ EXPORT_FROM_DLL void Player::UpdateMusic(void)
 
    if(action_level > 0)
    {
-      action_level_decrement += 0.005f;
+      if(music_current_mood == mood_action && action_level_decrement >= 0.2f)
+         action_level_decrement += 0.01f;
+      else
+         action_level_decrement += 0.005f;
       if(action_level_decrement > 1.0)
          action_level_decrement = 1.0f;
+
       action_level -= action_level_decrement;
       if(action_level > 80)
          action_level = 80;
@@ -6723,7 +6727,7 @@ void Player::GetPlayerView(Vector *pos, Vector *angle)
 void Player::IncreaseActionLevel(float action_level_increase)
 {
    if(music_current_mood == mood_normal && action_level <= 30 && action_level_increase < 8.0f)
-      action_level_increase = min(action_level_increase * (2 - (action_level_increase / 30)), 8);
+      action_level_increase = min(action_level_increase * (2.5 - action_level * 0.05), 8);
 
    action_level += action_level_increase;
    action_level_decrement = min(action_level_decrement, 0);
