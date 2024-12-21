@@ -120,6 +120,7 @@ Event EV_Player_ClearFlashColor("clearflashcolor");
 Event EV_Player_Mutate("mutate", EV_CHEAT);
 Event EV_Player_Human("human", EV_CHEAT);
 Event EV_Player_Skin("skin");
+Event EV_Player_LocalSound("localsound");
 
 Event EV_Player_WhatIs("whatis", EV_CHEAT);
 Event EV_Player_ActorInfo("actorinfo", EV_CHEAT);
@@ -249,7 +250,9 @@ ResponseDef Player::Responses[] =
    { &EV_Player_Mutate,                 (Response)&Player::Mutate },
    { &EV_Player_Human,                  (Response)&Player::Human },
    { &EV_Player_Skin,                   (Response)&Player::SetSkin },
-   
+
+   { &EV_Player_LocalSound,               (Response)&Player::LocalSoundEvent },
+
    //###
    { &EV_Player_GiveBikeCheat,          (Response)&Player::GiveBikeCheat }, // cheat to spawn a hoverbike
    { &EV_Player_BikeSkin,               (Response)&Player::SetBikeSkin },
@@ -8941,6 +8944,154 @@ qboolean Player::InCameraPVS(Vector pos)
    playerorigin[grav.z] = client->ps.pmove.origin[grav.z] * 0.125 + client->ps.viewoffset[2] * grav.sign;
 
    return gi.inPVS(playerorigin.vec3(), pos.vec3());
+}
+
+#define  SND_VOLUME        (1<<0)      // a byte
+#define  SND_ATTENUATION   (1<<1)      // a byte
+#define  SND_POS           (1<<2)      // three coordinates
+#define  SND_ENT           (1<<3)      // a short 0-2: channel, 3-12: entity
+#define  SND_OFFSET        (1<<4)      // a byte, msec offset from frame start
+#define  SND_PITCH         (1<<5)      // a byte, for pitch control
+#define  SND_FADE          (1<<6)      // a byte, for fading time
+#define  SND_FLAGS         (1<<7)      // a byte, for sound flags
+
+void Player::LocalSound(const char *soundname, float volume, int channel, int attenuation, float pitch, float timeofs, float fadetime, int sndflags)
+{
+   int      soundindex;
+   int      sendchan;
+   int      flags;
+
+   if(soundname == NULL)
+   {
+      gi.dprintf("Null sound specified.\n");
+      return;
+   }
+
+   soundindex = gi.soundindex(soundname);
+
+   if(volume < 0 || volume > 4.0)
+   {
+      gi.dprintf("Player::LocalSound: volume = %f\n", volume);
+      volume = 1.0;
+   }
+
+   if(attenuation < 0 || attenuation > 4)
+   {
+      gi.dprintf("Player::LocalSound: attenuation = %f\n", attenuation);
+      attenuation = 0;
+   }
+
+   if(timeofs < 0 || timeofs > 0.255)
+   {
+      gi.dprintf("Player::LocalSound: timeofs = %f\n", timeofs);
+      timeofs = 0;
+   }
+
+   sendchan = (entnum<<3) | (channel&7);
+
+   flags = 0;
+   if(volume != 1.0)
+      flags |= SND_VOLUME;
+   if(attenuation != ATTN_NORM)
+      flags |= SND_ATTENUATION;
+
+   // allways send the entity number for channel overrides
+   flags |= SND_ENT;
+
+   if(timeofs)
+      flags |= SND_OFFSET;
+
+   if(pitch != 1.0)
+      flags |= SND_PITCH;
+   if(fadetime)
+      flags |= SND_FADE;
+   if(sndflags != SOUND_SYNCH)
+      flags |= SND_FLAGS;
+
+   gi.WriteByte(svc_sound);
+   gi.WriteByte(flags);
+   gi.WriteShort(soundindex);
+
+   if(flags & SND_VOLUME)
+      gi.WriteByte(volume*63);
+
+   if(flags & SND_ATTENUATION)
+      gi.WriteByte(attenuation*63);
+
+   if(flags & SND_OFFSET)
+      gi.WriteByte(timeofs*1000);
+
+   gi.WriteShort(sendchan);
+
+   if(flags & SND_PITCH)
+      gi.WriteByte(pitch*63);
+   if(flags & SND_FADE)
+      gi.WriteByte(fadetime*63);
+   if(flags & SND_FLAGS)
+      gi.WriteByte(sndflags);
+
+   gi.unicast (edict, (channel & CHAN_RELIABLE));
+}
+
+void Player::LocalSoundEvent(Event *ev)
+{
+   str name;
+   float volume;
+   int   channel;
+   float attenuation;
+   float pitch;
+   float timeofs;
+   float fadetime;
+   int flags;
+   int i;
+
+   //
+   // set defaults
+   //
+   volume = 1.0f;
+   channel = CHAN_BODY;
+   attenuation = ATTN_NORM;
+   pitch = 1.0f;
+   timeofs = 0;
+   fadetime = 0;
+   flags = SOUND_SYNCH;
+   for(i = 1; i <= ev->NumArgs(); i++)
+   {
+      switch(i - 1)
+      {
+      case 0:
+         name = ev->GetString(i);
+         break;
+      case 1:
+         volume = ev->GetFloat(i);
+         break;
+      case 2:
+         channel = ev->GetInteger(i);
+         break;
+      case 3:
+         attenuation = ev->GetFloat(i);
+         break;
+      case 4:
+         pitch = ev->GetFloat(i);
+         break;
+      case 5:
+         timeofs = ev->GetFloat(i);
+         break;
+      case 6:
+         fadetime = ev->GetFloat(i);
+         break;
+      case 7:
+         flags = ev->GetInteger(i);
+         break;
+      default:
+         break;
+      }
+   }
+
+   if(name.length())
+      LocalSound(name.c_str(), volume, channel, pitch, timeofs, fadetime, flags);
+   else
+      ev->Error("Null sound specified.");
 }
 
 //### =========================================================================

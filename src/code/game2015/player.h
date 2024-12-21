@@ -53,6 +53,7 @@ extern Event EV_Player_HideStats;
 extern Event EV_Player_SetFlashColor;
 extern Event EV_Player_ClearFlashColor;
 extern Event EV_Player_Respawn;
+extern Event EV_Player_LocalSound;
 //###
 extern Event EV_Player_WeaponSwitch;
 extern Event EV_Player_WeaponOverride;
@@ -519,6 +520,9 @@ public:
    
    void              IncreaseActionLevel(float action_level_increase);
    qboolean          InCameraPVS(Vector pos);
+   void              LocalSound(const char *soundname, float volume = 1.0f, int channel = CHAN_BODY, int attenuation = ATTN_NORM,
+                                 float pitch = 1.0f, float timeofs = 0, float fadetime = 0, int sndflags = SOUND_SYNCH);
+   void              LocalSoundEvent(Event *ev);
 };
 
 inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
