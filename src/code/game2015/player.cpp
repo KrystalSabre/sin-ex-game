@@ -251,7 +251,7 @@ ResponseDef Player::Responses[] =
    { &EV_Player_Human,                  (Response)&Player::Human },
    { &EV_Player_Skin,                   (Response)&Player::SetSkin },
 
-   { &EV_Player_LocalSound,               (Response)&Player::LocalSoundEvent },
+   { &EV_Player_LocalSound,             (Response)&Player::LocalSoundEvent },
 
    //###
    { &EV_Player_GiveBikeCheat,          (Response)&Player::GiveBikeCheat }, // cheat to spawn a hoverbike
