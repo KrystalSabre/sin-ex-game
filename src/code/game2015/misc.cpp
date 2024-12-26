@@ -1174,7 +1174,7 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
          //
          // give them a bit of a push
          //
-         if(len < 400)
+         if(other->isSubclassOf<Sentient>() && len < 400)
             len = 400;
          //### corrected for different gravityaxies
          //other->velocity = ( ( TeleporterDestination * )dest )->movedir * len;
