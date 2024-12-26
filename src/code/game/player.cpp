@@ -1605,7 +1605,7 @@ void Player::Killed(Event *ev)
    //
    if(!deathmatch->value)
    {
-      ChangeMusic("failure", "none", true, 0);
+      ChangeMusic("failure", "none", true, -1);
    }
 
    if(!deathmatch->value && !coop->value && !level.training && !level.no_jc)
@@ -5992,6 +5992,20 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
             if(force || !music_duration || music_forced == 2 || !(client->ps.current_music_mood == current_mood_num && music_duration <= level.time + duration))
                music_duration = -duration;
          }
+         else if(duration == -1 && game.maxclients == 1 && gi.cvar("s_music", "1", 0)->value && current_mood_num == mood_failure && music_current_mood != mood_failure)
+         {
+            ScriptVariable *var, *var2;
+
+            var = levelVars.GetVariable("failuremusic");
+            var2 = levelVars.GetVariable("nullmusic");
+            if(var && var->stringValue() != "")
+            {
+               if(!var2 || (current_mood_num = MusicMood_NameToNum(var2->stringValue())) < 0)
+                  current_mood_num = mood_special;
+               LocalSound(var->stringValue(), 1.0, -1, ATTN_NORM, 1.0, 0.01f, 0, 0);
+            }
+            music_duration = 0;
+         }
          else
             music_duration = 0;
 
@@ -6794,7 +6808,8 @@ void Player::LocalSound(const char *soundname, float volume, int channel, int at
       timeofs = 0;
    }
 
-   sendchan = (entnum<<3) | (channel&7);
+   if((sendchan = channel) != -1)
+      sendchan = (entnum<<3) | (channel&7);
 
    flags = 0;
    if(volume != 1.0)

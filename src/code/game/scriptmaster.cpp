@@ -2900,7 +2900,7 @@ void ScriptThread::MissionFailed(Event *ev)
 {
    int i;
 
-   ChangeMusic("failure", "none", true, 0);
+   ChangeMusic("failure", "none", true, -1);
 
    for(i = 1; i <= game.maxclients; i++)
    {
