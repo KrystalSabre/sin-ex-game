@@ -359,9 +359,12 @@ void BulletWeapon::FireTracer(Vector end)
    qboolean server_effects;
    //trace_t  trace;
 
+   if(G_NearEntityLimit())
+      return;
+   
    server_effects = owner->isClient() && !deathmatch->value && !coop->value;
 
-   if(server_effects && G_Random(1.0) >= 0.7)
+   if(G_Random(1.0) > 0.7)
       return;
 
    client = (Player *)(Entity *)owner;
@@ -378,7 +381,9 @@ void BulletWeapon::FireTracer(Vector end)
    //trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireTracer");
    Vector tempangles, forward;
    dir = end - src;
-   velocity = forward * 100;
+   if(dir.length() < 150)
+      return;
+   //velocity = forward * 100;
    tracer = new Entity();
 
    tracer->angles = dir.toAngles();
@@ -397,7 +402,7 @@ void BulletWeapon::FireTracer(Vector end)
       tracer->setMoveType(MOVETYPE_FLY);
       tracer->setModel("sprites/tracer.spr");
       tracer->velocity = forward * 1500;
-      tracer->PostEvent(EV_Remove, floor(dir.length() / 150) / 10);
+      tracer->PostEvent(EV_Remove, floor(dir.length() / 150) * FRAMETIME);
    }
    else
    {

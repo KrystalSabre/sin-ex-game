@@ -1398,6 +1398,12 @@ BloodSplat::BloodSplat(Vector pos, Vector ang, float scale) : Entity()
 {
     BloodSplat *fadesplat;
 
+    if(G_NearEntityLimit())
+    {
+        PostEvent(EV_Remove, 0);
+        return;
+    }
+
     if(numBloodSplats > sv_maxbloodsplats->value)
     {
         // Fade one out of the list.

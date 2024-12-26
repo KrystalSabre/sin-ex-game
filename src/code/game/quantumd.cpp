@@ -775,7 +775,7 @@ void QuantumDestabilizer::TraceAttack(Vector start, Vector end, int damage, trac
 void QuantumDestabilizer::Shoot(Event *ev)
 {
    Vector   pos, dir;
-   Ion      *ion = new Ion();
+   //Ion      *ion = new Ion();
    trace_t  trace;
    int      length;
    int      damg;

@@ -264,7 +264,7 @@ void G_InitGame(void)
    sv_maxvelocity		    = gi.cvar("sv_maxvelocity", "2000", 0);
    sv_gravity			    = gi.cvar("sv_gravity", "800", 0);
    sv_maxbulletholes     = gi.cvar("sv_maxbulletholes", "32", 0);
-   sv_maxbloodsplats     = gi.cvar("sv_maxbloodspats", "5", 0);
+   sv_maxbloodsplats     = gi.cvar("sv_maxbloodsplats", "5", 0);
    sv_gore               = gi.cvar("sv_gore", "1", 0);
    sv_gibs               = gi.cvar("sv_gibs", "1", 0);
    sv_showdamage         = gi.cvar("sv_showdetaildamage", "0", 0);

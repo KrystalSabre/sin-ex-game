@@ -47,7 +47,7 @@ void SpawnBlastDamage(trace_t *trace, int damage, Entity *attacker)
    surfaceManager.DamageSurface(trace, damage, attacker);
    //### don't make the blast marks in DM to save on net bandwidth
    //if(trace->ent && trace->ent->entity && trace->ent->entity->flags & FL_BLASTMARK)
-   if(!deathmatch->value && trace->ent && trace->ent->entity && trace->ent->entity->flags & FL_BLASTMARK)
+   if(!deathmatch->value && !G_NearEntityLimit() && trace->ent && trace->ent->entity && trace->ent->entity->flags & FL_BLASTMARK)
    {
       auto blastmark = new Entity();
       blastmark->setMoveType(MOVETYPE_NONE);

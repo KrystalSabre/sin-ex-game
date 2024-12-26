@@ -1359,5 +1359,31 @@ void G_InitClientResp(gclient_t *client)
    client->resp.enterframe = level.framenum;
 }
 
+qboolean G_NearEntityLimit(void)
+{
+   int i;
+   int num;
+   edict_t	*e;
+
+   if(globals.num_edicts >= game.maxentities - 32)
+   {
+      num = 0;
+      e = &g_edicts[(int)maxclients->value + 1];
+      for(i = maxclients->value + 1; i < globals.num_edicts; i++, e++)
+      {
+         if(!e->inuse && (e->freetime < 2 || level.time - e->freetime > 0.5))
+         {
+            num++;
+            if(num > 32)
+               break;
+         }
+         if(i == game.maxentities - 33)
+            return true;
+      }
+   }
+
+   return false;
+}
+
 // EOF
 

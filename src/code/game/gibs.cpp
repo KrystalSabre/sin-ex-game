@@ -178,7 +178,7 @@ void CreateGibs(Entity * ent, float damage, float scale, int num, const char * m
 
    assert(ent);
 
-   if(!ent)
+   if(!ent || G_NearEntityLimit())
       return;
 
    ent->RandomGlobalSound("impact_gib");

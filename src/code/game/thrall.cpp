@@ -756,6 +756,8 @@ EXPORT_FROM_DLL void ThrallPulse::Explode(Event *ev)
    {
       for(i = 1; i < 4; i++)
       {
+         if(G_NearEntityLimit())
+            break;
          debris = new ThrallPulseDebris();
          debris->Setup(owner, v, i);
       }

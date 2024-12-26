@@ -48,7 +48,7 @@ void SpawnBlastDamage(trace_t *trace, int damage, Entity *attacker)
    }
 
    surfaceManager.DamageSurface(trace, damage, attacker);
-   if(trace->ent && trace->ent->entity && trace->ent->entity->flags & FL_BLASTMARK)
+   if(!G_NearEntityLimit() && trace->ent && trace->ent->entity && trace->ent->entity->flags & FL_BLASTMARK)
    {
       blastmark = new Entity();
       blastmark->setMoveType(MOVETYPE_NONE);
