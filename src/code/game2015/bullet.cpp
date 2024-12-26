@@ -438,7 +438,7 @@ void BulletWeapon::FireTracer(Vector end)
    if(G_NearEntityLimit())
       return;
 
-   server_effects = owner->isClient() && !deathmatch->value && !coop->value;
+   server_effects = owner->isClient() /*&& !deathmatch->value && !coop->value*/;
 
    if(G_Random(1.0) > 0.7)
       return;
@@ -478,7 +478,7 @@ void BulletWeapon::FireTracer(Vector end)
       tracer->setMoveType(MOVETYPE_FLY);
       tracer->setModel("sprites/tracer.spr");
       tracer->velocity = forward * 1500;
-      tracer->PostEvent(EV_Remove, floor(dir.length() / 150) * FRAMETIME);
+      tracer->PostEvent(EV_Remove, min(floor(dir.length() / (1500 * FRAMETIME)) * FRAMETIME, 2.0));
    }
    else
    {

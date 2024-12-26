@@ -1029,6 +1029,7 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
    int			i;
    Entity		*other;
    Vector		mid;
+   const gravityaxis_t &grav = gravity_axis[gravaxis];
 
    other = ev->GetEntity(1);
 
@@ -1066,20 +1067,22 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
    else if(other->isSubclassOf<Sentient>())       //###
    {
       PathManager.Teleport(other, other->worldorigin, dest->worldorigin);
-      other->worldorigin = dest->worldorigin + Vector(0, 0, 1);
+      other->worldorigin = dest->worldorigin;
+      other->worldorigin[grav.z] += 1 * grav.sign;
       other->velocity = vec_zero;
       //### raise player up a bit if on a hoverbike
       if(((Sentient *)other)->IsOnBike())
       {
-         other->origin[gravity_axis[gravaxis].z] += 24 * gravity_axis[gravaxis].sign;
+         other->origin[grav.z] += 24 * grav.sign;
       }
       //###
    }
    else
    {
       mid = (absmax - absmin) * 0.5;
-      other->worldorigin = dest->worldorigin + Vector(0, 0, 56);
-      other->origin += mid + Vector(0, 0, 56);
+      other->worldorigin = dest->worldorigin;
+      other->worldorigin[grav.z] += 56 * grav.sign;
+      other->origin += mid;
    }
 
    // draw the teleport splash at the destination
@@ -1090,7 +1093,25 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
    if(!(spawnflags & OFFSET_MOVE))
    {
       // set angles
-      other->setAngles( dest->angles );
+      Vector t[3];
+      Vector forward;
+      Vector right;
+      Vector up;
+      Vector dir = dest->angles;
+
+      dir.AngleVectors(&t[0], &t[1], &t[2]);
+      forward[grav.x] = t[0][0];
+      forward[grav.y] = t[0][1] * grav.sign;
+      forward[grav.z] = t[0][2] * grav.sign;
+      right[grav.x]   = t[1][0];
+      right[grav.y]   = t[1][1] * grav.sign;
+      right[grav.z]   = t[1][2] * grav.sign;
+      up[grav.x]      = t[2][0];
+      up[grav.y]      = t[2][1] * grav.sign;
+      up[grav.z]      = t[2][2] * grav.sign;
+      VectorsToEulerAngles(forward.vec3(), right.vec3(), up.vec3(), dir.vec3());
+
+      other->setAngles(dir);
    }
    //###
 
@@ -1102,8 +1123,8 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
       Event * ev;
       client = other->client;
 
-      if(!gravaxis)
-      {
+      //if(!gravaxis)
+      //{
          // clear the velocity and hold them in place briefly
          client->ps.pmove.pm_time = 100;
          client->ps.pmove.pm_flags |= PMF_TIME_TELEPORT;
@@ -1119,7 +1140,7 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
             other->ProcessEvent(ev);
          }
          //###
-      }
+      //}
 
       /*
       if ( gravaxis )
@@ -1142,7 +1163,7 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
       //###
    }
 
-   if(dest->isSubclassOf<TeleporterDestination>() && !gravaxis)
+   if(dest->isSubclassOf<TeleporterDestination>())
    {
       //### added OFFSET_MOVE type of teleporting
       if(!(spawnflags & OFFSET_MOVE))
@@ -1157,10 +1178,14 @@ EXPORT_FROM_DLL void Teleporter::Teleport(Event *ev)
             len = 400;
          //### corrected for different gravityaxies
          //other->velocity = ( ( TeleporterDestination * )dest )->movedir * len;
-         mid = ((TeleporterDestination *)dest)->movedir * len;
+         /*mid = ((TeleporterDestination *)dest)->movedir * len;
          other->velocity[0] = mid[gravity_axis[other->gravaxis].x];
          other->velocity[1] = mid[gravity_axis[other->gravaxis].y] * gravity_axis[other->gravaxis].sign;
-         other->velocity[2] = mid[gravity_axis[other->gravaxis].z] * gravity_axis[other->gravaxis].sign;
+         other->velocity[2] = mid[gravity_axis[other->gravaxis].z] * gravity_axis[other->gravaxis].sign;*/
+         other->velocity[grav.x] = static_cast<TeleporterDestination *>(dest)->movedir[0];
+         other->velocity[grav.y] = static_cast<TeleporterDestination *>(dest)->movedir[1] * grav.sign;
+         other->velocity[grav.z] = static_cast<TeleporterDestination *>(dest)->movedir[2] * grav.sign;
+         other->velocity *= len;
       }
       //###
    }

@@ -31,7 +31,7 @@ public:
    CLASS_PROTOTYPE(IonBurst);
 
    IonBurst();
-   virtual void   Setup(Entity *owner, Vector pos, float power);
+   virtual void   Setup(Entity *owner, Vector pos, float power, int gravityaxis);
    virtual void   Explode(Event *ev);
    virtual void   Archive(Archiver &arc);
    virtual void   Unarchive(Archiver &arc);
@@ -136,7 +136,7 @@ void IonBurst::Explode(Event *ev)
    }
 }
 
-void IonBurst::Setup(Entity *owner, Vector pos, float power)
+void IonBurst::Setup(Entity *owner, Vector pos, float power, int gravityaxis)
 {
    Event *event;
 
@@ -146,7 +146,7 @@ void IonBurst::Setup(Entity *owner, Vector pos, float power)
    setMoveType(MOVETYPE_BOUNCE);
    setSolidType(SOLID_BBOX);
    edict->clipmask = MASK_PROJECTILE;
-   SetGravityAxis(owner->gravaxis);
+   SetGravityAxis(gravityaxis);
    showModel();
 
    setModel("qp_burst.def");
@@ -155,9 +155,10 @@ void IonBurst::Setup(Entity *owner, Vector pos, float power)
    this->power = power;
 
    // Set the flying velocity
-   velocity[0] = 300.0 * crandom() + 200 * power;
-   velocity[1] = 300.0 * crandom() + 200 * power;
-   velocity[2] = 300.0 + 300.0 * random() + 200 * power;
+   const gravityaxis_t &grav = gravity_axis[gravaxis];
+   velocity[grav.x] = 300.0 * crandom() + 200 * power;
+   velocity[grav.y] = (300.0 * crandom() + 200 * power) * grav.sign;
+   velocity[grav.z] = (300.0 + 300.0 * random() + 200 * power) * grav.sign;
 
    takedamage = DAMAGE_NO;
 
@@ -368,7 +369,7 @@ void Ion::Explode(Event *ev)
          IonBurst    *burst;
 
          burst = new IonBurst();
-         burst->Setup(owner, v, power);
+         burst->Setup(owner, v, power, gravaxis);
       }
    }
 
@@ -393,6 +394,7 @@ void Ion::Setup(Entity *owner, Vector pos, Vector dir, float power)
    setMoveType(MOVETYPE_FLYMISSILE);
    setSolidType(SOLID_BBOX);
    edict->clipmask = MASK_PROJECTILE;
+   SetGravityAxis(owner->gravaxis);
    setModel("qp_burst.def");
 
    RandomAnimate("idle", NULL);

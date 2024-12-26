@@ -1291,7 +1291,7 @@ qboolean Weapon::ForceReload(void)
    // and there is some ammo available out of clip
    if(
       (ammo_clip_size != ammo_in_clip) &&
-      (AmmoAvailable() > 0)
+      (UnlimitedAmmo() || AmmoAvailable() > 0)
       )
    {
       weaponstate = WEAPON_RELOADING;
