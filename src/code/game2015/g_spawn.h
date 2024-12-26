@@ -165,7 +165,7 @@ void        G_MapInit(const char *mapname);
 void        G_LevelStart();
 void        G_Precache();
 
-qboolean    G_NearEntityLimit(void);
+qboolean    G_NearEntityLimit();
 
 #endif
 
