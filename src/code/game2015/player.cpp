@@ -7595,7 +7595,7 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
             {
                if(!var2 || (current_mood_num = MusicMood_NameToNum(var2->stringValue())) < 0)
                   current_mood_num = mood_special;
-               LocalSound(var->stringValue(), 1.0, -1, ATTN_NORM, 1.0, 0.01f, 0, 0);
+               LocalSound(var->stringValue(), 1.0, -1, ATTN_NORM, 1.0, 0.02f, 0, 0);
             }
             music_duration = 0;
          }
