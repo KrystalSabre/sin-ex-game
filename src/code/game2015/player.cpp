@@ -7587,10 +7587,11 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
          else if(duration == -1 && game.maxclients == 1 && gi.cvar("s_music", "1", 0)->value && current_mood_num == mood_failure && music_current_mood != mood_failure)
          {
             ScriptVariable *var, *var2;
+            str name;
 
             var = levelVars.GetVariable("failuremusic");
             var2 = levelVars.GetVariable("nullmusic");
-            if(var && var->stringValue() != "")
+            if(var && (name = var->stringValue()).length())
             {
                if(!var2 || (current_mood_num = MusicMood_NameToNum(var2->stringValue())) < 0)
                   current_mood_num = mood_special;
@@ -8975,10 +8976,11 @@ void Player::LocalSound(const char *soundname, float volume, int channel, int at
    int      soundindex;
    int      sendchan;
    int      flags;
+   str      name = soundname;
 
-   if(soundname == NULL)
+   if(!name.length())
    {
-      gi.dprintf("Null sound specified.\n");
+      gi.dprintf("Player::LocalSound: Null sound specified.\n");
       return;
    }
 
