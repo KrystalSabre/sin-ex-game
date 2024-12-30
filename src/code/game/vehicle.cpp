@@ -138,7 +138,7 @@ void Vehicle::VehicleStart(Event *ev)
 
    for(ent = G_NextEntity(world); ent != NULL; ent = G_NextEntity(ent))
    {
-      if(ent != this && ent->isSubclassOf<VehicleBase>())
+      if(ent != this && ent->isSubclassOf<VehicleBase>() && !ent->isSubclassOf<Vehicle>())
       {
          if((ent->absmax.x >= absmin.x) && (ent->absmax.y >= absmin.y) && (ent->absmax.z >= absmin.z) &&
             (ent->absmin.x <= absmax.x) && (ent->absmin.y <= absmax.y) && (ent->absmin.z <= absmax.z))
@@ -148,6 +148,98 @@ void Vehicle::VehicleStart(Event *ev)
             last->offset = last->worldorigin - worldorigin;
             last->offset = getLocalVector(last->offset);
             last->edict->s.scale *= edict->s.scale;
+         }
+      }
+   }
+
+   if(last == this && edict->s.scale == 1.0f)
+   {
+      FrontWheels *front;
+      BackWheels *back;
+      Vector i, j, k;
+      qboolean spawned;
+      i = Vector(orientation[0]);
+      j = Vector(orientation[1]);
+      k = Vector(orientation[2]);
+
+      if(!strncmp(model.c_str(), "models/atv", 10))
+      {
+         front = new FrontWheels();
+         front->setModel("atvtire_front.def");
+         front->setOrigin(worldorigin + i * 32 + j * 20 + k * 14.5);
+         front->worldorigin.copyTo(front->edict->s.old_origin);
+         front = new FrontWheels();
+         front->setModel("atvtire_front.def");
+         front->setOrigin(worldorigin + i * 32 + j * -20 + k * 14.5);
+         front->worldorigin.copyTo(front->edict->s.old_origin);
+         back = new BackWheels();
+         back->setModel("atvtire_back.def");
+         back->setOrigin(worldorigin + i * -32 + j * 20 + k * 14.5);
+         back->worldorigin.copyTo(back->edict->s.old_origin);
+         back = new BackWheels();
+         back->setModel("atvtire_back.def");
+         back->setOrigin(worldorigin + i * -32 + j * -20 + k * 14.5);
+         back->worldorigin.copyTo(back->edict->s.old_origin);
+         spawned = true;
+      }
+      else if(!strncmp(model.c_str(), "models/forklift", 15))
+      {
+         front = new FrontWheels();
+         front->setModel("atvtire_front.def");
+         front->setOrigin(worldorigin + i * 24 + j * 16 + k * 14.5);
+         front->worldorigin.copyTo(front->edict->s.old_origin);
+         front = new FrontWheels();
+         front->setModel("atvtire_front.def");
+         front->setOrigin(worldorigin + i * 24 + j * -16 + k * 14.5);
+         front->worldorigin.copyTo(front->edict->s.old_origin);
+         back = new BackWheels();
+         back->setModel("atvtire_back.def");
+         back->setOrigin(worldorigin + i * -32 + j * 16 + k * 14.5);
+         back->worldorigin.copyTo(back->edict->s.old_origin);
+         back = new BackWheels();
+         back->setModel("atvtire_back.def");
+         back->setOrigin(worldorigin + i * -32 + j * -16 + k * 14.5);
+         back->worldorigin.copyTo(back->edict->s.old_origin);
+         spawned = true;
+      }
+      else if(!strncmp(model.c_str(), "models/humv", 11))
+      {
+         front = new FrontWheels();
+         front->setModel("humv_front_tire.def");
+         front->setOrigin(worldorigin + i * 80 + j * 44 + k * 29.5);
+         front->worldorigin.copyTo(front->edict->s.old_origin);
+         front = new FrontWheels();
+         front->setModel("humv_front_tire.def");
+         front->setOrigin(worldorigin + i * 80 + j * -44 + k * 29.5);
+         front->worldorigin.copyTo(front->edict->s.old_origin);
+         back = new BackWheels();
+         back->setModel("humv_back_tire.def");
+         back->setOrigin(worldorigin + i * -76 + j * 44 + k * 29.5);
+         back->worldorigin.copyTo(back->edict->s.old_origin);
+         back = new BackWheels();
+         back->setModel("humv_back_tire.def");
+         back->setOrigin(worldorigin + i * -76 + j * -44 + k * 29.5);
+         back->worldorigin.copyTo(back->edict->s.old_origin);
+         spawned = true;
+      }
+
+      if(spawned)
+      {
+         gi.dprintf("%i: Vehicle with no wheels, spawning\n", entnum);
+         for(ent = G_NextEntity(world); ent != NULL; ent = G_NextEntity(ent))
+         {
+            if(ent != this && ent->isSubclassOf<VehicleBase>() && !ent->isSubclassOf<Vehicle>())
+            {
+               if((ent->absmax.x >= absmin.x) && (ent->absmax.y >= absmin.y) && (ent->absmax.z >= absmin.z) &&
+                  (ent->absmin.x <= absmax.x) && (ent->absmin.y <= absmax.y) && (ent->absmin.z <= absmax.z))
+               {
+                  last->vlink = (VehicleBase *)ent;
+                  last = (VehicleBase *)ent;
+                  last->offset = last->worldorigin - worldorigin;
+                  last->offset = getLocalVector(last->offset);
+                  last->edict->s.scale *= edict->s.scale;
+               }
+            }
          }
       }
    }
@@ -461,7 +553,7 @@ void Vehicle::DriverUse(Event *ev)
       }
 
       // if we are in CTF choose a place by default
-      if(ctf->value)
+      if(deathmatch->value)
       {
          pos = worldorigin;
          pos[2] += 192;
@@ -883,7 +975,7 @@ DrivableVehicle::DrivableVehicle() : Vehicle()
 {
    drivable = true;
    flags |= FL_SPARKS | FL_DIE_TESSELATE | FL_DIE_EXPLODE | FL_DARKEN;
-   if(ctf->value)
+   if(deathmatch->value)
       respawntime = G_GetFloatArg("respawntime", 60);
 }
 
@@ -920,7 +1012,7 @@ void DrivableVehicle::Killed(Event *ev)
       dir = sent->worldorigin - worldorigin;
       dir[2] += 64;
       dir.normalize();
-      sent->Damage(this, this, sent->health * 2, worldorigin, dir, vec_zero, 50, 0, MOD_VEHICLE, -1, -1, 1.0f);
+      sent->Damage(this, attacker, sent->health * 2, worldorigin, dir, vec_zero, 50, 0, MOD_VEHICLE, -1, -1, 1.0f);
    }
 
    if(flags & FL_DIE_TESSELATE)
@@ -942,7 +1034,7 @@ void DrivableVehicle::Killed(Event *ev)
 
    if(flags & FL_DIE_EXPLODE)
    {
-      CreateExplosion(centroid, 150 * edict->s.scale, edict->s.scale * 2, true, this, this, this);
+      CreateExplosion(centroid, 150 * edict->s.scale, edict->s.scale * 2, true, this, attacker, this);
    }
 
    if(flags & FL_DIE_GIBS)
@@ -956,7 +1048,7 @@ void DrivableVehicle::Killed(Event *ev)
    //
    // kill all my wheels
    //
-   if(ctf->value)
+   if(deathmatch->value)
    {
       last = this;
       while(last->vlink)
@@ -1021,7 +1113,7 @@ void DrivableVehicle::Killed(Event *ev)
       while(1);
    }
 
-   if(ctf->value)
+   if(deathmatch->value)
    {
       hideModel();
       // cancel events of type remove
