@@ -585,7 +585,8 @@ foundpos:
       if(drivable)
       {
          edict->s.sound = 0;
-         RandomSound("snd_dooropen", 1, CHAN_BODY);
+         RandomAnimate("dooropen", NULL);
+         //RandomSound("snd_dooropen", 1, CHAN_BODY);
          RandomSound("snd_stop", 1, CHAN_VOICE);
          driver->setSolidType(SOLID_BBOX);
       }
@@ -617,7 +618,8 @@ foundpos:
       }
       if(drivable)
       {
-         RandomSound("snd_doorclose", 1, CHAN_BODY);
+         RandomAnimate("doorclose", NULL);
+         //RandomSound("snd_doorclose", 1, CHAN_BODY);
          RandomSound("snd_start", 1, CHAN_VOICE);
          driver->setSolidType(SOLID_NOT);
       }

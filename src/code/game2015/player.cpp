@@ -5516,16 +5516,14 @@ void Player::SetCameraEntity(Entity *cameraEnt)
       Vector jitterang;
       //###
 
-      /*
-            if ( vehicle && cameraEnt == thirdpersonCamera )
-               {
-               Event * event;
+      if(cameraEnt == thirdpersonCamera)
+      {
+         Event * event;
 
-               event = new Event( EV_Camera_SetDistance );
-               event->AddFloat( 256 );
-               cameraEnt->ProcessEvent( event );
-               }
-      */
+         event = new Event(EV_Camera_SetDistance);
+         event->AddFloat(vehicle ? 256 : (hoverbike ? 160 : 128));
+         cameraEnt->ProcessEvent(event);
+      }
 
       edict->s.renderfx &= ~RF_VIEWERMODEL;
 

@@ -788,6 +788,7 @@ void Camera::SetSpeed(Event *ev)
 void Camera::SetDistance(Event *ev)
 {
    newstate.move.follow_dist = ev->GetFloat(1);
+   SetCurrentDistance(newstate.move.follow_dist);
 }
 
 void Camera::SetCurrentDistance
