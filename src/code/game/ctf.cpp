@@ -408,11 +408,11 @@ void CTF_UpdateStats(Player *player, Player *target)
    {
       int crosshair;
 
-      if(Info_ValueForKey(player->client->pers.userinfo, "crosshair") == "")
+      if(Info_ValueForKey(player->client->pers.userinfo, "u_crosshair") == "")
          crosshair = 1;
       else
       {
-         crosshair = atoi(Info_ValueForKey(player->client->pers.userinfo, "crosshair"));
+         crosshair = atoi(Info_ValueForKey(player->client->pers.userinfo, "u_crosshair"));
          if(!crosshair)
          {
             player->client->ps.stats[STAT_CROSSHAIR] = 0;

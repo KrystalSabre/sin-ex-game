@@ -323,11 +323,6 @@ void G_InitGame(void)
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
 
-   vid_ref           = gi.cvar("vid_ref", "", CVAR_USERINFO|CVAR_ARCHIVE);
-   sw_mode           = gi.cvar("sw_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
-   gl_mode           = gi.cvar("gl_mode", "0", CVAR_USERINFO|CVAR_ARCHIVE);
-   crosshair         = gi.cvar("crosshair", "1", CVAR_USERINFO|CVAR_ARCHIVE);
-
    CTF_Init();
 
    G_InitEvents();

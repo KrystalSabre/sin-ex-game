@@ -159,7 +159,7 @@ Event EV_Player_DropFlag("dropflag", EV_CONSOLE);
 #define CROUCH_SPEED			110.0f
 #define ACCELERATION			10.0f
 #define TAUNT_TIME			1.0f
-#define FOV_ADJUST(fov,videomode) (atan(16 / ((videomode >= 11 ? 9 : 10) / tan((atan((videomode >= 11 ? 3 : 4) / ((videomode >= 11 ? 4 : 5) / tan((float)fov / 360 * M_PI))) * 360 / M_PI) / 360 * M_PI))) * 360 / M_PI)
+#define FOV_ADJUST(fov,videomode) (atan(16 / ((videomode > 1 ? 10 : 9) / tan((atan((videomode > 1 ? 4 : 3) / ((videomode > 1 ? 5 : 4) / tan((float)fov / 360 * M_PI))) * 360 / M_PI) / 360 * M_PI))) * 360 / M_PI)
 
 /*
 ==============================================================================
@@ -5443,13 +5443,13 @@ void Player::SetCameraEntity(Entity *cameraEnt)
 {
    assert(cameraEnt);
 
-   int videomode = (!stricmp(Info_ValueForKey(client->pers.userinfo, "vid_ref"), "soft") ? atoi(Info_ValueForKey(client->pers.userinfo, "sw_mode")) : atoi(Info_ValueForKey(client->pers.userinfo, "gl_mode")));
+   int videomode = atoi(Info_ValueForKey(client->pers.userinfo, "u_videomode"));
    float realfov = fov;
 
    if(zoom_mode == ZOOMED_IN && fov > 20)
       realfov = 20;
 
-   if(videomode >= 8 && viewmode <= THIRD_PERSON)
+   if(videomode && viewmode <= THIRD_PERSON)
       realfov = FOV_ADJUST(realfov, videomode);
 
    // In release, we should never be without a camera
