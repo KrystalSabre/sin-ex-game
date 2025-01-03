@@ -130,24 +130,22 @@ void Mine::SlideOrStick(Event *ev)
    other = ev->GetEntity(1);
    assert(other);
 
-   if(other->takedamage)
-   {
-      setMoveType(MOVETYPE_BOUNCE);
-      event = new Event(EV_Mine_Explode);
-      PostEvent(event, 1.8);
-      return;
-   }
-
-   CancelEventsOfType(EV_Mine_Explode);
-
    // Check to see if we hit the ground, if so then slide along,
    // otherwise stick to the wall.
    if(((level.impact_trace.plane.normal[gravity_axis[gravaxis].z] * gravity_axis[gravaxis].sign) > 0.7) &&
       !sticky)
    {
+      CancelEventsOfType(EV_Mine_Explode);
       setMoveType(MOVETYPE_SLIDE);
+      velocity = velocity.normalize() * 600;
       event = new Event(EV_Mine_CheckForTargets);
       PostEvent(event, 2.5);
+   }
+   else if(other->takedamage)
+   {
+      setMoveType(MOVETYPE_BOUNCE);
+      event = new Event(EV_Mine_Explode);
+      PostEvent(event, 1.8);
    }
    else
    {
@@ -176,6 +174,7 @@ void Mine::SlideOrStick(Event *ev)
          }
       }
 
+      CancelEventsOfType(EV_Mine_Explode);
       CancelEventsOfType(EV_Mine_Run);
       setMoveType(MOVETYPE_NONE);
       RandomGlobalSound("spider_arm", 1, CHAN_VOICE);
@@ -191,7 +190,11 @@ void Mine::SlideOrStick(Event *ev)
       {
          CheckGround();
          if(groundentity)
-            setOrigin(origin + Vector(0, 0, 12));
+         {
+            const gravityaxis_t &grav = gravity_axis[gravaxis];
+            origin[grav.z] += 12; 
+            setOrigin(origin);
+         }
       }
 
       setOrigin(origin);
@@ -617,10 +620,16 @@ void Detonator::DoneFiring(Event *ev)
 
    if(!weapon || !weapon->HasAmmo())
    {
-      weapon = owner->BestWeapon();
+      if(mineList.NumObjects())
+         weapon = NULL;
+      else
+         weapon = owner->BestWeapon();
    }
 
-   owner->ChangeWeapon(weapon);
+   if(weapon)
+      owner->ChangeWeapon(weapon);
+   else
+      ForceIdle();
 }
 
 void Detonator::Shoot(Event *ev)
@@ -634,7 +643,7 @@ void Detonator::Shoot(Event *ev)
    // If the owner is in a camera, the only detonate that mine, 
    // otherwise detonate them all
 
-   NextAttack(0.1);
+   NextAttack(0.5);
 
    if(owner->isClient())
    {
