@@ -173,7 +173,7 @@ void Mine::SlideOrStick(Event *ev)
             }
          }
       }
-      
+
       CancelEventsOfType(EV_Mine_Explode);
       CancelEventsOfType(EV_Mine_Run);
       setMoveType(MOVETYPE_NONE);
