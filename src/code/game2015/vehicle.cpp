@@ -157,7 +157,7 @@ void Vehicle::VehicleStart(Event *ev)
       FrontWheels *front;
       BackWheels *back;
       Vector i, j, k;
-      qboolean spawned;
+      qboolean spawned = false;
       i = Vector(orientation[0]);
       j = Vector(orientation[1]);
       k = Vector(orientation[2]);

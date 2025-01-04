@@ -100,6 +100,8 @@ extern   int       sv_numtraces;
 extern   cvar_t   *parentmode;
 extern   cvar_t   *dedicated;
 
+extern   cvar_t   *cinemadelay;
+
 extern   usercmd_t *current_ucmd;
 
 #define DM_FLAG( flag ) ( deathmatch->value && ( ( int )dmflags->value & ( flag ) ) )

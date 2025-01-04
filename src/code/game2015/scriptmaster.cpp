@@ -280,7 +280,7 @@ EXPORT_FROM_DLL void ScriptMaster::PlayerSpawned()
          if(thread->WaitingOnPlayer())
          {
             thread->ClearWaitFor();
-            thread->Start(-1);
+            thread->Start(game.maxclients > 1 && level.cinematic ? cinemadelay->value : -1);
          }
       }
    }

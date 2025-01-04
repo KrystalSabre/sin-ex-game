@@ -129,10 +129,7 @@ cvar_t	*csys_draw;
 
 cvar_t   *parentmode;
 
-cvar_t   *vid_ref;
-cvar_t   *sw_mode;
-cvar_t   *gl_mode;
-cvar_t   *crosshair;
+cvar_t   *cinemadelay;
 
 //###
 cvar_t   *informermodel;
@@ -345,6 +342,8 @@ void G_InitGame(void)
    sv_fatrockets     = gi.cvar("sv_fatrockets", "1", CVAR_SERVERINFO);
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
+
+   cinemadelay       = gi.cvar("cinemadelay", "5", CVAR_SERVERINFO);
 
    //###
    informermodel     = gi.cvar("informermodel", MFD_INFORMERMODEL, CVAR_SERVERINFO | CVAR_ARCHIVE);

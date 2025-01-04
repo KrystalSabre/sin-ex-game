@@ -100,6 +100,8 @@ extern   int       sv_numtraces;
 extern   cvar_t   *parentmode;
 extern   cvar_t   *dedicated;
 
+extern   cvar_t   *cinemadelay;
+
 //###
 extern   cvar_t   *informermodel;
 extern   cvar_t   *informerskin;
