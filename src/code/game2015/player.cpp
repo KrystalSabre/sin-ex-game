@@ -782,7 +782,6 @@ void Player::InitView(void)
 
    // hud
    hidestats = level.defaulthud;
-   CTF_DrawHud();
 }
 
 void Player::ChooseSpawnPoint(void)
@@ -4038,7 +4037,6 @@ void Player::ExitConsole(Event *ev)
 
    showModel();
    hidestats = level.defaulthud;
-   CTF_DrawHud();
 }
 
 void Player::KickConsole(Event *ev)
@@ -6525,7 +6523,7 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    //
    // Weapon list
    //
-   client->ps.stats[STAT_WEAPONLIST] = 0;
+   client->ps.stats[STAT_WEAPONLIST] = !ctf->value;
 
    //
    // Inventory
@@ -6585,7 +6583,7 @@ EXPORT_FROM_DLL void Player::UpdateStats()
    //
    // Overlays
    //
-   if(drawoverlay && !(ctf->value && spectator && viewmode != SPECTATOR))
+   if(drawoverlay)
    {
       client->ps.stats[STAT_LAYOUTS] |= DRAW_OVERLAY;
    }
@@ -6885,7 +6883,6 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       {
          drawoverlay = false;
          hidestats = level.defaulthud;
-         CTF_DrawHud();
          SetViewMode(defaultViewMode);
       }
    }
@@ -7552,13 +7549,11 @@ void Player::HideOverlay(Event *ev)
 void Player::DrawStats(Event *ev)
 {
    hidestats = false;
-   CTF_DrawHud();
 }
 
 void Player::HideStats(Event *ev)
 {
    hidestats = true;
-   CTF_HideHud();
 }
 
 void Player::ChangeMusic(const char * current, const char * fallback, qboolean force, float duration)
@@ -8161,7 +8156,6 @@ void Player::MissileOverlayOff()
 {
    drawoverlay = false;
    hidestats   = level.defaulthud;
-   CTF_DrawHud();
 }
 
 void Player::WeaponSwitch(Event *ev)

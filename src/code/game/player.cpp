@@ -723,7 +723,6 @@ void Player::InitView(void)
 
    // hud
    hidestats = level.defaulthud;
-   CTF_DrawHud();
 }
 
 void Player::ChooseSpawnPoint(void)
@@ -3220,7 +3219,6 @@ void Player::ExitConsole(Event *ev)
 
    showModel();
    hidestats = level.defaulthud;
-   CTF_DrawHud();
 }
 
 void Player::KickConsole(Event *ev)
@@ -4989,7 +4987,7 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    //
    // Weapon list
    //
-   client->ps.stats[STAT_WEAPONLIST] = 0;
+   client->ps.stats[STAT_WEAPONLIST] = !ctf->value;
 
    //
    // Inventory
@@ -5049,7 +5047,7 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    //
    // Overlays
    //
-   if(drawoverlay && !(ctf->value && spectator && viewmode != SPECTATOR))
+   if(drawoverlay)
    {
       client->ps.stats[STAT_LAYOUTS] |= DRAW_OVERLAY;
    }
@@ -5303,7 +5301,6 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       {
          drawoverlay = false;
          hidestats = level.defaulthud;
-         CTF_DrawHud();
          SetViewMode(defaultViewMode);
       }
    }
@@ -5960,13 +5957,11 @@ void Player::HideOverlay(Event *ev)
 void Player::DrawStats(Event *ev)
 {
    hidestats = false;
-   CTF_DrawHud();
 }
 
 void Player::HideStats(Event *ev)
 {
    hidestats = true;
-   CTF_HideHud();
 }
 
 void Player::ChangeMusic(const char * current, const char * fallback, qboolean force, float duration)
@@ -6915,35 +6910,6 @@ void Player::LocalSoundEvent(Event *ev)
    else
       ev->Error("Null sound specified.");
 }
-
-//### =========================================================================
-// 2015 stuff
-
-// due to CTF using different stat values than regular WOS, a different hud file
-// must be used, but I didn't want to overwrite players' cl_hudfile, so I 
-// implemented the CTF hud as an overlay. Didn't add ability to change the CTF 
-// hud since this is all server side stuff.
-void Player::CTF_DrawHud()
-{
-   if(!ctf->value)
-      return;
-
-   SendOverlay(this, "ctfhud");
-   hidestats   = true;
-   drawoverlay = true;
-}
-
-void Player::CTF_HideHud()
-{
-   if(!ctf->value)
-      return;
-
-   hidestats   = true;
-   drawoverlay = false;
-}
-
-// end 2015 stuff
-//### =========================================================================
 
 // EOF
 
