@@ -6921,7 +6921,7 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
    if(brightness->value >= 0 || level.midnight >= 0)
    {
       char string[32];
-      snprintf(string, sizeof(string), "%f", max(brightness->value, 0) * level.midnight);
+      snprintf(string, sizeof(string), "%f", (brightness->value >= 0 ? brightness->value : 1.5f) * level.midnight);
 
       if(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) != 1.0f || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : brightness->string)))
       {
