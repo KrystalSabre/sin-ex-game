@@ -2852,6 +2852,8 @@ level_locals_t::level_locals_t() : Class()
    defaultcamera = NULL;
    defaulthud = false;
    playtime = 0;
+
+   midnight = -1;
 }
 
 EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
@@ -2910,6 +2912,8 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
 
    arc.WriteInteger(lavadamage);
    //###
+
+   arc.WriteFloat(midnight);
 }
 
 EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
@@ -2974,6 +2978,8 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
 
    arc.ReadInteger(&lavadamage);
    //###
+
+   arc.ReadFloat(&midnight);
 }
 
 /*

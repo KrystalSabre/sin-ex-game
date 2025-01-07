@@ -323,6 +323,8 @@ public:
    int         lavadamage;       // added specifiable lava damage
    //###
 
+   float       midnight;
+
    level_locals_t();
    virtual void   Archive(Archiver &arc)   override;
    virtual void   Unarchive(Archiver &arc) override;

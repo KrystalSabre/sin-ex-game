@@ -123,14 +123,22 @@ World::World() : Entity()
       gi.configstring(CS_SOUNDTRACK, text);
    }
 
-   text = G_GetSpawnArg("sky");
-   if(text)
+   if(DM_FLAG(DF_MIDNIGHT))
    {
-      gi.configstring(CS_SKY, text);
+      gi.configstring(CS_SKY, "black_");
+      level.midnight = 0.1f;
    }
    else
    {
-      gi.configstring(CS_SKY, "sky_");
+      text = G_GetSpawnArg("sky");
+      if(text)
+      {
+         gi.configstring(CS_SKY, text);
+      }
+      else
+      {
+         gi.configstring(CS_SKY, "sky_");
+      }
    }
 
    text = G_GetSpawnArg("skyrotate");

@@ -6918,11 +6918,17 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       SetCameraEntity(watchCamera);
    }
 
-   if(brightness->value >= 0 && (atof(Info_ValueForKey(client->pers.userinfo, "intensity")) != 1.0 || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), brightness->string)))
+   if(brightness->value >= 0 || level.midnight >= 0)
    {
-      gi.WriteByte(svc_stufftext);
-      gi.WriteString(va("set intensity 1 u; set gl_modulate %s u; vid_restart\n", brightness->string));
-      gi.unicast(edict, true);
+      char string[32];
+      snprintf(string, sizeof(string), "%f", max(brightness->value, 0) * level.midnight);
+
+      if(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) != 1.0f || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : brightness->string)))
+      {
+         gi.WriteByte(svc_stufftext);
+         gi.WriteString(va("\nset intensity 1 u; set gl_modulate %s u; vid_restart\n", (level.midnight >=0 ? string : brightness->string)));
+         gi.unicast(edict, true);
+      }
    }
 }
 
