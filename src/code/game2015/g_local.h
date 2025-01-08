@@ -48,6 +48,8 @@
 #define  svc_layout          4
 #define  svc_inventory       5
 #define  svc_console_command 6
+#define  svc_disconnect      8
+#define  svc_reconnect       9
 #define  svc_sound           10
 #define  svc_stufftext       12
 

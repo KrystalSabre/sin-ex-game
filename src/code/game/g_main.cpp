@@ -1368,6 +1368,15 @@ void G_ClientBegin(edict_t *ent, qboolean loadgame)
       G_ExitWithError();
    }
 
+   //TEMP VERSION CHECK
+   if(Q_strcasecmp(Info_ValueForKey(ent->client->pers.userinfo, "patchname"), "Mod"))
+   {
+      gi.cprintf(ent, PRINT_HIGH, "Server requires unofficial patch\n");
+      gi.WriteByte(svc_disconnect);
+      gi.unicast(ent, true);
+      return;
+   }
+
    if(ent->inuse && ent->entity)
    {
       // the client has cleared the client side viewangles upon
@@ -1653,7 +1662,8 @@ qboolean G_ClientConnect(edict_t *ent, const char *userinfo)
 
    G_ClientUserinfoChanged(ent, userinfo);
 
-   if(game.maxclients > 1)
+   //TEMP VERSION CHECK
+   if(game.maxclients > 1 && !Q_strcasecmp(Info_ValueForKey(ent->client->pers.userinfo, "patchname"), "Mod"))
    {
       gi.printf("%s connected\n", ent->client->pers.netname);
    }
