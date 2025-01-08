@@ -6918,15 +6918,48 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       SetCameraEntity(watchCamera);
    }
 
-   if(brightness->value >= 0 || level.midnight >= 0)
+   if(game.maxclients > 1 && brightness->value > 0)
    {
       char string[32];
-      snprintf(string, sizeof(string), "%f", (brightness->value >= 0 ? brightness->value : 1.5f) * level.midnight);
+      snprintf(string, sizeof(string), "%f", brightness->value * level.midnight);
 
-      if(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) != 1.0f || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : brightness->string)))
+      if(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) != 1.0f
+         || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : brightness->string)))
       {
          gi.WriteByte(svc_stufftext);
          gi.WriteString(va("\nset intensity 1 u; set gl_modulate %s u; vid_restart\n", (level.midnight >=0 ? string : brightness->string)));
+         gi.unicast(edict, true);
+      }
+   }
+   else
+   {
+      str intensity = Info_ValueForKey(client->pers.userinfo, "u_intensity");
+      str modulate = Info_ValueForKey(client->pers.userinfo, "u_modulate");
+
+      if(atof(intensity.c_str()) < 1.0f)
+      {
+         intensity = "1";
+         gi.WriteByte(svc_stufftext);
+         gi.WriteString(va("\nset u_intensity %s u\n", intensity.c_str()));
+         gi.unicast(edict, true);
+      }
+
+      if(!atof(modulate.c_str()))
+      {
+         modulate = "1.5";
+         gi.WriteByte(svc_stufftext);
+         gi.WriteString(va("\nset u_modulate %s u\n", modulate.c_str()));
+         gi.unicast(edict, true);
+      }
+
+      char string[32];
+      snprintf(string, sizeof(string), "%f", atof(modulate.c_str()) * level.midnight);
+
+      if(!(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) == 1.0f && atof(intensity.c_str()) == 1.0f) && Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "intensity"), intensity.c_str()) 
+         || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : modulate.c_str())))
+      {
+         gi.WriteByte(svc_stufftext);
+         gi.WriteString(va("\nset intensity %s u; set gl_modulate %s u; vid_restart\n", intensity.c_str(), (level.midnight >=0 ? string : modulate.c_str())));
          gi.unicast(edict, true);
       }
    }
