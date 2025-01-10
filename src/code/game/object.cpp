@@ -30,6 +30,13 @@ ResponseDef Object::Responses[] =
 
 Object::Object() : Entity()
 {
+   if(!model.length() || !gi.IsModel(edict->s.modelindex))
+   {
+      gi.dprintf("%i: Object with invalid model, removing\n", entnum);
+      PostEvent(EV_Remove, 0);
+      return;
+   }
+
    const char * animname;
    const char * skinname;
    Vector defangles;
