@@ -1558,9 +1558,9 @@ void G_PutClientInServer(edict_t *ent)
    }
 
    //### fix to make CTF hud show up
-   gi.WriteByte(svc_stufftext);
+   /*gi.WriteByte(svc_stufftext);
    gi.WriteString("cl_hudfile hud01; hud_restart");
-   gi.unicast(ent, true);
+   gi.unicast(ent, true);*/
    //###
 }
 
