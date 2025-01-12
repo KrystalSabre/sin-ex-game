@@ -127,7 +127,6 @@ Event EV_ScriptThread_ClearScreenPrintFile("clearscreenprintfile");
 Event EV_ScriptThread_MapName("mapname");
 Event EV_ScriptThread_EndGame("endgame");
 Event EV_ScriptThread_CameraCommand("cam");
-Event EV_ScriptThread_SetMidnight("setmidnight");
 
 // music command
 Event EV_ScriptThread_MusicEvent("music");
@@ -754,7 +753,6 @@ ResponseDef ScriptThread::Responses[] =
    { &EV_AI_DisconnectPath,                  (Response)&ScriptThread::PassToPathmanager },
    { &EV_ScriptThread_TriggerFromEnt,        (Response)&ScriptThread::TriggerFromEntEvent }, //###
    { &EV_ScriptThread_CameraCommand,         (Response)&ScriptThread::CameraCommand },
-   { &EV_ScriptThread_SetMidnight,           (Response)&ScriptThread::SetMidnightEvent },
    { nullptr, nullptr }
 };
 
@@ -3262,21 +3260,6 @@ void ScriptThread::TriggerFromEntEvent(Event *ev)
    }
 }
 //###
-
-void ScriptThread::SetMidnightEvent(Event *ev)
-{
-   if(!DM_FLAG(DF_MIDNIGHT))
-      return;
-
-   if(ev->NumArgs() < 2)
-   {
-      ev->Error("No args passed in");
-      return;
-   }
-
-   gi.configstring(CS_SKY, ev->GetString(1));
-   level.midnight = ev->GetFloat(2);
-}
 
 // EOF
 

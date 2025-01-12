@@ -6920,14 +6920,11 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
 
    if(game.maxclients > 1 && brightness->value > 0)
    {
-      char string[32];
-      snprintf(string, sizeof(string), "%f", brightness->value * level.midnight);
-
       if(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) != 1.0f
-         || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : brightness->string)))
+         || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), brightness->string))
       {
          gi.WriteByte(svc_stufftext);
-         gi.WriteString(va("\nset intensity 1 u; set gl_modulate %s u; vid_restart\n", (level.midnight >=0 ? string : brightness->string)));
+         gi.WriteString(va("\nset intensity 1 u; set gl_modulate %s u; vid_restart\n", brightness->string));
          gi.unicast(edict, true);
       }
    }
@@ -6952,14 +6949,11 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
          gi.unicast(edict, true);
       }
 
-      char string[32];
-      snprintf(string, sizeof(string), "%f", atof(modulate.c_str()) * level.midnight);
-
       if(!(atof(Info_ValueForKey(client->pers.userinfo, "intensity")) == 1.0f && atof(intensity.c_str()) == 1.0f) && Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "intensity"), intensity.c_str()) 
-         || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), (level.midnight >=0 ? string : modulate.c_str())))
+         || Q_strcasecmp(Info_ValueForKey(client->pers.userinfo, "gl_modulate"), modulate.c_str()))
       {
          gi.WriteByte(svc_stufftext);
-         gi.WriteString(va("\nset intensity %s u; set gl_modulate %s u; vid_restart\n", intensity.c_str(), (level.midnight >=0 ? string : modulate.c_str())));
+         gi.WriteString(va("\nset intensity %s u; set gl_modulate %s u; vid_restart\n", intensity.c_str(), modulate.c_str()));
          gi.unicast(edict, true);
       }
    }

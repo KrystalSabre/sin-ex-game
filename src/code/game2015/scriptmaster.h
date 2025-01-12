@@ -209,7 +209,6 @@ protected:
    void                 MapName(Event *ev);
    void                 EndGame(Event *ev);
    void                 CameraCommand(Event *ev);
-   void                 SetMidnightEvent(Event *ev);
 
 public:
    CLASS_PROTOTYPE(ScriptThread);
