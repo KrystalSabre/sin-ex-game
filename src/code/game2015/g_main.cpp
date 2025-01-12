@@ -130,7 +130,6 @@ cvar_t	*csys_draw;
 cvar_t   *parentmode;
 
 cvar_t   *cinemadelay;
-cvar_t   *brightness;
 
 //###
 cvar_t   *informermodel;
@@ -345,7 +344,6 @@ void G_InitGame(void)
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
 
    cinemadelay       = gi.cvar("cinemadelay", "5", CVAR_SERVERINFO);
-   brightness        = gi.cvar("sv_brightness", "1.5", CVAR_SERVERINFO);
 
    //###
    informermodel     = gi.cvar("informermodel", MFD_INFORMERMODEL, CVAR_SERVERINFO | CVAR_ARCHIVE);
