@@ -6922,7 +6922,7 @@ EXPORT_FROM_DLL void Player::EndFrame(Event *ev)
       || atof(Info_ValueForKey(client->pers.userinfo, "vid_gamma")) != 1.0f)
    {
       gi.WriteByte(svc_stufftext);
-      gi.WriteString("\nset intensity 1 u; set vid_gamma 1; vid_restart\n");
+      gi.WriteString("\nset intensity 1 u; set vid_gamma 1 u; vid_restart\n");
       gi.unicast(edict, true);
    }
 }
