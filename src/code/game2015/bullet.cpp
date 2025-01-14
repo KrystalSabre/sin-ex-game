@@ -61,7 +61,7 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    org = end - dir;
 
    ent = trace->ent->entity;
-   
+
    if(!trace->intersect.valid && ent)
    {
       trace2 = G_FullTrace(end, vec_zero, vec_zero, (end + dir * 80), 5, owner, MASK_SHOT, "BulletWeapon::TraceAttack");
