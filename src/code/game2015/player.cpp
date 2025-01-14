@@ -5483,7 +5483,7 @@ void Player::SetCameraEntity(Entity *cameraEnt)
       if(!ctf->value && vehicle && vehicle->IsDrivable())
       {
          if(fov < 112.5)
-            SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, (videomode >= 8 ? FOV_ADJUST(112.5, videomode) : 112.5));
+            SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, (videomode ? FOV_ADJUST(112.5, videomode) : 112.5));
          else
             SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, realfov);
       }
@@ -5491,7 +5491,7 @@ void Player::SetCameraEntity(Entity *cameraEnt)
       else if(hoverbike)
       {
          if(fov < 110)
-            SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, (videomode >= 8 ? FOV_ADJUST(110, videomode) : 110));
+            SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, (videomode ? FOV_ADJUST(110, videomode) : 110));
          else
             SetCameraValues(worldorigin, v_offset, v_angle, v_kick, velocity, blend, realfov);
       }
@@ -5723,7 +5723,7 @@ void Player::SetCameraEntity(Entity *cameraEnt)
 
       if(viewmode <= THIRD_PERSON)
          camerafov = realfov;
-      else if(videomode >= 8)
+      else if(videomode)
          camerafov = FOV_ADJUST(camerafov, videomode);
 
       SetCameraValues(cameraEnt->worldorigin, pos, cameraEnt->worldangles, jitterang, cameraEnt->velocity, noblend, camerafov);
