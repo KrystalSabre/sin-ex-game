@@ -1471,8 +1471,29 @@ void Sentient::ArmorDamage(Event *ev)
       }
    }
 
-   if(groupnum == -1)
-      location = "all";
+   if(groupnum < 0)
+   {
+      switch(groupnum)
+      {
+      default:
+      case -1:
+         location = "all";
+         break;
+      case -2:
+         location = "torso_upper";
+         break;
+      case -3:
+         location = "torso_lower";
+         break;
+      case -4:
+         location = "leg_left_upper";
+         break;
+      case -5:
+         location = "leg_left_lower";
+         break;
+      }
+      groupnum = -1;
+   }
    else
       location = gi.Group_NumToName(edict->s.modelindex, groupnum);
 

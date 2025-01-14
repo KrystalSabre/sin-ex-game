@@ -700,7 +700,7 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
                client->IncreaseActionLevel((float)action_level_increment / numbullets);
             }
             // do less than regular damage on a bbox hit
-            TraceAttack(src, trace.endpos, (mindamage + (int)G_Random(maxdamage - mindamage + 1))*0.85, &trace, 
+            TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, 
                         MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
          }
       }

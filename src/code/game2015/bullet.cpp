@@ -47,6 +47,7 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    int			timeofs;
    Entity		*ent;
    qboolean    ricochet;
+   trace_t     trace2;
 
    if(HitSky(trace))
    {
@@ -60,6 +61,39 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    org = end - dir;
 
    ent = trace->ent->entity;
+   
+   if(!trace->intersect.valid && ent)
+   {
+      trace2 = G_FullTrace(end, vec_zero, vec_zero, (end + dir * 80), 5, owner, MASK_SHOT, "BulletWeapon::TraceAttack");
+      if(trace2.intersect.valid && trace2.ent == trace->ent)
+      {
+         trace = &trace2;
+      }
+      else if(ent->isClient())
+      {
+         float pos = (end.z - ent->absmin.z) / (ent->absmax.z - ent->absmin.z);
+         if(pos >= 0.6)
+         {
+            trace->intersect.parentgroup = -2;
+            trace->intersect.damage_multiplier = 1;
+         }
+         else if(pos >= 0.45)
+         {
+            trace->intersect.parentgroup = -3;
+            trace->intersect.damage_multiplier = 1;
+         }
+         else if(pos >= 0.30)
+         {
+            trace->intersect.parentgroup = -4;
+            trace->intersect.damage_multiplier = 0.5;
+         }
+         else
+         {
+            trace->intersect.parentgroup = -5;
+            trace->intersect.damage_multiplier = 0.3;
+         }
+      }
+   }
 
    if(!trace->surface)
    {
@@ -182,16 +216,16 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
                // We didn't hit any groups, so send in generic damage
                ent->Damage(this,
                   owner,
-                  damage,
+                  damage*0.85,
                   trace->endpos,
                   dir,
                   trace->plane.normal,
                   kick,
                   dflags,
                   meansofdeath,
+                  (trace->intersect.parentgroup < -1 ? trace->intersect.parentgroup : -1),
                   -1,
-                  -1,
-                  1);
+                  (trace->intersect.parentgroup < -1 ? trace->intersect.damage_multiplier : 1));
             }
          }
       }
@@ -393,7 +427,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
                hitenemy = true;
             }
             // do less than regular damage on a bbox hit
-            TraceAttack(src, trace.endpos, (mindamage + (int)G_Random(maxdamage - mindamage + 1))*0.85, &trace, 
+            TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, 
                         MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
          }
       }
