@@ -258,6 +258,62 @@ Soda::Soda() : Health()
    setModel("health_soda.def");
 }
 
+//
+//Replacements
+//
+
+CLASS_DECLARATION(Health, ItemHealth, "item_health");
+
+ResponseDef ItemHealth::Responses[] =
+{
+   { NULL, NULL }
+};
+
+ItemHealth::ItemHealth() : Health()
+{
+   Set(20);
+   setModel("health.def");
+}
+
+CLASS_DECLARATION(Health, ItemSmallHealth, "item_health_small");
+
+ResponseDef ItemSmallHealth::Responses[] =
+{
+   { NULL, NULL }
+};
+
+ItemSmallHealth::ItemSmallHealth() : Health()
+{
+   Set(5);
+   setModel("health_small.def");
+}
+
+CLASS_DECLARATION(Health, ItemLargeHealth, "item_health_large");
+
+ResponseDef ItemLargeHealth::Responses[] =
+{
+   { NULL, NULL }
+};
+
+ItemLargeHealth::ItemLargeHealth() : Health()
+{
+   Set(50);
+   setModel("health_large.def");
+}
+
+CLASS_DECLARATION(Health, ItemMegaHealth, "item_health_mega");
+
+ResponseDef ItemMegaHealth::Responses[] =
+{
+   { NULL, NULL }
+};
+
+ItemMegaHealth::ItemMegaHealth() : Health()
+{
+   Set(100);
+   setModel("health_medkit.def");
+}
+
 //### very important 2015 added stuff ;)
 CLASS_DECLARATION(Health, Poofs, NULL);
 

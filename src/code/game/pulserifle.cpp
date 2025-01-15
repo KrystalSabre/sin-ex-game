@@ -432,5 +432,47 @@ GenericPulseRifle::GenericPulseRifle() : PulseRifle()
    SetModels(nullptr, "view_pulse2.def");
 }
 
+//
+//Replacements
+//
+
+CLASS_DECLARATION(PulseRifle, PulseLaser, "weapon_laser");
+
+ResponseDef PulseLaser::Responses[] =
+{
+   { NULL, NULL }
+};
+
+PulseLaser::PulseLaser() : PulseRifle()
+{
+   PulseRifle *weapon;
+
+   weapon = new PulseRifle();
+   weapon->SetModels("pulse2.def", "view_pulse2.def");
+   weapon->setOrigin(origin);
+   weapon->worldorigin.copyTo(weapon->edict->s.old_origin);
+
+   PostEvent(EV_Remove, 0);
+}
+
+CLASS_DECLARATION(PulseRifle, PulseCannon, "weapon_pulsecannon");
+
+ResponseDef PulseCannon::Responses[] =
+{
+   { NULL, NULL }
+};
+
+PulseCannon::PulseCannon() : PulseRifle()
+{
+   PulseRifle *weapon;
+
+   weapon = new PulseRifle();
+   weapon->SetModels("pulse2.def", "view_pulse2.def");
+   weapon->setOrigin(origin);
+   weapon->worldorigin.copyTo(weapon->edict->s.old_origin);
+
+   PostEvent(EV_Remove, 0);
+}
+
 // EOF
 

@@ -141,5 +141,47 @@ SpiderMines::SpiderMines()
    Setup("mine.def");
 }
 
+//
+//Replacements
+//
+
+CLASS_DECLARATION(Ammo, MagnumClip, "ammo_magnum");
+
+ResponseDef MagnumClip::Responses[] =
+{
+   { NULL, NULL }
+};
+
+MagnumClip::MagnumClip()
+{
+   Bullet10mm *ammo;
+
+   ammo = new Bullet10mm();
+   ammo->setModel("357.def");
+   ammo->setOrigin(origin);
+   ammo->worldorigin.copyTo(ammo->edict->s.old_origin);
+
+   PostEvent(EV_Remove, 0);
+}
+
+CLASS_DECLARATION(Ammo, HVShell, "ammo_highvelocity");
+
+ResponseDef HVShell::Responses[] =
+{
+   { NULL, NULL }
+};
+
+HVShell::HVShell()
+{
+   Bullet50mm *ammo;
+
+   ammo = new Bullet50mm();
+   ammo->setModel("50mm.def");
+   ammo->setOrigin(origin);
+   ammo->worldorigin.copyTo(ammo->edict->s.old_origin);
+
+   PostEvent(EV_Remove, 0);
+}
+
 // EOF
 

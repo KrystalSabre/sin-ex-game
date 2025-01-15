@@ -80,6 +80,38 @@ public:
    Soda();
 };
 
+//
+//Replacements
+//
+
+class EXPORT_FROM_DLL ItemHealth : public Health
+{
+public:
+   CLASS_PROTOTYPE(ItemHealth);
+   ItemHealth();
+};
+
+class EXPORT_FROM_DLL ItemSmallHealth : public Health
+{
+public:
+   CLASS_PROTOTYPE(ItemSmallHealth);
+   ItemSmallHealth();
+};
+
+class EXPORT_FROM_DLL ItemLargeHealth : public Health
+{
+public:
+   CLASS_PROTOTYPE(ItemLargeHealth);
+   ItemLargeHealth();
+};
+
+class EXPORT_FROM_DLL ItemMegaHealth : public Health
+{
+public:
+   CLASS_PROTOTYPE(ItemMegaHealth);
+   ItemMegaHealth();
+};
+
 //###
 class EXPORT_FROM_DLL Poofs : public Health
 {

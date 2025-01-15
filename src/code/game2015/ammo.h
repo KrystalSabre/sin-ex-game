@@ -98,6 +98,26 @@ public:
    SpiderMines();
 };
 
+//
+//Replacements
+//
+
+class EXPORT_FROM_DLL MagnumClip : public Ammo
+{
+public:
+   CLASS_PROTOTYPE(MagnumClip);
+
+   MagnumClip();
+};
+
+class EXPORT_FROM_DLL HVShell : public Ammo
+{
+public:
+   CLASS_PROTOTYPE(HVShell);
+
+   HVShell();
+};
+
 //### new ammo types
 class EXPORT_FROM_DLL Missiles : public Ammo
 {

@@ -61,6 +61,26 @@ public:
    GenericPulseRifle();
 };
 
+//
+//Replacements
+//
+
+class EXPORT_FROM_DLL PulseLaser : public PulseRifle
+{
+public:
+   CLASS_PROTOTYPE(PulseLaser);
+
+   PulseLaser();
+};
+
+class EXPORT_FROM_DLL PulseCannon : public PulseRifle
+{
+public:
+   CLASS_PROTOTYPE(PulseCannon);
+
+   PulseCannon();
+};
+
 #endif /* pulserifle.h */
 
 // EOF
