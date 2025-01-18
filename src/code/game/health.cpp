@@ -231,8 +231,8 @@ ResponseDef ItemLargeHealth::Responses[] =
 
 ItemLargeHealth::ItemLargeHealth() : Health()
 {
-   Set(50);
-   setModel("health_large.def");
+   Set(20);
+   setModel("health.def");
 }
 
 CLASS_DECLARATION(Health, ItemMegaHealth, "item_health_mega");
@@ -244,8 +244,8 @@ ResponseDef ItemMegaHealth::Responses[] =
 
 ItemMegaHealth::ItemMegaHealth() : Health()
 {
-   Set(100);
-   setModel("health_medkit.def");
+   Set(50);
+   setModel("health_large.def");
 }
 
 // EOF
