@@ -126,6 +126,7 @@ cvar_t	*csys_z;
 cvar_t	*csys_draw;
 
 cvar_t   *parentmode;
+cvar_t   *locale;
 
 cvar_t   *cinemadelay;
 
@@ -319,6 +320,7 @@ void G_InitGame(void)
    sv_fatrockets     = gi.cvar("sv_fatrockets", "1", CVAR_SERVERINFO);
 
    parentmode        = gi.cvar("parentmode", "0", CVAR_USERINFO|CVAR_SERVERINFO|CVAR_ARCHIVE);
+   locale            = gi.cvar("locale", "en", CVAR_ARCHIVE);
 
    cinemadelay       = gi.cvar("cinemadelay", "5", CVAR_SERVERINFO);
 

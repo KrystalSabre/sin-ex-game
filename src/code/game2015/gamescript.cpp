@@ -144,7 +144,27 @@ qboolean ScriptLibrarian::Goto(GameScript *scr, const char *name)
       n = str(name, 0, p - name);
       if(n == str("dialog"))
       {
-         n = dialog_script;
+         if(!strnicmp(dialog_script.c_str(), "dialog/", 7))
+         {
+            n = "dialog/";
+            n.append(locale->string);
+            n.append("/");
+            n.append(&dialog_script.c_str()[7]);
+            if(!GetScript(n.c_str()))
+            {
+               if(locale->string != "en")
+               {
+                  n = "dialog/en/";
+                  n.append(&dialog_script.c_str()[7]);
+                  if(!GetScript(n.c_str()))
+                     n = dialog_script;
+               }
+               else
+                  n = dialog_script;
+            }
+         }
+         else
+            n = dialog_script;
       }
       s = GetScript(n.c_str());
       if(!s)
@@ -179,7 +199,27 @@ qboolean ScriptLibrarian::labelExists(GameScript *scr, const char *name)
       n = str(name, 0, p - name);
       if(n == str("dialog"))
       {
-         n = dialog_script;
+         if(!strnicmp(dialog_script.c_str(), "dialog/", 7))
+         {
+            n = "dialog/";
+            n.append(locale->string);
+            n.append("/");
+            n.append(&dialog_script.c_str()[7]);
+            if(!GetScript(n.c_str()))
+            {
+               if(locale->string != "en")
+               {
+                  n = "dialog/en/";
+                  n.append(&dialog_script.c_str()[7]);
+                  if(!GetScript(n.c_str()))
+                     n = dialog_script;
+               }
+               else
+                  n = dialog_script;
+            }
+         }
+         else
+            n = dialog_script;
       }
       s = GetScript(n.c_str());
       if(!s)
