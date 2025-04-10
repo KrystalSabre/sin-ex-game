@@ -225,6 +225,7 @@ public:
    // used to prevent players from continuing failed games
    qboolean    missionfailed;
    float       missionfailedtime;
+   qboolean    nosaving;
 
    // intermission state
    float       intermissiontime; // time the intermission was started

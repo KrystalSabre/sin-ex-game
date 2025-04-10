@@ -194,6 +194,7 @@ protected:
    void                 JC_Hearable(Event *ev);
    void                 JC_Not_Hearable(Event *ev);
    void                 MissionFailed(Event *ev);
+   void                 NoSaving(Event *ev);
    void                 PassToPathmanager(Event *ev);
    void                 AirClamp(Event *ev);
    void                 StuffCommand(Event *ev);

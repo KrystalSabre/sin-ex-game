@@ -2432,6 +2432,7 @@ level_locals_t::level_locals_t() : Class()
 
    missionfailed = false;
    missionfailedtime = 0;
+   nosaving = false;
 
    defaultcamera = NULL;
    defaulthud = false;
@@ -2479,6 +2480,7 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
 
    arc.WriteBoolean(missionfailed);
    arc.WriteFloat(missionfailedtime);
+   arc.WriteBoolean(nosaving);
 
    arc.WriteObjectPointer(defaultcamera);
    arc.WriteBoolean(defaulthud);
@@ -2532,6 +2534,7 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
 
    arc.ReadBoolean(&missionfailed);
    arc.ReadFloat(&missionfailedtime);
+   arc.ReadBoolean(&nosaving);
 
    arc.ReadObjectPointer((Class **)&defaultcamera);
    arc.ReadBoolean(&defaulthud);

@@ -83,6 +83,7 @@ Event EV_ScriptThread_FreezePlayer("freezeplayer");
 Event EV_ScriptThread_ReleasePlayer("releaseplayer");
 Event EV_ScriptThread_Menu("menu");
 Event EV_ScriptThread_MissionFailed("missionfailed");
+Event EV_ScriptThread_NoSaving("nosaving");
 Event EV_ScriptThread_KillEnt("killent", EV_CONSOLE | EV_CHEAT);
 Event EV_ScriptThread_KillClass("killclass", EV_CONSOLE | EV_CHEAT);
 Event EV_ScriptThread_RemoveEnt("removeent", EV_CONSOLE | EV_CHEAT);
@@ -739,6 +740,7 @@ ResponseDef ScriptThread::Responses[] =
    { &EV_ScriptThread_JC_Hearable,     (Response)&ScriptThread::JC_Hearable },
    { &EV_ScriptThread_JC_Not_Hearable, (Response)&ScriptThread::JC_Not_Hearable },
    { &EV_ScriptThread_MissionFailed,   (Response)&ScriptThread::MissionFailed },
+   { &EV_ScriptThread_NoSaving,        (Response)&ScriptThread::NoSaving },
    { &EV_ScriptThread_KillEnt,			(Response)&ScriptThread::KillEnt },
    { &EV_ScriptThread_RemoveEnt,			(Response)&ScriptThread::RemoveEnt },
    { &EV_ScriptThread_KillClass,			(Response)&ScriptThread::KillClass },
@@ -2916,6 +2918,15 @@ void ScriptThread::MissionFailed(Event *ev)
 
    level.missionfailed = true;
    level.missionfailedtime = level.time + 3;
+   level.nosaving = true;
+}
+
+void ScriptThread::NoSaving(Event *ev)
+{
+   if(level.missionfailed)
+      return;
+
+   level.nosaving = ev->GetInteger(1);
 }
 
 void ScriptThread::PassToPathmanager(Event *ev)

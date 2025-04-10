@@ -884,6 +884,7 @@ void Player::Respawn(Event *ev)
    // force the load game menu to come up
    level.missionfailed = true;
    level.missionfailedtime = level.time - FRAMETIME;
+   level.nosaving = true;
 }
 
 void Player::SetDeltaAngles(void)
@@ -5034,7 +5035,15 @@ EXPORT_FROM_DLL void Player::UpdateStats(void)
    //
    // Frags
    //
-   client->ps.stats[STAT_FRAGS] = player->client->resp.score;
+   if(deathmatch->value)
+      client->ps.stats[STAT_FRAGS] = player->client->resp.score;
+   else if(level.nosaving)
+   {
+      client->ps.stats[STAT_FRAGS] = client->ps.stats[STAT_HEALTH];
+      client->ps.stats[STAT_HEALTH] = 0;
+   }
+   else
+      client->ps.stats[STAT_FRAGS] = 0;
 
    if(!player->hidestats && !(spectator && viewmode != SPECTATOR))
       client->ps.stats[STAT_LAYOUTS] = DRAW_STATS;
