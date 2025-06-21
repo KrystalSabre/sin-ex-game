@@ -2058,8 +2058,8 @@ EXPORT_FROM_DLL void Entity::StopSound(Event *ev)
 
 EXPORT_FROM_DLL void Entity::SetGravityAxis(int axis)
 {
-   Vector min;
-   Vector max;
+   //Vector min;
+   //Vector max;
 
    if((axis < 0) || (axis > 5))
    {
@@ -2075,16 +2075,16 @@ EXPORT_FROM_DLL void Entity::SetGravityAxis(int axis)
    gravaxis = EFFECTS_TO_GRAVITYAXIS(edict->s.effects);
    groundentity = NULL;
 
-   const gravityaxis_t &grav = gravity_axis[gravaxis];
+   /*const gravityaxis_t &grav = gravity_axis[gravaxis];
 
    min[grav.x] = mins[0];
    min[grav.y] = mins[1] * grav.sign;
    min[grav.z] = mins[2] * grav.sign;
    max[grav.x] = maxs[0];
    max[grav.y] = maxs[1] * grav.sign;
-   max[grav.z] = maxs[2] * grav.sign;
+   max[grav.z] = maxs[2] * grav.sign;*/
 
-   setSize(min, max);
+   setSize(mins, maxs);
 }
 
 EXPORT_FROM_DLL void Entity::GravityAxisEvent(Event *ev)
