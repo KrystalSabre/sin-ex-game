@@ -653,6 +653,7 @@ void Player::InitPhysics(void)
    fallsurface    = NULL;
    mass           = 200;
    xyspeed        = 0;
+   realorigin     = vec_zero; 
 }
 
 void Player::InitPowerups(void)
@@ -2704,7 +2705,8 @@ EXPORT_FROM_DLL void Player::GetMoveInfo(pmove_t *pm)
    client->ps.pmove = pm->s;
    old_pmove = pm->s;
 
-   setOrigin(Vector(pm->s.origin[0], pm->s.origin[1], pm->s.origin[2]) * 0.125);
+   realorigin = Vector(pm->s.origin[0], pm->s.origin[1], pm->s.origin[2]) * 0.125;
+   setOrigin(realorigin);
    velocity = Vector(pm->s.velocity[0], pm->s.velocity[1], pm->s.velocity[2]) * 0.125;
 
    if((client->ps.pmove.pm_type == PM_FREEZE) ||

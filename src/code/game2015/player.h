@@ -244,6 +244,7 @@ public:
 
    float             respawn_time;
    qboolean          trappedInQuantum;
+   Vector            realorigin;
 
    Player();
    virtual ~Player();
@@ -573,6 +574,7 @@ inline EXPORT_FROM_DLL void Player::Archive(Archiver &arc)
    arc.WriteVector(v_kick);
    arc.WriteVector(oldviewangles);
    arc.WriteVector(v_offset);
+   arc.WriteVector(realorigin);
 
    arc.WriteInteger(buttons);
    arc.WriteInteger(new_buttons);
@@ -726,6 +728,7 @@ inline EXPORT_FROM_DLL void Player::Unarchive(Archiver &arc)
    arc.ReadVector(&v_kick);
    arc.ReadVector(&oldviewangles);
    arc.ReadVector(&v_offset);
+   arc.ReadVector(&realorigin);
 
    arc.ReadInteger(&buttons);
    arc.ReadInteger(&new_buttons);

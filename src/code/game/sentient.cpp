@@ -150,10 +150,8 @@ Vector Sentient::EyePosition(void)
    pos = worldorigin;
    if(isClient())
    {
-      pos[0] = client->ps.pmove.origin[0];
-      pos[1] = client->ps.pmove.origin[1];
-      pos[2] = client->ps.pmove.origin[2];
-      pos *= 0.125;
+      Player *player = (Player *)this;
+      pos = player->realorigin;
    }
    pos[gravity_axis[gravaxis].x] += eyeposition[0];
    pos[gravity_axis[gravaxis].y] += eyeposition[1] * gravity_axis[gravaxis].sign;
@@ -169,10 +167,8 @@ Vector Sentient::GunPosition(void)
    pos = worldorigin;
    if(isClient())
    {
-      pos[0] = client->ps.pmove.origin[0];
-      pos[1] = client->ps.pmove.origin[1];
-      pos[2] = client->ps.pmove.origin[2];
-      pos *= 0.125;
+      Player *player = (Player *)this;
+      pos = player->realorigin;
    }
    pos[gravity_axis[gravaxis].x] += gunoffset[0];
    pos[gravity_axis[gravaxis].y] += gunoffset[1] * gravity_axis[gravaxis].sign;
