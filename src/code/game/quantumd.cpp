@@ -744,7 +744,7 @@ void QuantumDestabilizer::TraceAttack(Vector start, Vector end, int damage, trac
             this,
             owner,
             damage,
-            trace->endpos,
+            trace->intersect.position,
             dir,
             trace->plane.normal,
             kick,
@@ -752,7 +752,7 @@ void QuantumDestabilizer::TraceAttack(Vector start, Vector end, int damage, trac
             MOD_QUANTUM,
             trace->intersect.parentgroup,
             -1,
-            trace->intersect.damage_multiplier);
+            ((trace->intersect.damage_multiplier - 1) / 2) + 1.0f);
       }
       else
       {

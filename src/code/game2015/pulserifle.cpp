@@ -269,7 +269,7 @@ void PulseRifle::TraceAttack(Vector start, Vector end, int damage, trace_t *trac
                      MOD_PULSELASER,
                      trace->intersect.parentgroup,
                      -1,
-                     trace->intersect.damage_multiplier);
+                     ((trace->intersect.damage_multiplier - 1) / 2) + 1.0f);
       }
       else
       {
@@ -392,7 +392,7 @@ void PulseRifle::Shoot(Event *ev)
       if(ctf->value)
          trace = G_Trace(pos, vec_zero, vec_zero, end, owner, MASK_SHOT, "PulseRifle::Shoot");
       else
-         trace = G_FullTrace(pos, vec_zero, vec_zero, end, 30, owner, MASK_SHOT, "PulseRifle::Shoot");
+         trace = G_FullTrace(pos, vec_zero, vec_zero, end, 15, owner, MASK_SHOT, "PulseRifle::Shoot");
       delta = trace.endpos - pos;
       dist = delta.length();
 
