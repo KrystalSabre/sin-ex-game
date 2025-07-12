@@ -46,6 +46,7 @@ void Armor::Setup(const char *model, int amount)
    assert(model);
    setModel(model);
    Set(amount);
+   setRespawnTime(30);
 }
 
 void Armor::Add(int num)

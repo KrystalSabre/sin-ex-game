@@ -144,7 +144,7 @@ void Stungun::Shoot(Event *ev)
    setAngles(angles);
 
    damg = 35;
-   TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, 0);
+   TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, DAMAGE_ENERGY);
    NextAttack(0);
 }
 

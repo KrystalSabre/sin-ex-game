@@ -183,7 +183,7 @@ void Electrocute::KillSight(Event *ev)
       {
          if(ent->waterlevel)
          {
-            ent->Damage(this, other, ent->health, ent->worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR, MOD_ELECTRIC, -1, -1, 1.0f);
+            ent->Damage(this, other, ent->health, ent->worldorigin, vec_zero, vec_zero, 0, DAMAGE_ENERGY | DAMAGE_NO_ARMOR, MOD_ELECTRIC, -1, -1, 1.0f);
          }
       }
       ent = findradius(ent, worldorigin, radius);

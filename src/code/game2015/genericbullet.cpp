@@ -66,7 +66,7 @@ ResponseDef BeeGun::Responses[] =
 
 void BeeGun::Shoot(Event *ev)
 {
-   FireBullets(1, { 10, 10, 10 }, 4, 8, DAMAGE_BULLET, MOD_GENBULLET, true);
+   FireBullets(1, { 10, 10, 10 }, 4, 8, DAMAGE_ENERGY, MOD_LASER, true);
 }
 
 // EOF

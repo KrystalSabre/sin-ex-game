@@ -1456,8 +1456,16 @@ void Sentient::ArmorDamage(Event *ev)
    // If in deathmatch, client takes a minimum of 33% damage from source
    if(deathmatch->value)
    {
-      unmodified_damage = damage * 0.33f;
-      damage *= 0.67f;
+      if(dflags & DAMAGE_ENERGY)
+      {
+         unmodified_damage = damage * 0.5f;
+         damage *= 0.5f;
+      }
+      else
+      {
+         unmodified_damage = damage * 0.33f;
+         damage *= 0.67f;
+      }
    }
 
    // check to see if we have armor in this location to reduce the damage

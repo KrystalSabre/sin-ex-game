@@ -95,7 +95,7 @@ void Pulse::Explode(Event *ev)
       damg *= 1.5;
 
    if(other->takedamage)
-      other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 32, 0, MOD_PULSE, -1, -1, 1.0f);
+      other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 32, DAMAGE_ENERGY, MOD_PULSE, -1, -1, 1.0f);
 
    // Damage the surface
    surfaceManager.DamageSurface(&level.impact_trace, damg, owner);
@@ -349,7 +349,7 @@ void PulseRifle::PulseExplosion(trace_t *trace)
             {
                ent->Damage(this, owner, points,
                            org, v, vec_zero, points,
-                           DAMAGE_RADIUS, MOD_PULSE,
+                           DAMAGE_RADIUS | DAMAGE_ENERGY, MOD_PULSE,
                            -1, -1, 1.0f);
             }
          }
@@ -411,7 +411,7 @@ void PulseRifle::Shoot(Event *ev)
          damg = 30;
       else
          damg = 15;
-      TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, 0);
+      TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, DAMAGE_ENERGY);
       NextAttack(0);
    }
 }

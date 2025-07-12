@@ -131,7 +131,7 @@ void IonBurst::Explode(Event *ev)
 
    if(other->takedamage)
    {
-      other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 32, 0, MOD_ION, -1, -1, 1.0f);
+      other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 32, DAMAGE_ENERGY, MOD_ION, -1, -1, 1.0f);
       PostEvent(EV_Remove, 0);
    }
 }
@@ -341,7 +341,7 @@ void Ion::Explode(Event *ev)
 
    if(other->takedamage)
    {
-      other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 0, 0, MOD_ION, -1, -1, 1.0f);
+      other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 0, DAMAGE_ENERGY, MOD_ION, -1, -1, 1.0f);
 
       if(other->isSubclassOf<Sentient>())
       {
@@ -525,7 +525,7 @@ void QuantumDestabilizer::Destruct(Event *ev)
       if((ent != owner) && (!ent->deadflag) && (ent->takedamage) && !(ent->flags & FL_NOION))
       {
          if(owner->CanDamage(ent))
-            ent->Damage(this, owner, 10000 + ent->health, ent->worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ION, -1, -1, 1.0f);
+            ent->Damage(this, owner, 10000 + ent->health, ent->worldorigin, vec_zero, vec_zero, 0, DAMAGE_ENERGY | DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ION, -1, -1, 1.0f);
       }
       if(!owner)
          return;
@@ -533,7 +533,7 @@ void QuantumDestabilizer::Destruct(Event *ev)
    }
 
    // Make owner deceased
-   owner->Damage(this, owner, 10000 + owner->health, worldorigin, vec_zero, vec_zero, 0, DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ION_DESTRUCT, -1, -1, 1.0f);
+   owner->Damage(this, owner, 10000 + owner->health, worldorigin, vec_zero, vec_zero, 0, DAMAGE_ENERGY | DAMAGE_NO_ARMOR | DAMAGE_NO_SKILL, MOD_ION_DESTRUCT, -1, -1, 1.0f);
 }
 
 void QuantumDestabilizer::SentientOverload(Event *ev)
@@ -819,7 +819,7 @@ void QuantumDestabilizer::Shoot(Event *ev)
       }
 
       damg = 25;
-      TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, 0);
+      TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, DAMAGE_ENERGY);
       NextAttack(0);
    }
 //#endif

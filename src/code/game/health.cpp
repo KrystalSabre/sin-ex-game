@@ -128,6 +128,7 @@ ResponseDef LargeHealth::Responses[] =
 LargeHealth::LargeHealth() : Health()
 {
    Set(50);
+   setRespawnTime(30 + G_Random(10));
    setModel("health_large.def");
 }
 
@@ -141,6 +142,7 @@ ResponseDef MegaHealth::Responses[] =
 MegaHealth::MegaHealth() : Health()
 {
    Set(100);
+   setRespawnTime(60 + G_Random(20));
    setModel("health_medkit.def");
 }
 
@@ -245,6 +247,7 @@ ResponseDef ItemMegaHealth::Responses[] =
 ItemMegaHealth::ItemMegaHealth() : Health()
 {
    Set(50);
+   setRespawnTime(30 + G_Random(10));
    setModel("health_large.def");
 }
 
