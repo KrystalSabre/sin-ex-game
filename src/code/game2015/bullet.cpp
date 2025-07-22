@@ -304,7 +304,8 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
       // since this is a ricochet, we don't ignore the weapon owner this time.
       //
       //###
-      if(DM_FLAG(DF_BBOX_BULLETS))
+      //if(DM_FLAG(DF_BBOX_BULLETS))
+      if(deathmatch->value)
       {
          *trace = G_Trace(org, vec_zero, vec_zero, endpos, NULL, MASK_SHOT, "BulletWeapon::TraceAttack");
       }
@@ -413,7 +414,8 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
          }
       }
 
-      if(!damagedtarget && DM_FLAG(DF_BBOX_BULLETS))
+      //if(!damagedtarget && DM_FLAG(DF_BBOX_BULLETS))
+      if(!damagedtarget && deathmatch->value)
       {
          trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
 

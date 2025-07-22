@@ -435,6 +435,7 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
    int			timeofs;
    Entity		*ent;
    qboolean    ricochet;
+   trace_t     trace2;
 
    if(HitSky(trace))
       return;
@@ -446,6 +447,39 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
    org = end - dir;
 
    ent = trace->ent->entity;
+
+   if(!trace->intersect.valid && ent)
+   {
+      trace2 = G_FullTrace(Vector(end), vec_zero, vec_zero, (end + dir * 80), 5, bike->frontbox, MASK_SHOT, "BulletWeapon::TraceAttack");
+      if(trace2.intersect.valid && trace2.ent == trace->ent)
+      {
+         trace = &trace2;
+      }
+      else if(ent->isClient())
+      {
+         float pos = (end.z - ent->absmin.z) / (ent->absmax.z - ent->absmin.z);
+         if(pos >= 0.6)
+         {
+            trace->intersect.parentgroup = -2;
+            trace->intersect.damage_multiplier = 1;
+         }
+         else if(pos >= 0.45)
+         {
+            trace->intersect.parentgroup = -3;
+            trace->intersect.damage_multiplier = 1;
+         }
+         else if(pos >= 0.30)
+         {
+            trace->intersect.parentgroup = -4;
+            trace->intersect.damage_multiplier = 0.5;
+         }
+         else
+         {
+            trace->intersect.parentgroup = -5;
+            trace->intersect.damage_multiplier = 0.3;
+         }
+      }
+   }
 
    if(!trace->surface)
    {
@@ -545,16 +579,16 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
                // We didn't hit any groups, so send in generic damage
                ent->Damage(this,
                            owner,
-                           damage,
+                           damage*0.85,
                            trace->endpos,
                            dir,
                            trace->plane.normal,
                            kick,
                            dflags,
                            meansofdeath,
+                           (trace->intersect.parentgroup < -1 ? trace->intersect.parentgroup : -1),
                            -1,
-                           -1,
-                           1);
+                           (trace->intersect.parentgroup < -1 ? trace->intersect.damage_multiplier : 1));
             }
          }
       }
@@ -608,7 +642,8 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
       //
       // since this is a ricochet, we don't ignore the weapon owner this time.
       //
-      if(DM_FLAG(DF_BBOX_BULLETS))
+      //if(DM_FLAG(DF_BBOX_BULLETS))
+      if(deathmatch->value)
          *trace = G_Trace(org, vec_zero, vec_zero, endpos, nullptr, MASK_SHOT, "BulletWeapon::TraceAttack");
       else
          *trace = G_FullTrace(org, vec_zero, vec_zero, endpos, 5, nullptr, MASK_SHOT, "BulletWeapon::TraceAttack");
@@ -629,6 +664,10 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
    Vector	right;
    Vector	up;
    int		i;
+   int      action_per_bullet;
+   int      action_count;
+   int      action_max;
+   qboolean hitenemy;
 
    assert(owner);
    if(!owner)
@@ -638,6 +677,16 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
 
    angles = dir.toAngles();
    setAngles(angles);
+
+   action_per_bullet = action_level_increment;
+   action_count = 0;
+   action_max = 1;
+   hitenemy = false;
+   if(numbullets > 1)
+   {
+      action_max = numbullets * 0.6;
+      action_per_bullet /= action_max;
+   }
 
    for(i = 0; i < numbullets; i++)
    {
@@ -668,10 +717,12 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
                hit2 = trace2.ent->entity;
                if(hit2->takedamage && hit2->isClient())
                {
-                  if(owner->isClient() && hit2 != owner && !hit2->deadflag && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
+                  if(owner->isClient() && action_count < action_max && hit2 != owner && !(hit2->deadflag == DEAD_DEAD || !hitenemy && hit2->deadflag == DEAD_DYING) && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
                   {
                      Player *client = (Player *)(Entity *)owner;
-                     client->IncreaseActionLevel((float)action_level_increment / numbullets);
+                     client->IncreaseActionLevel(action_per_bullet);
+                     action_count++;
+                     hitenemy = true;
                   }
                   // probably traced to the rider, so hit him instead
                   hit2->Damage(this, owner, mindamage + (int)G_Random(maxdamage - mindamage + 1),
@@ -688,16 +739,19 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
          }
       }
 
-      if(!damagedtarget && DM_FLAG(DF_BBOX_BULLETS))
+      //if(!damagedtarget && DM_FLAG(DF_BBOX_BULLETS))
+      if(!damagedtarget && deathmatch->value)
       {
-         trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
+         trace = G_Trace(src, vec_zero, vec_zero, end, bike->frontbox, MASK_SHOT, "BulletWeapon::FireBullets");
 
          if(trace.fraction != 1.0)
          {
-            if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
             {
                Player *client = (Player *)(Entity *)owner;
-               client->IncreaseActionLevel((float)action_level_increment / numbullets);
+               client->IncreaseActionLevel(action_per_bullet);
+               action_count++;
+               hitenemy = true;
             }
             // do less than regular damage on a bbox hit
             TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, 
@@ -721,10 +775,12 @@ void HoverWeap::FireBullets(Vector src, Vector dir, int numbullets, Vector sprea
          damagedtarget = false;
          if(trace.fraction != 1.0)
          {
-            if(owner->isClient() && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !trace.ent->entity->deadflag && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
             {
                Player *client = (Player *)(Entity *)owner;
-               client->IncreaseActionLevel((float)action_level_increment / numbullets);
+               client->IncreaseActionLevel(action_per_bullet);
+               action_count++;
+               hitenemy = true;
             }
             TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, 
                         MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);

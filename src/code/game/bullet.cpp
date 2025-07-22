@@ -46,6 +46,7 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    int			timeofs;
    Entity		*ent;
    qboolean    ricochet;
+   trace_t     trace2;
 
    if(HitSky(trace))
    {
@@ -59,6 +60,39 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
    org = end - dir;
 
    ent = trace->ent->entity;
+
+   if(!trace->intersect.valid && ent)
+   {
+      trace2 = G_FullTrace(end, vec_zero, vec_zero, (end + dir * 80), 5, owner, MASK_SHOT, "BulletWeapon::TraceAttack");
+      if(trace2.intersect.valid && trace2.ent == trace->ent)
+      {
+         trace = &trace2;
+      }
+      else if(ent->isClient())
+      {
+         float pos = (end.z - ent->absmin.z) / (ent->absmax.z - ent->absmin.z);
+         if(pos >= 0.6)
+         {
+            trace->intersect.parentgroup = -2;
+            trace->intersect.damage_multiplier = 1;
+         }
+         else if(pos >= 0.45)
+         {
+            trace->intersect.parentgroup = -3;
+            trace->intersect.damage_multiplier = 1;
+         }
+         else if(pos >= 0.30)
+         {
+            trace->intersect.parentgroup = -4;
+            trace->intersect.damage_multiplier = 0.5;
+         }
+         else
+         {
+            trace->intersect.parentgroup = -5;
+            trace->intersect.damage_multiplier = 0.3;
+         }
+      }
+   }
 
    if(!trace->surface)
    {
@@ -181,16 +215,16 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
                // We didn't hit any groups, so send in generic damage
                ent->Damage(this,
                   owner,
-                  damage,
+                  damage*0.85,
                   trace->endpos,
                   dir,
                   trace->plane.normal,
                   kick,
                   dflags,
                   meansofdeath,
+                  (trace->intersect.parentgroup < -1 ? trace->intersect.parentgroup : -1),
                   -1,
-                  -1,
-                  1);
+                  (trace->intersect.parentgroup < -1 ? trace->intersect.damage_multiplier : 1));
             }
          }
       }
@@ -268,12 +302,23 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
       //
       // since this is a ricochet, we don't ignore the wewapon owner this time.
       //
-      *trace = G_FullTrace(org, vec_zero, vec_zero, endpos, 5, NULL, MASK_SHOT, "BulletWeapon::TraceAttack");
+      //###
+      //if(DM_FLAG(DF_BBOX_BULLETS))
+      if(deathmatch->value)
+      {
+         *trace = G_Trace(org, vec_zero, vec_zero, endpos, NULL, MASK_SHOT, "BulletWeapon::TraceAttack");
+      }
+      else
+      {
+         *trace = G_FullTrace(org, vec_zero, vec_zero, endpos, 5, NULL, MASK_SHOT, "BulletWeapon::TraceAttack");
+      }
+
       if(trace->fraction != 1.0)
       {
          endpos = trace->endpos;
          TraceAttack(org, endpos, damage * 0.8f, trace, numricochets - 1, kick, dflags, meansofdeath, true);
       }
+      //###
    }
 }
 
@@ -321,32 +366,54 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
          right * G_CRandom() * spread.x +
          up    * G_CRandom() * spread.y;
 
-      trace = G_FullTrace(src, vec_zero, vec_zero, end, 5, owner, MASK_SHOT, "BulletWeapon::FireBullets");
-#if 0
-      Com_Printf("Server OWNER  Angles:%0.2f %0.2f %0.2f\n", owner->angles[0], owner->angles[1], owner->angles[2]);
-      Com_Printf("Server Bullet Angles:%0.2f %0.2f %0.2f\n", angles[0], angles[1], angles[2]);
-      Com_Printf("Right               :%0.2f %0.2f %0.2f\n", right[0], right[1], right[2]);
-      Com_Printf("Up                  :%0.2f %0.2f %0.2f\n", up[0], up[1], up[2]);
-      Com_Printf("Direction           :%0.2f %0.2f %0.2f\n", dir[0], dir[1], dir[2]);
-      Com_Printf("Endpoint            :%0.2f %0.2f %0.2f\n", end[0], end[1], end[2]);
-      Com_Printf("Server Trace Start  :%0.2f %0.2f %0.2f\n", src[0], src[1], src[2]);
-      Com_Printf("Server Trace End    :%0.2f %0.2f %0.2f\n", trace.endpos[0], trace.endpos[1], trace.endpos[2]);
-      Com_Printf("\n");
-#endif
-      if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
-         FireTracer(trace.endpos);
-
-      if(trace.fraction != 1.0)
+      //if(!damagedtarget && DM_FLAG(DF_BBOX_BULLETS))
+      if(deathmatch->value)
       {
-         if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+         trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
+
+         if(trace.fraction != 1.0)
          {
-            Player *client = (Player *)(Entity *)owner;
-            client->IncreaseActionLevel(action_per_bullet);
-            action_count++;
-            hitenemy = true;
+            if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            {
+               Player *client = (Player *)(Entity *)owner;
+               client->IncreaseActionLevel(action_per_bullet);
+               action_count++;
+               hitenemy = true;
+            }
+            // do less than regular damage on a bbox hit
+            TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, 
+                        MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
          }
-         TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
       }
+      else
+      { //###
+         trace = G_FullTrace(src, vec_zero, vec_zero, end, 5, owner, MASK_SHOT, "BulletWeapon::FireBullets");
+#if 0
+         Com_Printf("Server OWNER  Angles:%0.2f %0.2f %0.2f\n", owner->angles[0], owner->angles[1], owner->angles[2]);
+         Com_Printf("Server Bullet Angles:%0.2f %0.2f %0.2f\n", angles[0], angles[1], angles[2]);
+         Com_Printf("Right               :%0.2f %0.2f %0.2f\n", right[0], right[1], right[2]);
+         Com_Printf("Up                  :%0.2f %0.2f %0.2f\n", up[0], up[1], up[2]);
+         Com_Printf("Direction           :%0.2f %0.2f %0.2f\n", dir[0], dir[1], dir[2]);
+         Com_Printf("Endpoint            :%0.2f %0.2f %0.2f\n", end[0], end[1], end[2]);
+         Com_Printf("Server Trace Start  :%0.2f %0.2f %0.2f\n", src[0], src[1], src[2]);
+         Com_Printf("Server Trace End    :%0.2f %0.2f %0.2f\n", trace.endpos[0], trace.endpos[1], trace.endpos[2]);
+         Com_Printf("\n");
+#endif
+         if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
+            FireTracer(trace.endpos);
+
+         if(trace.fraction != 1.0)
+         {
+            if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
+            {
+               Player *client = (Player *)(Entity *)owner;
+               client->IncreaseActionLevel(action_per_bullet);
+               action_count++;
+               hitenemy = true;
+            }
+            TraceAttack(src, trace.endpos, mindamage + (int)G_Random(maxdamage - mindamage + 1), &trace, MAX_RICOCHETS, kick, dflags, meansofdeath, server_effects);
+         }
+      } // ###
    }
 }
 
