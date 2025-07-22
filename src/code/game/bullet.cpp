@@ -176,10 +176,10 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
 
                switch(surfflags & MASK_SURF_TYPE)
                {
-               case SURF_TYPE_METAL:
-               case SURF_TYPE_GRILL:
+               //case SURF_TYPE_METAL:
+               //case SURF_TYPE_GRILL:
                case SURF_TYPE_MONITOR:
-               case SURF_TYPE_DUCT:
+               //case SURF_TYPE_DUCT:
                   SpawnSparks(trace->endpos, trace->plane.normal, 4);
                   break;
                case SURF_TYPE_FLESH:
@@ -231,6 +231,8 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
       else
       {
          surftype = SURF_TYPE_METAL;
+         SpawnSparks(trace->endpos, trace->plane.normal, 4);
+         ent->RandomGlobalSound("ricochet_metal", 1, CHAN_BODY);
          ricochet = true;
       }
    }
@@ -278,10 +280,10 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
 
       switch(surfflags & MASK_SURF_TYPE)
       {
-      case SURF_TYPE_METAL:
-      case SURF_TYPE_GRILL:
+      //case SURF_TYPE_METAL:
+      //case SURF_TYPE_GRILL:
       case SURF_TYPE_MONITOR:
-      case SURF_TYPE_DUCT:
+      //case SURF_TYPE_DUCT:
          SpawnSparks(trace->endpos, trace->plane.normal, 4);
          break;
       case SURF_TYPE_FLESH:
@@ -313,10 +315,12 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
          *trace = G_FullTrace(org, vec_zero, vec_zero, endpos, 5, NULL, MASK_SHOT, "BulletWeapon::TraceAttack");
       }
 
+      FireTracer(trace->endpos, org);
+
       if(trace->fraction != 1.0)
       {
          endpos = trace->endpos;
-         TraceAttack(org, endpos, damage * 0.8f, trace, numricochets - 1, kick, dflags, meansofdeath, true);
+         TraceAttack(org, endpos, damage * 0.8f, trace, numricochets - 1, kick, dflags, meansofdeath, 2);
       }
       //###
    }
@@ -371,6 +375,9 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
       {
          trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
 
+         if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
+            FireTracer(trace.endpos);
+
          if(trace.fraction != 1.0)
          {
             if(owner->isClient() && action_count < action_max && trace.ent->entity != owner && trace.ent->entity->isSubclassOf<Sentient>() && !(trace.ent->entity->deadflag == DEAD_DEAD || !hitenemy && trace.ent->entity->deadflag == DEAD_DYING) && !(trace.ent->entity->flags & (FL_FORCEFIELD | FL_GODMODE)))
@@ -417,7 +424,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
    }
 }
 
-void BulletWeapon::FireTracer(Vector end)
+void BulletWeapon::FireTracer(Vector end, Vector start)
 {
    Entity   *tracer;
    Vector   src, dir;
@@ -431,11 +438,13 @@ void BulletWeapon::FireTracer(Vector end)
    
    server_effects = owner->isClient() /*&& !deathmatch->value && !coop->value*/;
 
-   if(G_Random(1.0) > 0.7)
+   if(start == vec_zero && G_Random(1.0) > 0.7)
       return;
 
    client = (Player *)(Entity *)owner;
-   if(server_effects && client->ViewMode() == THIRD_PERSON)
+   if(start != vec_zero)
+      src = start;
+   else if(server_effects && client->ViewMode() == THIRD_PERSON)
    {
       savedhand = owner->client->pers.hand;
       owner->client->pers.hand = RIGHT_HANDED;
