@@ -1125,11 +1125,11 @@ void Player::Obituary(Entity *attacker, Entity *inflictor, str location, int mea
          {
             if(message1)
             {
-               gi.printf("%s %s.\n", client->pers.netname, message1);
+               gi.bprintf(PRINT_MEDIUM, "%s %s.\n", client->pers.netname, message1);
             }
             else
             {
-               gi.printf("%s died.\n", client->pers.netname);
+               gi.bprintf(PRINT_MEDIUM, "%s died.\n", client->pers.netname);
             }
             client->resp.score--;
          }
