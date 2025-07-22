@@ -267,7 +267,7 @@ void PulseRifle::TraceAttack(Vector start, Vector end, int damage, trace_t *trac
                      kick,
                      dflags,
                      MOD_PULSELASER,
-                     trace->intersect.parentgroup,
+                     -1,
                      -1,
                      ((trace->intersect.damage_multiplier - 1) / 2) + 1.0f);
       }

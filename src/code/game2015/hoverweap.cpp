@@ -595,11 +595,13 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
       else
       {
          surftype = SURF_TYPE_METAL;
+         SpawnSparks(trace->endpos, trace->plane.normal, 4);
+         ent->RandomGlobalSound("sparks", 1, CHAN_BODY);
          ricochet = true;
       }
    }
 
-   if(ricochet && (server_effects || (numricochets < MAX_RICOCHETS)))
+   /*if(ricochet && (server_effects || (numricochets < MAX_RICOCHETS)))
    {
       timeofs = MAX_RICOCHETS - numricochets;
       if(timeofs > 0xf)
@@ -632,7 +634,7 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
             }
          }
       }
-   }
+   }*/
 
    if(ricochet && numricochets && damage)
    {
@@ -647,6 +649,8 @@ void HoverWeap::TraceAttack(const Vector &start, const Vector &end, int damage, 
          *trace = G_Trace(org, vec_zero, vec_zero, endpos, nullptr, MASK_SHOT, "BulletWeapon::TraceAttack");
       else
          *trace = G_FullTrace(org, vec_zero, vec_zero, endpos, 5, nullptr, MASK_SHOT, "BulletWeapon::TraceAttack");
+
+      SpawnBeam(org, trace->endpos, NULL, gi.modelindex("models/beam_bike.def"), 1.0, 30, 0);
 
       if(trace->fraction != 1.0)
       {
