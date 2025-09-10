@@ -88,7 +88,8 @@ void Pulse::Explode(Event *ev)
       return;
    }
 
-   damg = 50 + (int)G_Random(25);
+   //damg = 50 + (int)G_Random(25);
+   damg = 75;
 
    // Single player packs a bigger punch
    if(!deathmatch->value && owner->isClient())
