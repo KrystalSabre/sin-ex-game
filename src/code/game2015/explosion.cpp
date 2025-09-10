@@ -162,19 +162,21 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
       {
          org = ent->centroid;
          v = org - inflictorent->worldorigin;
-         //### use passed in falloff rate
-         //points = v.length() * 0.5f;
-         points = v.length()*falloff_rate;
-         //###
-
-         if(points < 0)
-         {
-            points = 0;
-         }
          if(mod == MOD_PULSE)
-            points = damage - ((points / rad) * floor(damage * 0.67));
+            points = damage - ((max(v.length(), 0) / rad) * ceil(damage * 0.33));
          else
+         {
+            //### use passed in falloff rate
+            //points = v.length() * 0.5f;
+            points = v.length()*falloff_rate;
+            //###
+
+            if(points < 0)
+            {
+               points = 0;
+            }
             points = damage - points;
+         }
          if(ent == attackerent)
          {
             points *= 0.5;
