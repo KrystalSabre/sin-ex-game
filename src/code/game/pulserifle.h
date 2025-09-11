@@ -32,6 +32,7 @@ public:
 
    PulseRifle();
    virtual void      Shoot(Event *ev);
+   virtual void      DoneFiring(Event *ev)    override;
    void              TraceAttack(Vector start, Vector end, int damage, trace_t *trace, int numricochets,
                                  int kick, int dflags);
    void              PulseExplosion(trace_t *trace);

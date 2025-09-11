@@ -203,7 +203,7 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
                   ent->Damage(inflictorent, attackerent, points,
                               org, v, vec_zero, points, 
                               //DAMAGE_RADIUS, MOD_ROCKETSPLASH,
-                              DAMAGE_RADIUS | ((mod == MOD_PULSE || mod == MOD_ION) ? DAMAGE_ENERGY : 0), mod,
+                              DAMAGE_RADIUS, mod,
                               -1, -1, 1.0f );
                }
                //###

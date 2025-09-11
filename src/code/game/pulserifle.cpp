@@ -197,6 +197,7 @@ CLASS_DECLARATION(BulletWeapon, PulseRifle, "weapon_pulserifle");
 ResponseDef PulseRifle::Responses[] =
 {
    { &EV_Weapon_Shoot,              (Response)&PulseRifle::Shoot },
+   { &EV_Weapon_DoneFiring,         (Response)&PulseRifle::DoneFiring },
    { NULL, NULL }
 };
 
@@ -418,6 +419,21 @@ void PulseRifle::Shoot(Event *ev)
          damg = 15;
       TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, DAMAGE_ENERGY);
       NextAttack(0);
+   }
+}
+
+void PulseRifle::DoneFiring(Event *ev)
+{
+   weaponstate = WEAPON_READY;
+
+   if(weaponmode == PRIMARY)
+      RandomAnimate("primaryidle", EV_Weapon_Idle);
+   else
+      RandomAnimate("spindown", EV_Weapon_Idle);
+
+   if(owner)
+   {
+      owner->ProcessEvent(EV_Sentient_WeaponDoneFiring);
    }
 }
 
