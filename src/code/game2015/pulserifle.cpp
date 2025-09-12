@@ -88,12 +88,16 @@ void Pulse::Explode(Event *ev)
       return;
    }
 
-   //damg = 50 + (int)G_Random(25);
-   damg = 75;
+   damg = 50 + (int)G_Random(25);
 
    // Single player packs a bigger punch
-   if(!deathmatch->value && owner->isClient())
-      damg *= 1.5;
+   if(owner->isClient())
+   {
+      if(!deathmatch->value)
+         damg *= 1.5;
+      else
+         damg = 75;
+   }
 
    if(other->takedamage)
       other->Damage(this, owner, damg, worldorigin, velocity, level.impact_trace.plane.normal, 32, DAMAGE_ENERGY, MOD_PULSE, -1, -1, 1.0f);
@@ -210,8 +214,8 @@ PulseRifle::PulseRifle() : BulletWeapon()
    //###
       SetModels("pulse2.def", "view_pulse2.def");
 
-   SetAmmo("BulletPulse", 10, 50);
-   SetSecondaryAmmo("BulletPulse", 5, 50);
+   SetAmmo("BulletPulse", 5, 50);
+   SetSecondaryAmmo("BulletPulse", 10, 50);
    SetRank(80, 80);
    SetType(WEAPON_2HANDED_LO);
    dualmode = true;
@@ -257,7 +261,7 @@ void PulseRifle::TraceAttack(Vector start, Vector end, int damage, trace_t *trac
 
    if(ent && ent->takedamage)
    {
-      if(trace->intersect.valid)
+      if(trace->intersect.valid && deathmatch->value && !ctf->value)
       {
          // We hit a valid group so send in location based damage
          ent->Damage(this,
@@ -271,7 +275,7 @@ void PulseRifle::TraceAttack(Vector start, Vector end, int damage, trace_t *trac
                      MOD_PULSELASER,
                      -1,
                      -1,
-                     ((trace->intersect.damage_multiplier - 1) / 2) + 1.0f);
+                     ((trace->intersect.damage_multiplier - 1) * 0.5f) + 1.0f);
       }
       else
       {
@@ -394,7 +398,7 @@ void PulseRifle::Shoot(Event *ev)
       if(ctf->value)
          trace = G_Trace(pos, vec_zero, vec_zero, end, owner, MASK_SHOT, "PulseRifle::Shoot");
       else
-         trace = G_FullTrace(pos, vec_zero, vec_zero, end, 15, owner, MASK_SHOT, "PulseRifle::Shoot");
+         trace = G_FullTrace(pos, vec_zero, vec_zero, end, 20, owner, MASK_SHOT, "PulseRifle::Shoot");
       delta = trace.endpos - pos;
       dist = delta.length();
 
@@ -409,7 +413,7 @@ void PulseRifle::Shoot(Event *ev)
          client->IncreaseActionLevel((float)action_level_increment / 6);
       }
 
-      if(ctf->value)
+      if(!deathmatch->value || ctf->value)
          damg = 30;
       else
          damg = 15;

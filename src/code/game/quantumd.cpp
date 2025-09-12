@@ -461,7 +461,7 @@ QuantumDestabilizer::QuantumDestabilizer() : BulletWeapon()
    gi.soundindex("weapons/quantum/burst.wav");
 
    SetAmmo("BulletPulse", 20, 100);
-   SetSecondaryAmmo( "BulletPulse", 5, 100);
+   SetSecondaryAmmo("BulletPulse", 10, 100);
    SetRank(90, 90);
    SetType(WEAPON_2HANDED_LO);
    trapped_sent = NULL;
@@ -737,7 +737,7 @@ void QuantumDestabilizer::TraceAttack(Vector start, Vector end, int damage, trac
 
    if(ent && ent->takedamage)
    {
-      if(trace->intersect.valid)
+      if(trace->intersect.valid && deathmatch->value && !ctf->value)
       {
          // We hit a valid group so send in location based damage
          ent->Damage(
@@ -752,7 +752,7 @@ void QuantumDestabilizer::TraceAttack(Vector start, Vector end, int damage, trac
             MOD_QUANTUM,
             -1,
             -1,
-            ((trace->intersect.damage_multiplier - 1) / 2) + 1.0f);
+            ((trace->intersect.damage_multiplier - 1) * 0.3f) + 1.0f);
       }
       else
       {
@@ -818,7 +818,10 @@ void QuantumDestabilizer::Shoot(Event *ev)
          client->IncreaseActionLevel((float)action_level_increment / 4);
       }
 
-      damg = 25;
+      if(!deathmatch->value || ctf->value)
+         damg = 40;
+      else
+         damg = 25;
       TraceAttack(pos, trace.endpos, damg, &trace, 0, 0, DAMAGE_ENERGY);
       NextAttack(0);
    }
