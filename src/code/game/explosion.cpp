@@ -78,7 +78,12 @@ void RadiusDamage(Entity *inflictorent, Entity *attackerent, int damage, Entity 
    float		rad;
 
    if(mod == MOD_PULSE)
-      rad = floor(damage * 1.34) + 60;
+   {
+      if(!deathmatch->value && attackerent && attackerent->isClient())
+         rad = 210;
+      else
+         rad = 160;
+   }
    else
       rad = (float)(damage + 60);
 
