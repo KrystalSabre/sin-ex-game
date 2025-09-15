@@ -218,18 +218,38 @@ void Item::DropToFloor(Event *ev)
 
 qboolean Item::Drop(void)
 {
+   Vector temp;
+
    if(!owner)
    {
       return false;
    }
 
-   setOrigin(owner->worldorigin + Vector(0, 0, 40));
+   const gravityaxis_t &grav = gravity_axis[gravaxis];
+
+   temp[grav.z] = 40 * grav.sign;
+   if(owner)
+   {
+      setOrigin(owner->worldorigin + temp);
+   }
+   else
+   {
+      setOrigin(worldorigin + temp);
+   }
 
    // drop the item
    PlaceItem();
-   velocity = owner->velocity * 0.5 + Vector(G_CRandom(50), G_CRandom(50), 100);
-   setAngles(owner->angles);
-   avelocity = Vector(0, G_CRandom(360), 0);
+   if(owner)
+   {
+      temp[grav.x] = G_CRandom(50);
+      temp[grav.y] = G_CRandom(50);
+      temp[grav.z] = 100 * grav.sign;
+      velocity = owner->velocity * 0.5 + temp;
+      setAngles(owner->angles);
+   }
+
+   if(!gravaxis)
+      avelocity = Vector(0, G_CRandom(360), 0);
 
    trigger_time = level.time + 1;
 

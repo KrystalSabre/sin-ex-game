@@ -58,10 +58,16 @@ void GlowStick::Use(Event *ev)
       owner->RemoveItem(this);
    }
 
-   dir = owner->orientation[0];
+   const gravityaxis_t &grav = gravity_axis[owner->gravaxis];
+   Vector pos = owner->worldorigin;
+   pos[grav.z] += owner->viewheight * grav.sign;
+   dir[grav.x] = owner->orientation[0][0];
+   dir[grav.y] = owner->orientation[0][1] * grav.sign;
+   dir[grav.z] = owner->orientation[0][2] * grav.sign;
 
    glowstick = new Entity();
 
+   glowstick->SetGravityAxis(owner->gravaxis);
    glowstick->angles = dir.toAngles();
    glowstick->setAngles(glowstick->angles);
    glowstick->setMoveType(MOVETYPE_BOUNCE);
@@ -74,7 +80,8 @@ void GlowStick::Use(Event *ev)
    glowstick->edict->s.color_g = 1.0;
    glowstick->edict->s.color_b = 0.1;
    glowstick->edict->s.radius = 200;
-   glowstick->setOrigin(owner->worldorigin + Vector(0, 0, owner->viewheight));
+   glowstick->setOrigin(pos);
+   glowstick->worldorigin.copyTo(glowstick->edict->s.old_origin);
    glowstick->PostEvent(EV_Remove, 60);
 }
 

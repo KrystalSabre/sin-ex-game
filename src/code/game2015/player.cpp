@@ -8572,7 +8572,8 @@ void Player::CTF_DropTech(Event *ev)
 
    if((tech = static_cast<CTF_Tech *>(HasItemOfSuperclass("CTF_Tech"))))
    {
-      Vector forward, right;
+      Vector forward, right, temp;
+      const gravityaxis_t &grav = gravity_axis[gravaxis];
       qboolean checkammo = false; //###
 
       //###
@@ -8581,7 +8582,8 @@ void Player::CTF_DropTech(Event *ev)
          checkammo = true;
       //###
 
-      tech->setOrigin(worldorigin + Vector(0, 0, 80));
+      temp[grav.z] = 80 * grav.sign;
+      tech->setOrigin(worldorigin + temp);
       tech->worldorigin.copyTo(tech->edict->s.old_origin);
       // drop the item
       tech->PlaceItem();
@@ -8589,7 +8591,8 @@ void Player::CTF_DropTech(Event *ev)
       v_angle.AngleVectors(&forward, &right, NULL);
       tech->velocity = velocity * 0.5 + forward * 200;
       tech->setAngles(angles);
-      tech->avelocity = Vector(0, G_CRandom(360), 0);
+      if(!tech->gravaxis)
+         tech->avelocity = Vector(0, G_CRandom(360), 0);
 
       tech->SetTriggerTime(level.time + 2);
 
@@ -8621,7 +8624,8 @@ void Player::CTF_DropFlag(Event *ev)
 {
    Item     *dropped_flag;
    str      enemy_flag;
-   Vector   forward, right;
+   Vector   forward, right, temp;
+   const gravityaxis_t &grav = gravity_axis[gravaxis];
 
    // Figure out the enemy flag
    if(client->resp.ctf_team == CTF_TEAM_HARDCORPS)
@@ -8662,14 +8666,16 @@ void Player::CTF_DropFlag(Event *ev)
 
       dropped_flag->RandomAnimate("idle", NULL);
       dropped_flag->PostEvent(EV_Flag_Reset, CTF_DROPPED_FLAG_RETURN_TIMEOUT);
-      dropped_flag->setOrigin(worldorigin + Vector(0, 0, 80));
+      temp[grav.z] = 80 * grav.sign;
+      dropped_flag->setOrigin(worldorigin + temp);
       dropped_flag->worldorigin.copyTo(dropped_flag->edict->s.old_origin);
       // drop the item
       dropped_flag->PlaceItem();
       v_angle.AngleVectors(&forward, &right, NULL);
       dropped_flag->velocity = velocity * 0.5 + forward * 200;
       dropped_flag->setAngles(angles);
-      dropped_flag->avelocity = Vector(0, G_CRandom(360), 0);
+      if(!dropped_flag->gravaxis)
+         dropped_flag->avelocity = Vector(0, G_CRandom(360), 0);
       dropped_flag->SetTriggerTime(level.time + 2);
       dropped_flag->spawnflags |= DROPPED_PLAYER_ITEM;
       // Remove this from the owner's item list

@@ -899,7 +899,8 @@ qboolean Weapon::Drop()
       setAngles(owner->angles);
    }
 
-   avelocity = Vector(0, G_CRandom(360), 0);
+   if(!gravaxis)
+      avelocity = Vector(0, G_CRandom(360), 0);
 
    if(owner && owner->isClient())
    {

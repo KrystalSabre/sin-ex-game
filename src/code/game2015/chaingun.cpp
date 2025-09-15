@@ -131,6 +131,9 @@ EXPORT_FROM_DLL void Grenade::Setup(Entity *owner, Vector pos, Vector forward, V
    velocity += up * (200 + crandom() * 10.0);
    velocity += right * (crandom() * 10.0);
 
+   angles = forward.toAngles();
+   angles[PITCH] = -angles[PITCH] - 180;
+   setAngles(angles);
    avelocity ={ 575, 0, 0 };
 
    ev = new Event(EV_Grenade_Explode);
