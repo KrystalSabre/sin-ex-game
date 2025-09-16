@@ -261,7 +261,7 @@ void PulseRifle::TraceAttack(Vector start, Vector end, int damage, trace_t *trac
 
    if(ent && ent->takedamage)
    {
-      if(trace->intersect.valid && deathmatch->value && !ctf->value)
+      if(trace->intersect.valid && deathmatch->value)
       {
          // We hit a valid group so send in location based damage
          ent->Damage(this,
@@ -395,7 +395,7 @@ void PulseRifle::Shoot(Event *ev)
       // Fire the beam
       length = ev->GetInteger(1);
       end = pos + dir * length;
-      if(ctf->value)
+      if(!owner->isClient() || ctf->value)
          trace = G_Trace(pos, vec_zero, vec_zero, end, owner, MASK_SHOT, "PulseRifle::Shoot");
       else
          trace = G_FullTrace(pos, vec_zero, vec_zero, end, 20, owner, MASK_SHOT, "PulseRifle::Shoot");
@@ -413,7 +413,7 @@ void PulseRifle::Shoot(Event *ev)
          client->IncreaseActionLevel((float)action_level_increment / 6);
       }
 
-      if(!deathmatch->value || ctf->value)
+      if(!deathmatch->value && owner->isClient() || ctf->value)
          damg = 30;
       else
          damg = 15;
