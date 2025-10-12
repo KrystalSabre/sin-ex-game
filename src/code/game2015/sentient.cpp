@@ -154,7 +154,7 @@ Vector Sentient::EyePosition()
    Vector pos;
 
    pos = worldorigin;
-   if(isClient())
+   if(isClient() && !(client->ps.pmove.pm_flags & PMF_NO_PREDICTION))
    {
       Player *player = (Player *)this;
       pos = player->realorigin;
@@ -171,7 +171,7 @@ Vector Sentient::GunPosition()
    Vector pos;
 
    pos = worldorigin;
-   if(isClient())
+   if(isClient() && !(client->ps.pmove.pm_flags & PMF_NO_PREDICTION))
    {
       Player *player = (Player *)this;
       pos = player->realorigin;
