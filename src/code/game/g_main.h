@@ -40,6 +40,7 @@ extern   netsurface_t   *g_surfaces;
 
 extern   cvar_t   *developer;
 extern   cvar_t   *precache;
+extern   cvar_t   *noreload;
 
 extern   cvar_t   *maxentities;
 extern   cvar_t   *maxconsoles;

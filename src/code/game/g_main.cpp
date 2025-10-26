@@ -76,6 +76,7 @@ cvar_t   *dialog;
 cvar_t	*precache;
 cvar_t   *g_showmem;
 cvar_t   *g_timeents;
+cvar_t	*noreload;
 
 cvar_t	*sv_maxvelocity;
 cvar_t	*sv_gravity;
@@ -232,6 +233,7 @@ void G_InitGame(void)
 
    developer			= gi.cvar("developer", "0", 0);
    precache 			= gi.cvar("sv_precache", "1", 0);
+   noreload          = gi.cvar("sv_noreload", "0", 0);
 
    //FIXME: sv_ prefix is wrong for these
    sv_rollspeed		    = gi.cvar("sv_rollspeed", "200", 0);

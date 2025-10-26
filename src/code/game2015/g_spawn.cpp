@@ -1228,6 +1228,20 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
 
    if(!LoadingServer || game.autosaved)
    {
+      if(!deathmatch->value && !noreload->value)
+      {
+         char name[MAX_OSPATH];
+         FILE *f;
+
+         snprintf(name, sizeof(name), "%s/save/current/%s.sav", gi.PlayerDir(), mapname);
+         f = fopen(name, "rb");
+         if(f)
+         {
+            fclose(f);
+            return;
+         }
+      }
+
       G_LevelStart();
    }
 }
