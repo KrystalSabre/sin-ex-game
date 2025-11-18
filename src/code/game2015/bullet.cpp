@@ -316,7 +316,7 @@ void BulletWeapon::TraceAttack(Vector start, Vector end, int damage, trace_t *tr
          *trace = G_FullTrace(org, vec_zero, vec_zero, endpos, 5, NULL, MASK_SHOT, "BulletWeapon::TraceAttack");
       }
 
-      FireTracer(trace->endpos, org);
+      FireTracer(trace->endpos, org, false);
 
       if(trace->fraction != 1.0)
       {
@@ -395,7 +395,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
                if(hit2->takedamage && hit2->isClient())
                {
                   if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
-                     FireTracer(trace2.endpos);
+                     FireTracer(trace2.endpos, vec_zero, (server_effects == 3 ? true : false));
 
                   if(owner->isClient() && action_count < action_max && hit2 != owner && !(hit2->deadflag == DEAD_DEAD || !hitenemy && hit2->deadflag == DEAD_DYING) && !(hit2->flags & (FL_FORCEFIELD | FL_GODMODE)))
                   {
@@ -413,7 +413,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
             }
             
             if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
-               FireTracer(trace.endpos);
+               FireTracer(trace.endpos, vec_zero, (server_effects == 3 ? true : false));
 
             hit->Damage(this, owner, mindamage + (int)G_Random(maxdamage - mindamage + 1), trace.endpos, dir, trace.plane.normal, kick, dflags, meansofdeath, -1, -1, 1);
 
@@ -427,7 +427,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
          trace = G_Trace(src, vec_zero, vec_zero, end, owner, MASK_SHOT, "BulletWeapon::FireBullets");
 
          if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
-            FireTracer(trace.endpos);
+            FireTracer(trace.endpos, vec_zero, (server_effects == 3 ? true : false));
 
          if(trace.fraction != 1.0)
          {
@@ -458,7 +458,7 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
          Com_Printf("\n");
 #endif
          if(server_effects >= 2 && !(silenced && (owner->flags & FL_SILENCER)))
-            FireTracer(trace.endpos);
+            FireTracer(trace.endpos, vec_zero, (server_effects == 3 ? true : false));
 
          if(trace.fraction != 1.0)
          {
@@ -475,27 +475,24 @@ void BulletWeapon::FireBullets(int numbullets, Vector spread, int mindamage, int
    }
 }
 
-void BulletWeapon::FireTracer(Vector end, Vector start)
+void BulletWeapon::FireTracer(Vector end, Vector start, qboolean instant)
 {
    Entity   *tracer;
    Vector   src, dir;
    Player   *client;
    int      savedhand;
-   qboolean server_effects;
    //trace_t  trace;
 
    if(G_NearEntityLimit())
       return;
 
-   server_effects = owner->isClient() /*&& !deathmatch->value && !coop->value*/;
-
-   if(start == vec_zero && G_Random(1.0) > 0.7)
+   if(!instant && start == vec_zero && G_Random(1.0) > 0.7)
       return;
 
    client = (Player *)(Entity *)owner;
    if(start != vec_zero)
       src = start;
-   else if(server_effects && client->ViewMode() == THIRD_PERSON)
+   else if(owner->isClient() && client->ViewMode() == THIRD_PERSON)
    {
       savedhand = owner->client->pers.hand;
       owner->client->pers.hand = RIGHT_HANDED;
@@ -514,33 +511,42 @@ void BulletWeapon::FireTracer(Vector end, Vector start)
    tracer = new Entity();
 
    tracer->angles = dir.toAngles();
-   if(server_effects)
+   if(owner->isClient() || instant)
       tracer->angles[PITCH] = -tracer->angles[PITCH] + 90;
    else
       tracer->angles[PITCH] *= -1;
 
    tracer->setAngles(tracer->angles);
 
-   if(server_effects)
+   if(owner->isClient())
    {
       tempangles = dir.toAngles();
       tempangles[PITCH] *= -1;
       AngleVectors(tempangles.vec3(), forward.vec3(), NULL, NULL);
-      tracer->setMoveType(MOVETYPE_FLY);
       tracer->setModel("sprites/tracer.spr");
+      tracer->setOrigin(src);
+      tracer->setMoveType(MOVETYPE_FLY);
       tracer->velocity = forward * 1500;
       tracer->PostEvent(EV_Remove, min(floor(dir.length() / (1500 * FRAMETIME)) * FRAMETIME, 2.0));
    }
    else
    {
+      if(instant)
+      {
+         tracer->setModel("sprites/tracer.spr");
+         tracer->setOrigin(end);
+      }
+      else
+      {
+         tracer->setModel("models/tracer.def");
+         tracer->setOrigin(src);
+      }
       tracer->setMoveType(MOVETYPE_NONE);
-      tracer->setModel("models/tracer.def");
       tracer->PostEvent(EV_Remove, 0.1f);
    }
 
    tracer->setSolidType(SOLID_NOT);
    tracer->setSize({ 0, 0, 0 }, { 0, 0, 0 });
-   tracer->setOrigin(src);
    tracer->edict->s.renderfx &= ~RF_FRAMELERP;
    tracer->edict->s.renderfx |= RF_DETAIL;
    tracer->edict->clipmask = 0x80000000;

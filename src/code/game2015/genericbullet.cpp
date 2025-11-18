@@ -34,7 +34,7 @@ GenericBullet::GenericBullet() : BulletWeapon()
 void GenericBullet::Shoot(Event *ev)
 {
    //FireTracer();
-   FireBullets(1, { 10, 10, 10 }, 2, 3, DAMAGE_BULLET, MOD_GENBULLET, 2);
+   FireBullets(1, { 10, 10, 10 }, 2, 3, DAMAGE_BULLET, MOD_GENBULLET, 3);
    NextAttack(0);
 }
 
@@ -53,7 +53,7 @@ void ReconahGun::Shoot(Event *ev)
       FireTracer();
    }*/
 
-   FireBullets(1, { 10, 10, 10 }, 14, 26, DAMAGE_BULLET, MOD_GENBULLET, 2);
+   FireBullets(1, { 10, 10, 10 }, 14, 26, DAMAGE_BULLET, MOD_GENBULLET, 3);
 }
 
 CLASS_DECLARATION(GenericBullet, BeeGun, "weapon_beegun");

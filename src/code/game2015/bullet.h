@@ -30,7 +30,7 @@ protected:
 
    virtual void TraceAttack(Vector start, Vector end, int damage, trace_t *trace, int numricochets, 
                             int kick, int dflags, int meansofdeath, qboolean server_effects);
-   virtual void FireTracer(Vector end, Vector start = vec_zero);
+   virtual void FireTracer(Vector end, Vector start, qboolean instant);
 
 public:
    CLASS_PROTOTYPE(BulletWeapon);
