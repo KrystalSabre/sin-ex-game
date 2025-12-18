@@ -1132,6 +1132,29 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
    inhibit = 0;
    world_spawned = false;
 
+   char name[MAX_OSPATH];
+   FILE *f;
+
+   snprintf(name, sizeof(name), "%s/maps/%s.ent", gi.GameDir(), mapname);
+   f = fopen(name, "rb");
+   if(f)
+   {
+      int numentitychars;
+      char *map_entitystring;
+      fseek(f, 0, SEEK_END);
+      numentitychars = ftell(f);
+      fseek(f, 0, SEEK_SET);
+      map_entitystring = NULL;
+      if(numentitychars)
+      {
+         map_entitystring = (char *)gi.TagMalloc(numentitychars * sizeof(char), TAG_LEVEL);
+         fread(map_entitystring, sizeof(char), numentitychars, f);
+         if(map_entitystring[0] == '{')
+            entities = map_entitystring;
+      }
+      fclose(f);
+   }
+
    // parse ents
    while(1)
    {
