@@ -1143,27 +1143,13 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
    world_spawned = false;
 
    char name[MAX_OSPATH];
-   FILE *f;
+   int			length;
+   const char	*buffer;
 
-   snprintf(name, sizeof(name), "%s/maps/%s.ent", gi.GameDir(), mapname);
-   f = fopen(name, "rb");
-   if(f)
-   {
-      int numentitychars;
-      char *map_entitystring;
-      fseek(f, 0, SEEK_END);
-      numentitychars = ftell(f);
-      fseek(f, 0, SEEK_SET);
-      map_entitystring = NULL;
-      if(numentitychars)
-      {
-         map_entitystring = (char *)gi.TagMalloc(numentitychars * sizeof(char), TAG_LEVEL);
-         fread(map_entitystring, sizeof(char), numentitychars, f);
-         if(map_entitystring[0] == '{')
-            entities = map_entitystring;
-      }
-      fclose(f);
-   }
+   snprintf(name, sizeof(name), "maps/%s.ent", mapname);
+   length = gi.LoadFile(name, (void **)&buffer, TAG_LEVEL);
+   if(length > 0 && buffer[0] == '{')
+      entities = buffer;
 
    // parse ents
    while(1)
@@ -1244,6 +1230,8 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
 #endif
    }
 
+   if(buffer)
+      gi.TagFree((void *)buffer);
    game.force_entnum = false;
    gi.dprintf("%i entities inhibited\n", inhibit);
 
@@ -1253,7 +1241,6 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
    {
       if(!deathmatch->value && !noreload->value)
       {
-         char name[MAX_OSPATH];
          FILE *f;
 
          snprintf(name, sizeof(name), "%s/save/current/%s.sav", gi.PlayerDir(), mapname);
