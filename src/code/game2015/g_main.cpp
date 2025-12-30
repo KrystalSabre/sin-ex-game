@@ -3478,7 +3478,7 @@ void G_InitSoundtrack(const char *filename)
    int   size;
    int   song;
    char  fullfile[MAX_OSPATH];
-	byte  *data;
+	const char *data;
 
    //
    // check for extension
@@ -3505,7 +3505,6 @@ void G_InitSoundtrack(const char *filename)
 
    // set the buffer
    buffer = (char *)data;
-   buffer[size] = '\0';
    // initialize some variables
    strcpy(load_path, "");
 
