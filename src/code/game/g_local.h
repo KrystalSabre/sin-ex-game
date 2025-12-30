@@ -269,6 +269,10 @@ public:
    qboolean    defaulthud;
    int         playtime;
 
+   float       music_default_duration[16];
+   qboolean    music_failure_hack;
+   str         music_failure_string;
+
    level_locals_t();
    virtual void   Archive(Archiver &arc)   override;
    virtual void   Unarchive(Archiver &arc) override;

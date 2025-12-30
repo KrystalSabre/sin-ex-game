@@ -2861,6 +2861,25 @@ level_locals_t::level_locals_t() : Class()
    defaultcamera = NULL;
    defaulthud = false;
    playtime = 0;
+   
+   music_default_duration[0] = 0;
+   music_default_duration[1] = -1;
+   music_default_duration[2] = -1;
+   music_default_duration[3] = -1;
+   music_default_duration[4] = -1;
+   music_default_duration[5] = -1;
+   music_default_duration[6] = -1;
+   music_default_duration[7] = -1;
+   music_default_duration[8] = -1;
+   music_default_duration[9] = -1;
+   music_default_duration[10] = -1;
+   music_default_duration[11] = -1;
+   music_default_duration[12] = -1;
+   music_default_duration[13] = -1;
+   music_default_duration[14] = -1;
+   music_default_duration[15] = -1;
+   music_failure_hack = false;
+   music_failure_string = "";
 }
 
 EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
@@ -3436,6 +3455,150 @@ void G_ServerCommand(void)
    {
       gi.cprintf(NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
    }
+}
+
+#define MAX_ARGS 16
+#define MAX_ARG_LENGTH 64
+void G_InitSoundtrack(const char *filename)
+{
+   cvar_t *musicdir;
+   cvar_t *sounddir;
+
+   char  args[MAX_ARGS][MAX_ARG_LENGTH];
+   int   numargs;
+   int   argnum;
+   char  com_token[MAX_STRING_CHARS];
+
+   char  alias[MAX_OSPATH];
+   char  file[MAX_OSPATH];
+   char  load_path[MAX_OSPATH];
+   char  *buffer;
+   char  path[MAX_QPATH];
+
+   int   size;
+   int   song;
+   char  fullfile[MAX_OSPATH];
+	byte  *data;
+
+   //
+   // check for extension
+   //
+
+   musicdir = gi.cvar("s_musicdir", "", 0);
+
+	if(!strrchr(filename, '.'))
+	{
+      Com_sprintf(path, sizeof(path), "%s/%s.mus", musicdir->string, filename);
+   }
+   else
+   	Com_sprintf(path, sizeof(path), "%s/%s", musicdir->string, filename);
+
+	size = gi.LoadFile(path, (void **)&data, TAG_LEVEL);
+
+	if(!data)
+	{
+		gi.dprintf("G_InitSoundtrack: Couldn't load %s\n", path);
+		return;
+	}
+   else
+		gi.dprintf("G_InitSoundtrack: Loading %s\n", path);
+
+   // set the buffer
+   buffer = (char *)data;
+   buffer[size] = '\0';
+   // initialize some variables
+   strcpy(load_path, "");
+
+   // read in all the commands
+   while(1)
+   {
+      numargs = 0;
+      // see if we reached the end of the file
+		strcpy(com_token, COM_GetToken((const char **)&buffer, true));
+
+      if(!com_token[0])
+         break;
+
+      if(strlen(com_token) >= MAX_ARG_LENGTH)
+      {
+         gi.dprintf("G_InitSoundtrack: argument too long, truncating in %s\n", path);
+         com_token[MAX_ARG_LENGTH - 1] = 0;
+      }
+      strcpy(args[numargs++], com_token);
+      // get the rest of the line
+      while(1)
+      {
+         strcpy(com_token, COM_GetToken((const char **)&buffer, false));
+         if(!com_token[0])
+            break;
+         if(strlen(com_token) >= MAX_ARG_LENGTH)
+         {
+            gi.dprintf("G_InitSoundtrack: argument too long, truncating in %s\n", path);
+            com_token[MAX_ARG_LENGTH - 1] = 0;
+         }
+         strcpy(args[numargs++], com_token);
+      }
+
+      // now that we have the whole line, process it
+      argnum = 0;
+      // see if it is a special command
+      if(!Q_strcasecmp(args[argnum], "path"))
+      {
+         strcpy(load_path, args[argnum+1]);
+         if(load_path[strlen(load_path)-1] != '/' || load_path[strlen(load_path)-1] != '\\') 
+            strcat(load_path, "/");
+         continue;
+      }
+      if(args[argnum][0] == '!')
+      {
+         if((song = MusicMood_NameToNum(&args[0][1])) != -1)
+         {
+            if(!Q_strcasecmp(args[1], "loop") && level.music_default_duration[song] > 0)
+               level.music_default_duration[song] = 0;
+         }
+         else
+            gi.dprintf("G_InitSoundtrack: song %s not found, command skipped in %s.\n", &args[0][1], path);
+      }
+      else
+      {
+         sounddir = gi.cvar("s_sounddir", "", 0);
+
+         if(numargs > 1)
+         {
+            strcpy(alias, args[argnum]);
+            strcpy(file, load_path);
+            strcat(file, args[argnum + 1]);
+   	      Com_sprintf(fullfile, sizeof(fullfile), "%s/%s", sounddir->string, file);
+         }
+         else
+         {
+            strcpy(file, load_path);
+            strcat(file, args[argnum + 1]);
+   	      Com_sprintf(fullfile, sizeof(fullfile), "%s/%s", sounddir->string, file);
+            // copy the filename minus the extension
+            strncpy(alias, args[argnum], strlen(args[argnum])-4);
+            alias[strlen(args[argnum])-4] = 0;
+         }
+
+         if((song = MusicMood_NameToNum(alias)) != -1)
+         {
+            if(gi.LoadFile(fullfile, NULL, 0) != -1)
+            {
+               level.music_default_duration[song] = gi.SoundLength(file);
+               if(song == mood_failure)
+                  level.music_failure_string = file;
+            }
+            else if(song == mood_special && !Q_strcasecmp(args[argnum + 1], "null"))
+               level.music_failure_hack = true;
+            else
+               gi.dprintf("G_InitSoundtrack: file %s not found, skipping song %s in %s.\n", file, alias, path);
+         }
+         else
+            gi.dprintf("G_InitSoundtrack: song %s not found in %s, skipping.\n", alias, path);
+      }
+   }
+   if(data)
+      gi.TagFree((void *)data);
 }
 
 //### ghost restoration functions
