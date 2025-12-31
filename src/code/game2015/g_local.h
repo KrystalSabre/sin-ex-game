@@ -314,10 +314,6 @@ public:
    qboolean    defaulthud;
    int         playtime;
 
-   float       music_default_duration[16];
-   qboolean    music_failure_hack;
-   str         music_failure_string;
-
    //### added checkpoint stuff
    float       fastest_lap;      // fastest lap time so far
    str         cp_sounds_script; // script to execute to cache the checkpoint sounds

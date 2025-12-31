@@ -5987,7 +5987,6 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
 {
    int current_mood_num;
    int fallback_mood_num;
-   float default_duration;
 
    music_forced = force;
 
@@ -6000,21 +5999,23 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
       }
       else
       {
-         default_duration = level.music_default_duration[current_mood_num];
-         if(default_duration > 0 && duration != -1 || duration > 0)
+         if(duration > 0)
          {
-            if(default_duration > 0 && (!duration || default_duration < duration))
-               duration = default_duration;
-
             if(force || !music_duration || music_forced == 2 || !(client->ps.current_music_mood == current_mood_num && music_duration <= level.time + duration))
                music_duration = -duration;
          }
          else if(duration && game.maxclients == 1 && gi.cvar("s_music", "1", 0)->value && current_mood_num != music_current_mood)
          {
-            if(level.music_failure_hack && level.music_failure_string.length())
+            ScriptVariable *var, *var2;
+            str name;
+
+            var = levelVars.GetVariable("musicstring");
+            var2 = levelVars.GetVariable("nullmusic");
+            if(var && (name = var->stringValue()).length())
             {
-               current_mood_num = mood_special;
-               LocalSound(level.music_failure_string.c_str(), 1.0, -1, ATTN_NORM, 1.0, 0.02f, 0, 0);
+               if(!var2 || (current_mood_num = MusicMood_NameToNum(var2->stringValue())) < 0)
+                  current_mood_num = mood_special;
+               LocalSound(var->stringValue(), 1.0, -1, ATTN_NORM, 1.0, 0.02f, 0, 0);
             }
             music_duration = 0;
          }
