@@ -1133,8 +1133,8 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
    world_spawned = false;
 
    char name[MAX_OSPATH];
-   int			length;
-   const char	*buffer;
+   int			length = 0;
+   const char	*buffer = nullptr;
 
    snprintf(name, sizeof(name), "maps/%s.ent", mapname);
    length = gi.LoadFile(name, (void **)&buffer, TAG_LEVEL);
@@ -1221,7 +1221,10 @@ void G_SpawnEntities(const char *mapname, const char *entities, const char *spaw
    }
 
    if(buffer)
+   {
       gi.TagFree((void *)buffer);
+      buffer = NULL;
+   }
    game.force_entnum = false;
    gi.dprintf("%i entities inhibited\n", inhibit);
 

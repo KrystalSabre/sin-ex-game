@@ -3467,18 +3467,17 @@ void G_InitSoundtrack(const char *filename)
    char  args[MAX_ARGS][MAX_ARG_LENGTH];
    int   numargs;
    int   argnum;
-   char  com_token[MAX_STRING_CHARS];
 
    char  alias[MAX_OSPATH];
    char  file[MAX_OSPATH];
    char  load_path[MAX_OSPATH];
-   char  *buffer;
    char  path[MAX_QPATH];
-
-   int   size;
-   int   song;
    char  fullfile[MAX_OSPATH];
-	const char *data;
+
+   int   size = 0;
+   int   song = 0;
+	const char *data = nullptr;
+   const char *com_token;
 
    //
    // check for extension
@@ -3495,7 +3494,8 @@ void G_InitSoundtrack(const char *filename)
 
 	size = gi.LoadFile(path, (void **)&data, TAG_LEVEL);
 
-	if(!data)
+   assert(data);
+	if(!data || size <= 0)
 	{
 		gi.dprintf("G_InitSoundtrack: Couldn't load %s\n", path);
 		return;
@@ -3503,8 +3503,6 @@ void G_InitSoundtrack(const char *filename)
    else
 		gi.dprintf("G_InitSoundtrack: Loading %s\n", path);
 
-   // set the buffer
-   buffer = (char *)data;
    // initialize some variables
    strcpy(load_path, "");
 
@@ -3513,29 +3511,19 @@ void G_InitSoundtrack(const char *filename)
    {
       numargs = 0;
       // see if we reached the end of the file
-		strcpy(com_token, COM_GetToken((const char **)&buffer, true));
+		com_token = COM_GetToken(&data, true);
 
       if(!com_token[0])
          break;
 
-      if(strlen(com_token) >= MAX_ARG_LENGTH)
-      {
-         gi.dprintf("G_InitSoundtrack: argument too long, truncating in %s\n", path);
-         com_token[MAX_ARG_LENGTH - 1] = 0;
-      }
-      strcpy(args[numargs++], com_token);
+      Q_strlcpy(args[numargs++], com_token, MAX_ARG_LENGTH);
       // get the rest of the line
       while(1)
       {
-         strcpy(com_token, COM_GetToken((const char **)&buffer, false));
+         com_token = COM_GetToken(&data, false);
          if(!com_token[0])
             break;
-         if(strlen(com_token) >= MAX_ARG_LENGTH)
-         {
-            gi.dprintf("G_InitSoundtrack: argument too long, truncating in %s\n", path);
-            com_token[MAX_ARG_LENGTH - 1] = 0;
-         }
-         strcpy(args[numargs++], com_token);
+         Q_strlcpy(args[numargs++], com_token, MAX_ARG_LENGTH);
       }
 
       // now that we have the whole line, process it
@@ -3597,7 +3585,10 @@ void G_InitSoundtrack(const char *filename)
       }
    }
    if(data)
+   {
       gi.TagFree((void *)data);
+      data = NULL;
+   }
 }
 
 //### ghost restoration functions
