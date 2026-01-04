@@ -1172,6 +1172,8 @@ void ChangeMusic(const char *current, const char *fallback, qboolean force, floa
 void ChangeSoundtrack(const char * soundtrack)
 {
    gi.configstring(CS_SOUNDTRACK, soundtrack);
+   level.soundtrack = soundtrack;
+   G_InitSoundtrack();
 }
 
 //

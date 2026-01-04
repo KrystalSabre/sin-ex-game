@@ -97,6 +97,7 @@ World::World() : Entity()
    if(text)
    {
       gi.configstring(CS_SOUNDTRACK, text);
+      level.soundtrack = text;
    }
 
    text = G_GetSpawnArg("sky");

@@ -756,6 +756,7 @@ void G_ReadLevel(const char *filename)
    }
 
    ReadLevel(filename);
+   G_InitSoundtrack();
 }
 
 /*
@@ -2399,6 +2400,7 @@ level_locals_t::level_locals_t() : Class()
    level_name = "";
    mapname = "";
    nextmap = "";
+   soundtrack = "";
 
    playerfrozen = false;
    intermissiontime = 0;
@@ -2424,6 +2426,9 @@ level_locals_t::level_locals_t() : Class()
    default_current_mood = "normal";
    default_fallback_mood = "normal";
    default_music_forced = false;
+   memset(music_default_duration, 0, 16*sizeof(float));
+   music_failure_hack = false;
+   music_failure_string = "";
 
    water_color = vec_zero;
    lightvolume_color = vec_zero;
@@ -2450,6 +2455,7 @@ EXPORT_FROM_DLL void level_locals_t::Archive(Archiver &arc)
    arc.WriteString(level_name);
    arc.WriteString(mapname);
    arc.WriteString(nextmap);
+   arc.WriteString(soundtrack);
 
    arc.WriteBoolean(playerfrozen);
    arc.WriteFloat(intermissiontime);
@@ -2498,6 +2504,7 @@ EXPORT_FROM_DLL void level_locals_t::Unarchive(Archiver &arc)
    arc.ReadString(&level_name);
    arc.ReadString(&mapname);
    arc.ReadString(&nextmap);
+   arc.ReadString(&soundtrack);
 
    arc.ReadBoolean(&playerfrozen);
    arc.ReadFloat(&intermissiontime);
@@ -2868,6 +2875,50 @@ void G_ServerCommand(void)
    else
    {
       gi.cprintf(NULL, PRINT_HIGH, "Unknown server command \"%s\"\n", cmd);
+   }
+}
+
+void G_InitSoundtrack(void)
+{
+   int			length;
+   const char	*data = nullptr;
+
+   str         name;
+
+   if(!level.soundtrack.length())
+      return;
+
+   name = "music/";
+   name += level.soundtrack;
+   name += ".mus";
+
+   length = gi.LoadFile(name.c_str(), (void **)&data, TAG_LEVEL);
+   if(length < 0)
+   {
+      gi.printf("Couldn't load %s\n", name.c_str());
+      return;
+   }
+   else
+      gi.printf("Loading %s\n", name.c_str());
+
+   gi.printf("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n", level.music_default_duration[0], level.music_default_duration[1], 
+      level.music_default_duration[2], level.music_default_duration[3], level.music_default_duration[4], level.music_default_duration[5], 
+      level.music_default_duration[6], level.music_default_duration[7], level.music_default_duration[8], level.music_default_duration[9], level.music_default_duration[10], 
+      level.music_default_duration[11], level.music_default_duration[12], level.music_default_duration[13], level.music_default_duration[14], level.music_default_duration[15]);
+
+   FILE *temp;
+   temp = fopen("music.test", "wb");
+   if(temp)
+   {
+      fwrite(data, sizeof(char), length, temp);
+   }
+   fclose(temp);
+
+   assert(data);
+   if(data)
+   {
+      gi.TagFree((void *)data);
+      data = NULL;
    }
 }
 

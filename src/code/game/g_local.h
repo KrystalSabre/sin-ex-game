@@ -218,6 +218,7 @@ public:
    str         level_name;             // the descriptive name (Outer Base, etc)
    str         mapname;                // the server name (base1, etc)
    str         nextmap;                // go here when fraglimit is hit
+   str         soundtrack;
 
    // used for cinematics
    qboolean    playerfrozen;
@@ -254,6 +255,9 @@ public:
    str         default_current_mood;
    str         default_fallback_mood;
    qboolean    default_music_forced;
+   float       music_default_duration[16];
+   qboolean    music_failure_hack;
+   str         music_failure_string;
 
    // Blending color for water, light volumes,lava
    Vector      water_color;

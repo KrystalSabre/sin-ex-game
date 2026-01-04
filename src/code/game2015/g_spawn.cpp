@@ -984,6 +984,7 @@ void G_LevelStart(void)
    levelVars.SetVariable("found_secrets", level.found_secrets);
 
    G_FindTeams();
+   G_InitSoundtrack();
 
    // Create the mission computer
    consoleManager.CreateMissionComputer();

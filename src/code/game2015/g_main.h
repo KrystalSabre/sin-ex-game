@@ -155,6 +155,8 @@ void        SVCmd_RemoveIP_f(void);
 void        SVCmd_ListIP_f(void);
 void        SVCmd_WriteIP_f(void);
 
+void        G_InitSoundtrack(void);
+
 #endif /* g_main.h */
 
 // EOF
