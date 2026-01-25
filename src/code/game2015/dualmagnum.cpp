@@ -87,7 +87,7 @@ void DualMagnum::ReadyWeapon(void)
 void DualMagnum::Shoot(Event *ev)
 {
    NextAttack(0.2);
-   FireBullets(1, Vector(10, 10, 10), 12, 24, DAMAGE_BULLET, MOD_MAGNUM, true);
+   FireBullets(1, Vector(200, 200, 200), 12, 24, DAMAGE_BULLET, MOD_MAGNUM, true);
 }
 
 void DualMagnum::SecondaryUse(Event *ev)
