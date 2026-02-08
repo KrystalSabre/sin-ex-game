@@ -37,6 +37,7 @@ public:
    void         AttackFinished(Event *ev);
    void         ReleaseBetty(Event *ev);
    void         Killed(Event *ev);
+   void         DamageEvent(Event *ev);
    virtual void Archive(Archiver &arc)   override;
    virtual void Unarchive(Archiver &arc) override;
 };

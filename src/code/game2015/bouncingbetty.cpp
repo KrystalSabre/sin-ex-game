@@ -36,6 +36,7 @@ ResponseDef BettyLauncher::Responses[] =
    { &EV_Betty_AttackFinished, (Response)&BettyLauncher::AttackFinished },
    { &EV_Betty_Fire,           (Response)&BettyLauncher::ReleaseBetty },
    { &EV_Killed,               (Response)&BettyLauncher::Killed },
+   { &EV_Damage,               (Response)&BettyLauncher::DamageEvent },
    { NULL, NULL }
 };
 
@@ -62,6 +63,18 @@ BettyLauncher::BettyLauncher() : Entity()
    {
       PostEvent(EV_Betty_CheckVicinity, 0.3f);
    }
+}
+
+void BettyLauncher::DamageEvent(Event *ev)
+{
+   Entity   *inflictor;
+
+   inflictor = ev->GetEntity(2);
+
+   if(inflictor && (inflictor->isSubclassOf<BouncingBetty>() || inflictor->isSubclassOf<BettySpike>()))
+      return;
+   else
+      Entity::DamageEvent(ev);
 }
 
 void BettyLauncher::Killed(Event *ev)
