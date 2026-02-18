@@ -121,6 +121,7 @@ Event EV_Player_Mutate("mutate", EV_CHEAT);
 Event EV_Player_Human("human", EV_CHEAT);
 Event EV_Player_Skin("skin");
 Event EV_Player_LocalSound("localsound");
+Event EV_Player_SoundLength("soundlength", EV_CHEAT);
 
 Event EV_Player_WhatIs("whatis", EV_CHEAT);
 Event EV_Player_ActorInfo("actorinfo", EV_CHEAT);
@@ -252,6 +253,7 @@ ResponseDef Player::Responses[] =
    { &EV_Player_Skin,                   (Response)&Player::SetSkin },
 
    { &EV_Player_LocalSound,             (Response)&Player::LocalSoundEvent },
+   { &EV_Player_SoundLength,            (Response)&Player::SoundLength },
 
    //###
    { &EV_Player_GiveBikeCheat,          (Response)&Player::GiveBikeCheat }, // cheat to spawn a hoverbike
@@ -9125,6 +9127,34 @@ void Player::LocalSoundEvent(Event *ev)
 
    if(name.length())
       LocalSound(name.c_str(), volume, channel, pitch, timeofs, fadetime, flags);
+   else
+      ev->Error("Null sound specified.");
+}
+
+void Player::SoundLength(Event *ev)
+{
+   str name;
+
+   name = ev->GetString(1);
+
+   if(name.length())
+   {
+      float len;
+
+      len = gi.SoundLength(name.c_str());
+      gi.printf("%f\n", len);
+      
+      if(developer->value)
+      {
+         FILE *f;
+         f = fopen("sound.len", "wb");
+         if(f)
+         {
+            fwrite(&len, sizeof(float), 1, f);
+            fclose(f);
+         }
+      }
+   }
    else
       ev->Error("Null sound specified.");
 }
