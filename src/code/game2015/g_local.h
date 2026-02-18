@@ -301,7 +301,6 @@ public:
    str         default_fallback_mood;
    qboolean    default_music_forced;
    float       music_default_duration[16];
-   qboolean    music_failure_hack;
    str         music_failure_string;
 
    // Blending color for water, light volumes,lava

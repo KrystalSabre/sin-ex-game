@@ -2427,7 +2427,6 @@ level_locals_t::level_locals_t() : Class()
    default_fallback_mood = "normal";
    default_music_forced = false;
    memset(music_default_duration, 0, 16*sizeof(float));
-   music_failure_hack = false;
    music_failure_string = "";
 
    water_color = vec_zero;
@@ -2894,7 +2893,14 @@ void G_InitSoundtrack(void)
    name = musicdir->string;
    name += "/";
    name += level.soundtrack;
-   name += ".snd";
+   if(strchr(name.c_str(), '.'))
+   {
+      name[name.length()-3] = 's';
+      name[name.length()-2] = 'n';
+      name[name.length()-1] = 'd';
+   }
+   else
+      name += ".snd";
 
    length = gi.LoadFile(name.c_str(), (void **)&data, TAG_LEVEL);
    if(length < 0)
@@ -2907,6 +2913,14 @@ void G_InitSoundtrack(void)
    for(i = 0; i < 16; i++)
    {
       memcpy(&level.music_default_duration[i], &data[i*sizeof(float)], sizeof(float));
+   }
+
+   if(length > 64)
+   {
+      char file[MAX_OSPATH];
+      Q_strlcpy(file, &data[64], length - 63);
+      level.music_failure_string = file;
+      gi.printf("%s, %i\n", level.music_failure_string.c_str(), length);
    }
 
    gi.printf("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n", level.music_default_duration[0], level.music_default_duration[1], 

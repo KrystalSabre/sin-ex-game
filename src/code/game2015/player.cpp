@@ -7600,16 +7600,10 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
          }
          else if(duration && game.maxclients == 1 && gi.cvar("s_music", "1", 0)->value && current_mood_num != music_current_mood)
          {
-            ScriptVariable *var, *var2;
-            str name;
-
-            var = levelVars.GetVariable("musicstring");
-            var2 = levelVars.GetVariable("nullmusic");
-            if(var && (name = var->stringValue()).length())
+            if(level.music_failure_string.length())
             {
-               if(!var2 || (current_mood_num = MusicMood_NameToNum(var2->stringValue())) < 0)
-                  current_mood_num = mood_special;
-               LocalSound(var->stringValue(), 1.0, -1, ATTN_NORM, 1.0, 0.02f, 0, 0);
+               current_mood_num = mood_special;
+               LocalSound(level.music_failure_string.c_str(), 1.0, -1, ATTN_NORM, 1.0, 0.02f, 0, 0);
             }
             music_duration = 0;
          }
