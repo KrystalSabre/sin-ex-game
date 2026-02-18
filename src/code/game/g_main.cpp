@@ -2880,17 +2880,21 @@ void G_ServerCommand(void)
 
 void G_InitSoundtrack(void)
 {
-   int			length;
+   int			length, i;
    const char	*data = nullptr;
 
    str         name;
+   cvar_t      *musicdir;
 
    if(!level.soundtrack.length())
       return;
 
-   name = "music/";
+   musicdir = gi.cvar("s_musicdir", "", 0);
+
+   name = musicdir->string;
+   name += "/";
    name += level.soundtrack;
-   name += ".mus";
+   name += ".snd";
 
    length = gi.LoadFile(name.c_str(), (void **)&data, TAG_LEVEL);
    if(length < 0)
@@ -2898,8 +2902,12 @@ void G_InitSoundtrack(void)
       gi.printf("Couldn't load %s\n", name.c_str());
       return;
    }
-   else
-      gi.printf("Loading %s\n", name.c_str());
+
+   gi.printf("Loading %s\n", name.c_str());
+   for(i = 0; i < 16; i++)
+   {
+      memcpy(&level.music_default_duration[i], &data[i*sizeof(float)], sizeof(float));
+   }
 
    gi.printf("%.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f\n", level.music_default_duration[0], level.music_default_duration[1], 
       level.music_default_duration[2], level.music_default_duration[3], level.music_default_duration[4], level.music_default_duration[5], 
@@ -2910,9 +2918,9 @@ void G_InitSoundtrack(void)
    temp = fopen("music.test", "wb");
    if(temp)
    {
-      fwrite(data, sizeof(char), length, temp);
+      fwrite(&level.music_default_duration, sizeof(char), length, temp);
+      fclose(temp);
    }
-   fclose(temp);
 
    assert(data);
    if(data)
