@@ -6001,8 +6001,11 @@ void Player::ChangeMusic(const char * current, const char * fallback, qboolean f
       }
       else
       {
-         if(duration > 0)
+         if(level.music_default_duration[current_mood_num] > 0 && duration != -1 || duration > 0)
          {
+            if(level.music_default_duration[current_mood_num] > 0 && (!duration || level.music_default_duration[current_mood_num] < duration))
+               duration = level.music_default_duration[current_mood_num];
+
             if(force || !music_duration || music_forced == 2 || !(client->ps.current_music_mood == current_mood_num && music_duration <= level.time + duration))
                music_duration = -duration;
          }
