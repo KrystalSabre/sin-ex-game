@@ -6735,9 +6735,18 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
 
       player = (Player*)G_GetEntity(1 + currentCameraTarget);
       if(!player || !player->isClient() || player->spectator)
-         player = this;
-      client->ps.current_music_mood = player->music_current_mood;
-      client->ps.fallback_music_mood = player->music_fallback_mood;
+      {
+         client->ps.current_music_mood = music_current_mood;
+         if(level.music_default_duration[music_current_mood] == -1)
+            client->ps.fallback_music_mood = music_current_mood;
+         else
+            client->ps.fallback_music_mood = music_fallback_mood;
+      }
+      else
+      {
+         client->ps.current_music_mood = player->client->ps.current_music_mood;
+         client->ps.fallback_music_mood = player->client->ps.fallback_music_mood;
+      }
    }
    else if(music_duration > 0 && music_duration <= level.time + 0.001)
    {
@@ -6749,7 +6758,7 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
          client->ps.current_music_mood = music_fallback_mood;
          client->ps.fallback_music_mood = music_fallback_mood;
       }
-      else if(!music_forced && music_fallback_mood == music_current_mood)
+      else if(music_fallback_mood == music_current_mood && (!music_forced || level.music_default_duration[music_fallback_mood] > 0))
       {
          music_current_mood = mood_normal;
          music_fallback_mood = mood_normal;
@@ -6776,11 +6785,17 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
          }
          music_forced = false;
       }
+
+      if(level.music_default_duration[music_current_mood] > 0)
+         music_duration = level.time + level.music_default_duration[music_current_mood];
    }
    else if(music_forced)
    {
       client->ps.current_music_mood = music_current_mood;
-      client->ps.fallback_music_mood = music_fallback_mood;
+      if(level.music_default_duration[music_current_mood] == -1)
+         client->ps.fallback_music_mood = music_current_mood;
+      else
+         client->ps.fallback_music_mood = music_fallback_mood;
    }
    else if(action_level > 30)
    {
@@ -6807,7 +6822,10 @@ EXPORT_FROM_DLL void Player::UpdateMusic()
    else if(!(client->ps.current_music_mood == mood_action && music_current_mood == mood_action))
    {
       client->ps.current_music_mood = music_current_mood;
-      client->ps.fallback_music_mood = music_fallback_mood;
+      if(level.music_default_duration[music_current_mood] == -1)
+         client->ps.fallback_music_mood = music_current_mood;
+      else
+         client->ps.fallback_music_mood = music_fallback_mood;
    }
 
    if(action_level > 0)
