@@ -1594,7 +1594,7 @@ void Sentient::ArmorDamage(Event *ev)
 
          pl_defender = (Player *)this;
 
-         if(pl_defender->HasItem("CTF_Tech_Half") && !(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)))
+         if(pl_defender->HasItem("CTF_Tech_Shield") && !(dflags & (DAMAGE_NO_ARMOR | DAMAGE_NO_PROTECTION)))
          {
             damage *= 0.3f;
 

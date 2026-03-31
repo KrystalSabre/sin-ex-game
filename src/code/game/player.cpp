@@ -6733,7 +6733,7 @@ void Player::CTF_SoundEvent(Event *ev)
       {
          RandomGlobalSound("snd_empathy");
       }
-      else if(item = FindItem("CTF_Tech_Half"))
+      else if(item = FindItem("CTF_Tech_Shield"))
       {
          RandomGlobalSound("snd_shield");
       }
