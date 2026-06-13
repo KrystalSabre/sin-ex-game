@@ -18,7 +18,7 @@
 #include "lensflare.h"
 #include "light.h"
 
-CLASS_DECLARATION(Trigger, LensFlare, "lensflare");
+CLASS_DECLARATION(Entity, LensFlare, "lensflare");
 
 /*****************************************************************************/
 /*SINED lensflare (0 1 0) (-8 -8 -8) (8 8 8)
