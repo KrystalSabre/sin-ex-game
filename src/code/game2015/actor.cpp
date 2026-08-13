@@ -4001,7 +4001,8 @@ void Actor::FlyEvent(Event *ev)
 void Actor::NotLandEvent(Event *ev)
 {
    //movement &= ~AI_CANWALK;
-   flags &= FL_SWIM | FL_FLY;
+   //flags &= FL_SWIM | FL_FLY;
+   return;
 }
 
 inline qboolean Actor::CanMoveTo(Vector pos)
