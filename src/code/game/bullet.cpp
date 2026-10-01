@@ -476,7 +476,7 @@ void BulletWeapon::FireTracer(Vector end, Vector start, qboolean instant)
       tracer->setOrigin(src);
       tracer->setMoveType(MOVETYPE_FLY);
       tracer->velocity = forward * 1500;
-      tracer->PostEvent(EV_Remove, min(floor(dir.length() / (1500 * FRAMETIME)) * FRAMETIME, 2.0));
+      tracer->PostEvent(EV_Remove, min(floor(dir.length() / (1500 * FRAMETIME)) * FRAMETIME, 2.0) + 0.01);
    }
    else
    {
